@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.15'
+gem 'rails', '3.0.17'
 gem "jquery-rails"
 gem 'json'
 gem 'rest-client', :require => 'rest_client'
@@ -12,7 +12,7 @@ gem 'scoped_search', '>= 2.3.7'
 gem 'net-ldap'
 gem "safemode", "~> 1.0.1"
 gem 'uuidtools'
-gem "apipie-rails", ">= 0.0.7"
+gem "apipie-rails", ">= 0.0.12"
 gem 'rabl'
 # Previous versions collide with Environment model
 gem "ruby_parser", ">= 2.3.1"
