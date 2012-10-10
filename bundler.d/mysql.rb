@@ -1,3 +1,3 @@
 group :mysql do
-  gem 'mysql'
+  #gem 'mysql'
 end
