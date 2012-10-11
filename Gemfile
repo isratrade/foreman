@@ -17,8 +17,6 @@ gem 'rabl'
 # Previous versions collide with Environment model
 gem "ruby_parser", ">= 2.3.1"
 gem 'oauth'
-gem "puppet"
-gem "facter"
 
 Dir["#{File.dirname(__FILE__)}/bundler.d/*.rb"].each do |bundle|
  # puts "adding custom gem file #{bundle}"
