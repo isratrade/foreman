@@ -176,7 +176,9 @@ class ApplicationController < ActionController::Base
   end
 
   def update_activity_time
-    session[:expires_at] = Setting[:idle_timeout].minutes.from_now.utc
+    # check if idle_timeout is zero or negative. If yes, update to 1 year so user it's logged out immediately
+    idle_timeout = (Setting[:idle_timeout] <= 0 ? 525600 : Setting[:idle_timeout])
+    session[:expires_at] = idle_timeout.minutes.from_now.utc
   end
 
   def expire_session
