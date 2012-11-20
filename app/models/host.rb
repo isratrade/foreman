@@ -6,18 +6,18 @@ class Host < Puppet::Rails::Host
   define_model_callbacks :ready_for_build
 
   #regular callback
-  after_save :send_email_ready_to_build2
+  after_save :custom_callback_method
+
+  def custom_callback_method
+    run_callbacks :ready_for_build do
+      p "running reading for build method after save"  
+    end
+  end
+
   #custom callback
   after_ready_for_build :do_something_special_after_build 
-
-  def send_email_ready_to_build2
-    #do_something_special_after_build
-    #puts "sending email ready to build"  
-  end
   def do_something_special_after_build
-    run_callbacks :ready_for_build do
-      p "sending email ready to build"  
-    end
+      p "doing customized callback something special after build"  
   end
 
   belongs_to :model
