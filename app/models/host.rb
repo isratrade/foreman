@@ -3,21 +3,28 @@ require 'facts_importer'
 class Host < Puppet::Rails::Host
   include Authorization
   include ReportCommon
-  define_model_callbacks :ready_for_build
 
-  #regular callback
-  after_save :custom_callback_method
+  # Define custom hook that is executed after_save
+  # and can be called in model by methods before_ready_for_build or after_ready_for_build
+  define_model_callbacks :ready_for_build, :only => :after
+  after_save :run_custom_hooks
 
-  def custom_callback_method
-    run_callbacks :ready_for_build do
-      p "running reading for build method after save"  
+  def run_custom_hooks
+    if build?
+      run_callbacks :ready_for_build do
+        logger.debug { "custom hooks on #{name} will be executed if defined." }  
+      end
     end
   end
 
   #custom callback
+  #before_ready_for_build :do_something_special_before_build 
   after_ready_for_build :do_something_special_after_build 
+  #def do_something_special_before_build
+  #    p "doing customized callback something special BEFORE build"  
+  #end
   def do_something_special_after_build
-      p "doing customized callback something special after build"  
+      p "doing customized callback something special AFTER build"  
   end
 
   belongs_to :model

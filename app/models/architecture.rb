@@ -19,6 +19,4 @@ class Architecture < ActiveRecord::Base
     super({:only => [:name, :id]}.merge(options))
   end
 
-
-
 end
