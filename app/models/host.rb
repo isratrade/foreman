@@ -3,6 +3,23 @@ require 'facts_importer'
 class Host < Puppet::Rails::Host
   include Authorization
   include ReportCommon
+  define_model_callbacks :ready_for_build
+
+  #regular callback
+  after_save :send_email_ready_to_build2
+  #custom callback
+  after_ready_for_build :do_something_special_after_build 
+
+  def send_email_ready_to_build2
+    #do_something_special_after_build
+    #puts "sending email ready to build"  
+  end
+  def do_something_special_after_build
+    run_callbacks :ready_for_build do
+      p "sending email ready to build"  
+    end
+  end
+
   belongs_to :model
   has_many :host_classes, :dependent => :destroy
   has_many :puppetclasses, :through => :host_classes
