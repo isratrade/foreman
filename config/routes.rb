@@ -316,5 +316,5 @@ Foreman::Application.routes.draw do
   end
 
   #Keep this line the last route
-  match '*a', :to => 'errors#routing'
+  #match '*a', :to => 'errors#routing'
 end

@@ -48,7 +48,7 @@ Foreman::Application.routes.draw do
 
       match '/', :to => 'home#index'
       match 'status', :to => 'home#status', :as => "status"
-      match '*other', :to => 'home#route_error'
+   #   match '*other', :to => 'home#route_error'
     end
 
   end
