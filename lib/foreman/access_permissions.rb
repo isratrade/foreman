@@ -106,6 +106,8 @@ Foreman::AccessControl.map do |map|
     map.permission :create_params,  {:host_editing => [:create_params]}
     map.permission :edit_params,    {:host_editing => [:edit_params]}
     map.permission :destroy_params, {:host_editing => [:destroy_params]}
+    map.permission :edit_classes_api,  {:"api/v1/host_classes" => [:create, :destroy]}
+    map.permission :edit_params_api,  {:"api/v1/host_classes" => [:create, :update, :destroy]}
   end
 
   map.security_block :media do |map|
@@ -221,11 +223,6 @@ Foreman::AccessControl.map do |map|
     map.permission :create_trends,  {:trends => [:new, :create]}
     map.permission :edit_trends,    {:trends => [:edit, :update]}
     map.permission :destroy_trends, {:trends => [:destroy]}
-  end
-
-  map.security_block :host_classes do |map|
-    map.permission :edit_classes_api,  {:"api/v1/host_classes" => [:create, :destroy]}
-    map.permission :edit_params_api,  {:"api/v1/host_classes" => [:create, :update, :destroy]}
   end
 
 end

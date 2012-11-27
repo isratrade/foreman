@@ -22,7 +22,7 @@ module Api
       private
 
       def find_host_id
-        if @host =  Host.find_by_name(params[:host_id]) || Host.find_by_id(:params[:host_id])
+        if @host = Host.find_by_name(params[:host_id]) || Host.find_by_id(:params[:host_id])
           @host
         else
           render_error 'not_found', :status => :not_found and return false
