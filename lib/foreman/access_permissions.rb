@@ -222,4 +222,10 @@ Foreman::AccessControl.map do |map|
     map.permission :edit_trends,    {:trends => [:edit, :update]}
     map.permission :destroy_trends, {:trends => [:destroy]}
   end
+
+  map.security_block :host_classes do |map|
+    map.permission :edit_classes_api,  {:"api/v1/host_classes" => [:create, :destroy]}
+    map.permission :edit_params_api,  {:"api/v1/host_classes" => [:create, :update, :destroy]}
+  end
+
 end

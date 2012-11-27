@@ -26,6 +26,11 @@ Foreman::Application.routes.draw do
           resources :images, :except => [:new, :edit]
         end
       end
+      constraints(:host_id => /[^\/]+/) do
+        match "/hosts/:host_id/puppetclasses/:puppetclass_id/host_classes" => "host_classes#create", :via => :post
+        match "/hosts/:host_id/puppetclasses/:puppetclass_id/host_classes" => "host_classes#destroy", :via => :delete
+      end
+
       resources :config_templates, :except => [:new, :edit] do
         collection do
           get 'build_pxe_default'
