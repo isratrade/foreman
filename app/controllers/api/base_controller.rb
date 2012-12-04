@@ -107,6 +107,34 @@ module Api
       end
     end
 
+    def reference_name
+      if params[:host_id].present?
+        "Host"
+      end
+    end
+
+    def reference_class
+      @reference_class ||= reference_name.camelize.constantize
+    end
+
+
+    def find_reference
+      reference = resource_identifying_attributes.find do |key|
+        next if key=='id' and params[:id].to_i == 0
+        method = "find_by_#{key}"
+        reference_class.respond_to?(method) and
+          (reference = reference_class.send method, params[:id]) and
+          break reference
+      end
+
+      if resource
+        return instance_variable_set(:"@#{resource_name}", reference)
+      else
+        render_error 'not_found', :status => :not_found and return false
+      end
+    end
+
+
     def set_default_response_format
       request.format = :json if params[:format].blank?
     end

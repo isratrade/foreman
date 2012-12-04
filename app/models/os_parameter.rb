@@ -12,5 +12,4 @@ class OsParameter < Parameter
     errors.add :base, "You do not have permission to #{operation} this Operating System parameter"
     false
   end
-
 end

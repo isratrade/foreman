@@ -1,8 +1,7 @@
 module Api
-  module V1
-    class HostgroupsController < V1::BaseController
+  module V2
+    class HostgroupsController < V2::BaseController
       before_filter :find_resource, :only => %w{show update destroy}
-      before_filter :find_host
 
       api :GET, "/hostgroups/", "List all hostgroups."
       param :search, String, :desc => "filter results"
