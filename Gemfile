@@ -18,10 +18,10 @@ gem 'rabl', '>= 0.7.5'
 # Previous versions collide with Environment model
 gem "ruby_parser", ">= 2.3.1"
 gem 'oauth'
-gem 'foreman_reserve', :git => "https://github.com/isratrade/foreman_reserve.git"
+#gem 'foreman_reserve', :git => "https://github.com/isratrade/foreman_reserve.git"
 #gem 'foreman_reserve', :path => "../rails_apps/foreman_reserve"
-gem 'foreman_ovirt', :path => "../rails_apps/foreman_ovirt"
-#gem 'foreman_ovirt', :git => "https://github.com/isratrade/foreman_ovirt"
+#gem 'foreman_ovirt', :path => "../rails_apps/foreman_ovirt"
+gem 'foreman_ovirt', :git => "https://github.com/isratrade/foreman_ovirt.git"
 
 Dir["#{File.dirname(__FILE__)}/bundler.d/*.rb"].each do |bundle|
  # puts "adding custom gem file #{bundle}"
