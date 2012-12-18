@@ -13,6 +13,7 @@ Foreman::Application.routes.draw do
       constraints(:id => /[^\/]+/) do
         resources :domains, :except => [:new, :edit]
         resources :hosts, :except => [:new, :edit] do
+          get :status, :on => :member
           resources :reports       ,:only => [:index, :show] do
             get :last, :on => :collection
           end
