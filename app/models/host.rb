@@ -779,6 +779,25 @@ class Host < Puppet::Rails::Host
     end
   end
 
+  def smart_proxies
+    smart_proxies = Array.new
+    if subnet
+      smart_proxies << subnet.dhcp
+      smart_proxies << subnet.tftp
+      smart_proxies << subnet.dns
+    end
+    if domain
+      smart_proxies << domain.dns
+    end
+    if puppet_proxy_id.present?
+      smart_proxies << SmartProxy.find_by_id(puppet_proxy_id)
+    end
+    if hostgroup.try(:puppet_proxy_id)
+      smart_proxies << SmartProxy.find_by_id(hostgroup.puppet_proxy_id)
+    end
+    return smart_proxies.uniq
+  end
+
   private
   def lookup_keys_params
     return {} unless Setting["Enable_Smart_Variables_in_ENC"]
