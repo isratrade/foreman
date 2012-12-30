@@ -18,13 +18,16 @@ class TaxableImporter
   def self.mismatches_all
     a = Array.new
     Host.my_hosts.where('location_id > 0').each do |host|
-      misatches = self.new(host, host.location).mismatches
-      if misatches.length > 0
-        a << {:host => host.name, :mismatches => misatches}
+      mismatches = self.new(host, host.location).mismatches
+      if mismatches.length > 0
+        a << {:host => host.name, :mismatches => mismatches}
       end
     end
     Host.my_hosts.where('organization_id > 0').each do |host|
-      self.new(host, host.organization).mismatches
+      mismatches = self.new(host, host.organization).mismatches
+      if mismatches.length > 0
+        a << {:host => host.name, :mismatches => mismatches}
+      end
     end
     return a
   end
@@ -85,7 +88,7 @@ class TaxableImporter
     end
     if @host.smart_proxies.count > 0
       @host.smart_proxies.each do |smart_proxy|
-        if smart_proxy.try(:id) !@taxonomy.smart_proxies.pluck(:id).include?(smart_proxy.id)
+        if smart_proxy.try(:id) && !@taxonomy.smart_proxies.pluck(:id).include?(smart_proxy.id)
           mismatches << "SmartProxy"
         end
       end
