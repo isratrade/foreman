@@ -52,6 +52,8 @@ class Taxonomy < ActiveRecord::Base
     end
   end
 
+  class Mismatch < StandardError ; end
+
   def ensure_no_orphans(record)
     a = TaxableImporter.mismatches_for_taxonomy(self)
     error_msg = ""
@@ -61,7 +63,7 @@ class Taxonomy < ActiveRecord::Base
           error_msg += "Host #{err[:host].to_s} uses #{err[:mismatch_on].to_s} #{err[:value].to_s}\n"
         end
       end
-      raise error_msg
+      raise Mismatch, error_msg
     end
   end
 

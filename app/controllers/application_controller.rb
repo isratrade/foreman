@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   rescue_from ScopedSearch::QueryNotSupported, :with => :invalid_search_query
   rescue_from Exception, :with => :generic_exception if Rails.env.production?
   rescue_from ActiveRecord::RecordNotFound, :with => :not_found
+  rescue_from Taxonomy::Mismatch, :with => :cant_remove_taxonomy_settings
 
   # standard layout to all controllers
   helper 'layout'
@@ -118,6 +119,12 @@ class ApplicationController < ActionController::Base
       format.yml { head :status => 404}
     end
     true
+  end
+
+  def cant_remove_taxonomy_settings(exception = nil)
+    logger.debug "Mismatches: #{exception}" if exception
+    error "#{exception}"
+    redirect_to :back
   end
 
   def api_request?
