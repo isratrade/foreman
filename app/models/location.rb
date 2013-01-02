@@ -1,5 +1,7 @@
 class Location < Taxonomy
   include Foreman::ThreadSession::LocationModel
+  # include ActiveModel::Validations
+  # validates_with TaxonomyValidator
 
   has_and_belongs_to_many :organizations
   has_many :hosts
@@ -16,4 +18,5 @@ class Location < Taxonomy
         end
         where(conditions).reorder('type, name')
       }
+
 end

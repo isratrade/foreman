@@ -1,6 +1,8 @@
 class Taxonomy < ActiveRecord::Base
   audited
   has_associated_audits
+#  include ActiveModel::Validations
+#  validates_with TaxonomyValidator
 
   validates_presence_of :name
   validates_uniqueness_of :name, :scope => :type
@@ -13,7 +15,7 @@ class Taxonomy < ActiveRecord::Base
   has_many :compute_resources, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ComputeResource'
   has_many :media, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Medium'
   has_many :config_templates, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ConfigTemplate'
-  has_many :domains, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Domain'
+  has_many :domains, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Domain', :before_remove => :ensure_no_orphans
   has_many :hostgroups, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Hostgroup'
   has_many :environments, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Environment'
   has_many :subnets, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Subnet'
@@ -48,6 +50,18 @@ class Taxonomy < ActiveRecord::Base
         yield if block_given?
       end
     end
+  end
+
+  protected
+
+  def ensure_no_orphans(record)
+    #mm = Array.new
+    Host.all.each do |host|
+      if !TaxableImporter.new(host,self).matching?
+        raise "#{host.name} uses this"
+      end
+    end
+
   end
 
 end

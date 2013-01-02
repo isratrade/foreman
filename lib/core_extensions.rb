@@ -60,6 +60,30 @@ class ActiveRecord::Base
     end
   end
 
+  # ActiveRecord Callback class
+  class EnsureTaxonomyMatching
+    attr_reader :hosts, :taxonomy, :logger
+    def initialize
+      @hosts = Host.all
+      @logger  = Rails.logger
+    end
+
+    def before_destroy(record)
+      #@taxonomy = Location.find(record.taxonomy_id)
+      # @hosts.each do |host|
+      #   #if TaxableImporter.new(host,record).matching?
+      #     record.errors.add :base, "#{record.id} is used by #{host.id}"
+      #   #end
+      # end
+      # if record.errors.empty?
+      #   true
+      # else
+        @logger.error "You may333 not destroy #{record.id} as it is in use!"
+        false
+      # end
+    end
+  end
+
   def id_and_type
     "#{id}-#{self.class.table_name.humanize}"
   end
