@@ -22,6 +22,16 @@ class Taxonomy < ActiveRecord::Base
 
   scoped_search :on => :name, :complete_value => true
 
+  validate :test_method
+
+  def test_method
+    if true
+      errors.add(:name, "must be a location name")
+      errors.add('domains', "you cannot remove domains that are used by hosts.")
+    end
+  end
+
+
   def to_param
     "#{id.to_s.parameterize}"
   end
@@ -56,11 +66,15 @@ class Taxonomy < ActiveRecord::Base
 
   def ensure_no_orphans(record)
     a = TaxableImporter.mismatches_for_taxonomy(self)
-    error_msg = ""
+    error_msg = "The following cannot be removed since they belong to hosts:\n\n"
     unless a.length == 0
       a.each do |line|
         line.each do |err|
-          error_msg += "Host #{err[:host].to_s} uses #{err[:mismatch_on].to_s} #{err[:value].to_s}\n"
+          error_msg += "#{err[:value]} (#{err[:mismatch_on]}) \n"
+          self.errors.add :base, "Testing validation on base"
+          self.errors.add :name, "Testing validation error on name"
+
+          false
         end
       end
       raise Mismatch, error_msg

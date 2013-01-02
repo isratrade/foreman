@@ -121,12 +121,6 @@ class ApplicationController < ActionController::Base
     true
   end
 
-  def cant_remove_taxonomy_settings(exception = nil)
-    logger.debug "Mismatches: #{exception}" if exception
-    error "#{exception}"
-    redirect_to :back
-  end
-
   def api_request?
     request.format.json? or request.format.yaml?
   end

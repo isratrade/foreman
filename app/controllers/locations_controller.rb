@@ -93,4 +93,12 @@ class LocationsController < ApplicationController
   def find_location
     @location = Location.find(params[:id])
   end
+
+  def cant_remove_taxonomy_settings(exception = nil)
+    logger.debug "Mismatches: #{exception}" if exception
+    error "#{exception}"
+    redirect_to :back
+  end
+
+
 end
