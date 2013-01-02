@@ -19,4 +19,6 @@ class Location < Taxonomy
         where(conditions).reorder('type, name')
       }
 
+
+
 end

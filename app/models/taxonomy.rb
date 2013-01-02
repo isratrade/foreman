@@ -10,15 +10,15 @@ class Taxonomy < ActiveRecord::Base
   belongs_to :user
 
   has_many :taxable_taxonomies, :dependent => :destroy
-  has_many :users, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'User'
-  has_many :smart_proxies, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'SmartProxy'
-  has_many :compute_resources, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ComputeResource'
-  has_many :media, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Medium'
-  has_many :config_templates, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ConfigTemplate'
-  has_many :domains, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Domain', :before_remove => :ensure_no_orphans
-  has_many :hostgroups, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Hostgroup'
-  has_many :environments, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Environment'
-  has_many :subnets, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Subnet'
+  has_many :users, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'User', :after_remove => :ensure_no_orphans
+  has_many :smart_proxies, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'SmartProxy', :after_remove => :ensure_no_orphans
+  has_many :compute_resources, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ComputeResource', :after_remove => :ensure_no_orphans
+  has_many :media, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Medium', :after_remove => :ensure_no_orphans
+  has_many :config_templates, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ConfigTemplate', :after_remove => :ensure_no_orphans
+  has_many :domains, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Domain', :after_remove => :ensure_no_orphans
+  has_many :hostgroups, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Hostgroup', :after_remove => :ensure_no_orphans
+  has_many :environments, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Environment', :after_remove => :ensure_no_orphans
+  has_many :subnets, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Subnet', :after_remove => :ensure_no_orphans
 
   scoped_search :on => :name, :complete_value => true
 
@@ -52,16 +52,17 @@ class Taxonomy < ActiveRecord::Base
     end
   end
 
-  protected
-
   def ensure_no_orphans(record)
-    #mm = Array.new
-    Host.all.each do |host|
-      if !TaxableImporter.new(host,self).matching?
-        raise "#{host.name} uses this"
+    a = TaxableImporter.mismatches_for_taxonomy(self)
+    error_msg = ""
+    unless a.length == 0
+      a.each do |line|
+        line.each do |err|
+          error_msg += "Host #{err[:host].to_s} uses #{err[:mismatch_on].to_s} #{err[:value].to_s}\n"
+        end
       end
+      raise error_msg
     end
-
   end
 
 end
