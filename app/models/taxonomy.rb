@@ -1,8 +1,6 @@
 class Taxonomy < ActiveRecord::Base
   audited
   has_associated_audits
-#  include ActiveModel::Validations
-#  validates_with TaxonomyValidator
 
   validates_presence_of :name
   validates_uniqueness_of :name, :scope => :type
@@ -60,6 +58,49 @@ class Taxonomy < ActiveRecord::Base
         yield if block_given?
       end
     end
+  end
+
+  def hosts_used_ids
+    #initialize hash
+    a = {:organization_ids => [],
+         :location_ids => [],
+         :hostgroup_ids => [],
+         :environment_ids => [],
+         :domain_ids => [],
+         :config_template_ids => [],
+         :medium_ids => [],
+         :compute_resource_ids => [],
+         :subnet_ids => [],
+         :smart_proxy_ids => [],
+         :user_ids => []
+    }
+    #loop through hosts for taxonomy only
+    self.hosts.each do |host|
+      a[:organization_ids] << host.organization_id
+      a[:location_ids] << host.location_id
+      a[:hostgroup_ids] << host.hostgroup_id
+      a[:environment_ids] << host.environment_id
+      a[:domain_ids] << host.domain_id
+      a[:config_template_ids] << (host.operatingsystem_id.present? && host.configTemplate ?  host.configTemplate.id : nil)
+      a[:medium_ids] << host.medium_id
+      a[:compute_resource_ids] << host.compute_resource_id
+      a[:subnet_ids]  << host.subnet_id
+      a[:smart_proxy_ids] << host.medium_id
+      a[:user_ids] << (host.owner_type == 'User' ? host.owner_id : nil)
+    end
+    # remove nils in each array and make unqiue
+    a[:organization_ids] = a[:organization_ids].uniq.compact
+    a[:location_ids] = a[:location_ids].uniq.compact
+    a[:hostgroup_ids] = a[:hostgroup_ids].uniq.compact
+    a[:environment_ids] = a[:environment_ids].uniq.compact
+    a[:domain_ids] = a[:domain_ids].uniq.compact
+    a[:config_template_ids] = a[:config_template_ids].uniq.compact
+    a[:medium_ids] = a[:medium_ids].uniq.compact
+    a[:compute_resource_ids] =  a[:compute_resource_ids].uniq.compact
+    a[:subnet_ids] = a[:subnet_ids].uniq.compact
+    a[:smart_proxy_ids] = a[:smart_proxy_ids].uniq.compact
+    a[:user_ids] = a[:user_ids].uniq.compact
+    return a
   end
 
   class Mismatch < StandardError ; end

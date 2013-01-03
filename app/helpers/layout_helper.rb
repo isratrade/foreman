@@ -64,7 +64,7 @@ module LayoutHelper
       field(f, attr,options) do
         selected_ids = klass.send(ActiveModel::Naming.plural(associations.first)).select("#{associations.first.class.table_name}.id").map(&:id)
         attr_ids = (attr.to_s.singularize+"_ids").to_sym
-        f.collection_select attr_ids, associations.all, :id, :to_s ,{:selected => selected_ids}, html_options.merge(:multiple => true)
+        f.collection_select attr_ids, associations.all, :id, :to_s ,options.merge(:selected => selected_ids), html_options.merge(:multiple => true)
       end
     else
       field(f, attr, options) do

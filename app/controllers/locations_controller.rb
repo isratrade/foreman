@@ -58,6 +58,8 @@ class LocationsController < ApplicationController
   def edit
     Taxonomy.no_taxonomy_scope do
       # we explicitly render here in order to evaluate the view without taxonomy scope
+      #@hosts_used_ids = {:domain_ids => [2,10], :subnet_ids => [1,2]}
+      @hosts_used_ids = @location.hosts_used_ids
       render :edit
     end
   end
