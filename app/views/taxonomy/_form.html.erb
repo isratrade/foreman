@@ -26,48 +26,49 @@
 
       <div class="tab-pane" id="users">
         <%= multiple_checkboxes f, :users, taxonomy, User.except_admin,
-           {:disabled => hosts_used_ids[:smart_proxy_ids]} %>
+           {:disabled => used_and_selected_ids[:user_ids]} %>
       </div>
 
       <div class="tab-pane" id="smart_proxies">
         <%= multiple_checkboxes f, :smart_proxies, taxonomy, SmartProxy,
-           {:disabled => hosts_used_ids[:smart_proxy_ids]} %>
+           {:disabled => used_and_selected_ids[:smart_proxy_ids]} %>
       </div>
 
       <div class="tab-pane" id="subnets">
         <%= multiple_checkboxes f, :subnets, taxonomy, Subnet,
-            {:disabled => hosts_used_ids[:subnet_ids]} %>
+            {:disabled => used_and_selected_ids[:subnet_ids]} %>
       </div>
 
       <div class="tab-pane" id="compute_resources">
         <%= multiple_checkboxes f, :compute_resources, taxonomy, ComputeResource,
-            {:disabled => hosts_used_ids[:compute_resource_ids]} %>
+            {:disabled => used_and_selected_ids[:compute_resource_ids]} %>
       </div>
 
       <div class="tab-pane" id="media">
         <%= multiple_checkboxes f, :media, taxonomy, Medium,
-           {:disabled => hosts_used_ids[:medium_ids]} %>
+           {:disabled => used_and_selected_ids[:medium_ids]} %>
       </div>
 
       <div class="tab-pane" id="template">
         <%= multiple_checkboxes f, :config_templates, taxonomy, ConfigTemplate,
-           {:disabled => hosts_used_ids[:config_template_ids]} %>
+           {:disabled => used_and_selected_ids[:config_template_ids]} %>
       </div>
 
       <div class="tab-pane" id="domains">
-        <%#= multiple_checkboxes f, :domains, taxonomy, Domain %>
         <%= multiple_checkboxes f, :domains, taxonomy, Domain,
-           {:disabled => hosts_used_ids[:domain_ids]} %>
+           {:disabled => used_and_selected_ids[:domain_ids]},
+           {:should_be_checked => need_to_be_selected_ids[:domain_ids]}
+            %>
       </div>
 
       <div class="tab-pane" id="environments">
         <%= multiple_checkboxes f, :environments, taxonomy, Environment,
-            {:disabled => hosts_used_ids[:config_template_ids]} %>
+            {:disabled => used_and_selected_ids[:config_template_ids]} %>
       </div>
 
       <div class="tab-pane" id="hostgroups">
         <%= multiple_checkboxes f, :hostgroups, taxonomy, Hostgroup,
-            {:disabled => hosts_used_ids[:hostgroup_ids]} %>
+            {:disabled => used_and_selected_ids[:hostgroup_ids]} %>
       </div>
 
       <% if (taxonomy.is_a?(Location) ? SETTINGS[:organizations_enabled] : SETTINGS[:locations_enabled]) %>

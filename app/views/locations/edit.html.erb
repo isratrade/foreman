@@ -1,3 +1,6 @@
 <% title "Edit #{@location}" %>
 
-<%= render 'taxonomy/form' , :taxonomy => @location, :hosts_used_ids => @hosts_used_ids %>
+<%= render 'taxonomy/form' , :taxonomy => @location,
+                             :used_and_selected_ids => @used_and_selected_ids,
+                             :need_to_be_selected_ids => @need_to_be_selected_ids
+                              %>

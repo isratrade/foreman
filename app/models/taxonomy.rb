@@ -20,7 +20,7 @@ class Taxonomy < ActiveRecord::Base
 
   scoped_search :on => :name, :complete_value => true
 
-  validate :test_method
+  #validate :test_method
 
   def test_method
     if true
@@ -60,7 +60,7 @@ class Taxonomy < ActiveRecord::Base
     end
   end
 
-  def hosts_used_ids
+  def used_ids
     #initialize hash
     a = {:organization_ids => [],
          :location_ids => [],
@@ -103,23 +103,122 @@ class Taxonomy < ActiveRecord::Base
     return a
   end
 
+  def selected_ids
+    #initialize hash
+    b = {:organization_ids => [],
+         :location_ids => [],
+         :hostgroup_ids => [],
+         :environment_ids => [],
+         :domain_ids => [],
+         :config_template_ids => [],
+         :medium_ids => [],
+         :compute_resource_ids => [],
+         :subnet_ids => [],
+         :smart_proxy_ids => [],
+         :user_ids => []
+    }
+    if self.is_a?(Location)
+      b[:organization_ids] = organizations.pluck(:id)
+    else
+      b[:location_ids] = locations.pluck(:id)
+    end
+    b[:hostgroup_ids] = hostgroups.pluck(:id)
+    b[:environment_ids] = environments.pluck(:id)
+    b[:domain_ids] = domains.pluck(:id)
+    b[:config_template_ids] = config_templates.pluck(:id)
+    b[:medium_ids] = media.pluck(:id)
+    b[:compute_resource_ids] =  compute_resources.pluck(:id)
+    b[:subnet_ids] = subnets.pluck(:id)
+    b[:smart_proxy_ids] = smart_proxies.pluck(:id)
+    b[:user_ids] = users.pluck(:id)
+    return b
+  end
+
+  def used_and_selected_ids
+    a = used_ids
+    b = selected_ids
+    c = {:organization_ids => [],
+         :location_ids => [],
+         :hostgroup_ids => [],
+         :environment_ids => [],
+         :domain_ids => [],
+         :config_template_ids => [],
+         :medium_ids => [],
+         :compute_resource_ids => [],
+         :subnet_ids => [],
+         :smart_proxy_ids => [],
+         :user_ids => []
+    }
+    if self.is_a?(Location)
+      c[:organization_ids] = a[:organization_ids] & b[:organization_ids]
+    else
+      c[:location_ids] = a[:location_ids] & b[:location_ids]
+    end
+    c[:environment_ids] = a[:environment_ids] & b[:environment_ids]
+    c[:hostgroup_ids] = a[:hostgroup_ids] & b[:hostgroup_ids]
+    c[:environment_ids] = a[:environment_ids] & b[:environment_ids]
+    c[:domain_ids] = a[:domain_ids] & b[:domain_ids]
+    c[:config_template_ids] = a[:config_template_ids] & b[:config_template_ids]
+    c[:medium_ids] = a[:medium_ids] & b[:medium_ids]
+    c[:compute_resource_ids] = a[:compute_resource_ids] & b[:compute_resource_ids]
+    c[:subnet_ids] = a[:subnet_ids] & b[:subnet_ids]
+    c[:smart_proxy_ids] = a[:smart_proxy_ids] & b[:smart_proxy_ids]
+    c[:user_ids] = a[:user_ids] & b[:user_ids]
+    return c
+  end
+
+  def need_to_be_selected_ids
+    a = used_ids
+    b = selected_ids
+    d = {:organization_ids => [],
+         :location_ids => [],
+         :hostgroup_ids => [],
+         :environment_ids => [],
+         :domain_ids => [],
+         :config_template_ids => [],
+         :medium_ids => [],
+         :compute_resource_ids => [],
+         :subnet_ids => [],
+         :smart_proxy_ids => [],
+         :user_ids => []
+    }
+    if self.is_a?(Location)
+      d[:organization_ids] = a[:organization_ids] - b[:organization_ids]
+    else
+      d[:location_ids] = a[:location_ids] - b[:location_ids]
+    end
+    d[:environment_ids] = a[:environment_ids] - b[:environment_ids]
+    d[:hostgroup_ids] = a[:hostgroup_ids] - b[:hostgroup_ids]
+    d[:environment_ids] = a[:environment_ids] - b[:environment_ids]
+    d[:domain_ids] = a[:domain_ids] - b[:domain_ids]
+    d[:config_template_ids] = a[:config_template_ids] - b[:config_template_ids]
+    d[:medium_ids] = a[:medium_ids] - b[:medium_ids]
+    d[:compute_resource_ids] = a[:compute_resource_ids] - b[:compute_resource_ids]
+    d[:subnet_ids] = a[:subnet_ids] - b[:subnet_ids]
+    d[:smart_proxy_ids] = a[:smart_proxy_ids] - b[:smart_proxy_ids]
+    d[:user_ids] = a[:user_ids] - b[:user_ids]
+    return d
+  end
+
+
   class Mismatch < StandardError ; end
 
   def ensure_no_orphans(record)
-    a = TaxableImporter.mismatches_for_taxonomy(self)
-    error_msg = "The following cannot be removed since they belong to hosts:\n\n"
-    unless a.length == 0
-      a.each do |line|
-        line.each do |err|
-          error_msg += "#{err[:value]} (#{err[:mismatch_on]}) \n"
-          self.errors.add :base, "Testing validation on base"
-          self.errors.add :name, "Testing validation error on name"
+    # a = TaxableImporter.mismatches_for_taxonomy(self)
+    # error_msg = "The following cannot be removed since they belong to hosts:\n\n"
+    # unless a.length == 0
+    #   a.each do |line|
+    #     line.each do |err|
+    #       error_msg += "#{err[:value]} (#{err[:mismatch_on]}) \n"
+    #       self.errors.add :base, "Testing validation on base"
+    #       self.errors.add :name, "Testing validation error on name"
 
-          false
-        end
-      end
-      raise Mismatch, error_msg
-    end
+    #       false
+    #     end
+    #   end
+    #   raise Mismatch, error_msg
+    # end
+    true
   end
 
 end

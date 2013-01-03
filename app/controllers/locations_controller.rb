@@ -59,7 +59,8 @@ class LocationsController < ApplicationController
     Taxonomy.no_taxonomy_scope do
       # we explicitly render here in order to evaluate the view without taxonomy scope
       #@hosts_used_ids = {:domain_ids => [2,10], :subnet_ids => [1,2]}
-      @hosts_used_ids = @location.hosts_used_ids
+      @used_and_selected_ids = @location.used_and_selected_ids
+      @need_to_be_selected_ids = @location.need_to_be_selected_ids
       render :edit
     end
   end
@@ -71,6 +72,8 @@ class LocationsController < ApplicationController
     if result
       process_success
     else
+      @used_and_selected_ids = @location.used_and_selected_ids
+      @need_to_be_selected_ids = @location.need_to_be_selected_ids
       process_error
     end
   end
