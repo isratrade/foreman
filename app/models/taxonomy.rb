@@ -204,21 +204,28 @@ class Taxonomy < ActiveRecord::Base
   class Mismatch < StandardError ; end
 
   def ensure_no_orphans(record)
-    # a = TaxableImporter.mismatches_for_taxonomy(self)
-    # error_msg = "The following cannot be removed since they belong to hosts:\n\n"
-    # unless a.length == 0
-    #   a.each do |line|
-    #     line.each do |err|
-    #       error_msg += "#{err[:value]} (#{err[:mismatch_on]}) \n"
-    #       self.errors.add :base, "Testing validation on base"
-    #       self.errors.add :name, "Testing validation error on name"
-
-    #       false
-    #     end
-    #   end
-    #   raise Mismatch, error_msg
-    # end
-    true
+    a = self.need_to_be_selected_ids
+    found_orphan = false
+    error_msg = "The following cannot be removed since they belong to hosts:\n\n"
+    a.each do |key, array_values|
+      unless a.length == 0
+        class_name = key.to_s[0..-5].classify
+        klass = class_name.constantize
+        array_values.each do |id|
+          record = klass.find_by_id(id)
+          error_msg += "#{record.to_s} (#{class_name}) \n"
+  #       self.errors.add :base, "Testing validation on base"
+  #       self.errors.add :name, "Testing validation error on name"
+          found_orphan = true
+        end
+      end
+    end
+    if found_orphan
+      raise Mismatch, error_msg
+      false
+    else
+      true
+    end
   end
 
 end
