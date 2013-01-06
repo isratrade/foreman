@@ -59,12 +59,17 @@ module LayoutHelper
     end
   end
 
+#(options[:disabled] ||=[])
   def multiple_checkboxes(f, attr, klass, associations, options = {}, html_options={})
     if associations.count > 5
       field(f, attr,options) do
         selected_ids = klass.send(ActiveModel::Naming.plural(associations.first)).select("#{associations.first.class.table_name}.id").map(&:id)
         attr_ids = (attr.to_s.singularize+"_ids").to_sym
-        f.collection_select attr_ids, associations.all, :id, :to_s ,options.merge(:selected => selected_ids), html_options.merge(:multiple => true)
+        hidden_fields = f.hidden_field(attr_ids, :multiple => true, :value => '')
+        options[:disabled].each do |disabled_value|
+          hidden_fields += f.hidden_field(attr_ids, :multiple => true, :value => disabled_value )
+        end
+        hidden_fields + f.collection_select(attr_ids, associations.all, :id, :to_s ,options.merge(:selected => selected_ids), html_options.merge(:multiple => true))
       end
     else
       field(f, attr, options) do

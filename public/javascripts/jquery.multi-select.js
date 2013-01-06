@@ -466,3 +466,14 @@ $(document).on('click', '.ms-deselect-all', function () {
   $(this).closest('.controls').find('select[multiple]').multiSelect('deselect_all');
   return false;
 });
+
+
+$(function(){
+  $('select[multiple]').each(function(i,item){
+    var missing_ids = $.parseJSON($(item).attr('data-mismatches'));
+    $.each(missing_ids, function(index,missing_id){
+      var missing_name = $(item).find('option[value="'+$(item).attr('id')+'"]').text();
+      $('#ms-'+$(item).attr('id') +' ul li span:contains("'+missing_id+'")').addClass('delete');
+    })
+  })
+});
