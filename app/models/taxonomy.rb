@@ -197,7 +197,7 @@ class Taxonomy < ActiveRecord::Base
     d[:subnet_ids] = a[:subnet_ids] - b[:subnet_ids]
     d[:smart_proxy_ids] = a[:smart_proxy_ids] - b[:smart_proxy_ids]
     d[:user_ids] = a[:user_ids] - b[:user_ids]
-    return d.to_json
+    return d
   end
 
 
