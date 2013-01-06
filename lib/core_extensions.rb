@@ -78,8 +78,8 @@ class ActiveRecord::Base
       # if record.errors.empty?
       #   true
       # else
-        @logger.error "You may333 not destroy #{record.id} as it is in use!"
-        false
+      #  @logger.error "You may333 not destroy #{record.id} as it is in use!"
+      #  false
       # end
     end
   end
