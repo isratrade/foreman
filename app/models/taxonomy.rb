@@ -8,27 +8,19 @@ class Taxonomy < ActiveRecord::Base
   belongs_to :user
 
   has_many :taxable_taxonomies, :dependent => :destroy
-  has_many :users, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'User', :after_remove => :ensure_no_orphans
-  has_many :smart_proxies, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'SmartProxy', :after_remove => :ensure_no_orphans
-  has_many :compute_resources, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ComputeResource', :after_remove => :ensure_no_orphans
-  has_many :media, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Medium', :after_remove => :ensure_no_orphans
-  has_many :config_templates, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ConfigTemplate', :after_remove => :ensure_no_orphans
-  has_many :domains, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Domain', :after_remove => :ensure_no_orphans
-  has_many :hostgroups, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Hostgroup', :after_remove => :ensure_no_orphans
-  has_many :environments, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Environment', :after_remove => :ensure_no_orphans
-  has_many :subnets, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Subnet', :after_remove => :ensure_no_orphans
+  has_many :users, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'User'
+  has_many :smart_proxies, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'SmartProxy'
+  has_many :media, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Medium'
+  has_many :config_templates, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ConfigTemplate'
+  has_many :compute_resources, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'ComputeResource'
+  has_many :domains, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Domain'
+  has_many :hostgroups, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Hostgroup'
+  has_many :environments, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Environment'
+  has_many :subnets, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'Subnet'
 
   scoped_search :on => :name, :complete_value => true
 
-  #validate :test_method
-
-  def test_method
-    if true
-      errors.add(:name, "must be a location name")
-      errors.add('domains', "you cannot remove domains that are used by hosts.")
-    end
-  end
-
+  validate :check_for_orphans
 
   def to_param
     "#{id.to_s.parameterize}"
@@ -85,7 +77,7 @@ class Taxonomy < ActiveRecord::Base
       a[:medium_ids] << host.medium_id
       a[:compute_resource_ids] << host.compute_resource_id
       a[:subnet_ids]  << host.subnet_id
-      a[:smart_proxy_ids] << host.medium_id
+      a[:smart_proxy_ids] << host.smart_proxy_ids
       a[:user_ids] << (host.owner_type == 'User' ? host.owner_id : nil)
     end
     # remove nils in each array and make unqiue
@@ -98,7 +90,7 @@ class Taxonomy < ActiveRecord::Base
     a[:medium_ids] = a[:medium_ids].uniq.compact
     a[:compute_resource_ids] =  a[:compute_resource_ids].uniq.compact
     a[:subnet_ids] = a[:subnet_ids].uniq.compact
-    a[:smart_proxy_ids] = a[:smart_proxy_ids].uniq.compact
+    a[:smart_proxy_ids] = a[:smart_proxy_ids].flatten.uniq.compact
     a[:user_ids] = a[:user_ids].uniq.compact
     return a
   end
@@ -196,36 +188,29 @@ class Taxonomy < ActiveRecord::Base
     d[:compute_resource_ids] = a[:compute_resource_ids] - b[:compute_resource_ids]
     d[:subnet_ids] = a[:subnet_ids] - b[:subnet_ids]
     d[:smart_proxy_ids] = a[:smart_proxy_ids] - b[:smart_proxy_ids]
-    d[:user_ids] = a[:user_ids] - b[:user_ids]
+    d[:user_ids] = a[:user_ids] - b[:user_ids] - User.only_admin.pluck(:id)
     return d
   end
 
-
   class Mismatch < StandardError ; end
 
-  def ensure_no_orphans(record)
+  def check_for_orphans
     a = self.need_to_be_selected_ids
     found_orphan = false
-    error_msg = "The following cannot be removed since they belong to hosts:\n\n"
+    error_msg = "The following must be selected since they belong to hosts:\n\n"
     a.each do |key, array_values|
-      unless a.length == 0
+      unless array_values.length == 0
         class_name = key.to_s[0..-5].classify
         klass = class_name.constantize
         array_values.each do |id|
-          record = klass.find_by_id(id)
-          error_msg += "#{record.to_s} (#{class_name}) \n"
-  #       self.errors.add :base, "Testing validation on base"
-  #       self.errors.add :name, "Testing validation error on name"
+          row = klass.find_by_id(id)
+          error_msg += "#{row.to_s} (#{class_name}) \n"
           found_orphan = true
         end
+        errors.add(class_name.downcase.pluralize, "You cannot remove #{class_name.downcase.pluralize} that are used by hosts.")
       end
     end
-    if found_orphan
-      raise Mismatch, error_msg
-      false
-    else
-      true
-    end
+    errors.add(:base, error_msg) if found_orphan
   end
 
 end

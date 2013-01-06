@@ -62,7 +62,7 @@
 
       <div class="tab-pane" id="domains">
         <%= multiple_checkboxes f, :domains, taxonomy, Domain,
-           {:disabled => used_and_selected_ids[:domain_ids]},
+            {:disabled => used_and_selected_ids[:domain_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:domain_ids].to_json} %>
       </div>
 

@@ -798,6 +798,10 @@ class Host < Puppet::Rails::Host
     return smart_proxies.uniq
   end
 
+  def smart_proxy_ids
+    smart_proxies.compact.map(&:id)
+  end
+
   private
   def lookup_keys_params
     return {} unless Setting["Enable_Smart_Variables_in_ENC"]

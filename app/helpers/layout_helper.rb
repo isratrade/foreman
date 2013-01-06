@@ -61,7 +61,7 @@ module LayoutHelper
 
 #(options[:disabled] ||=[])
   def multiple_checkboxes(f, attr, klass, associations, options = {}, html_options={})
-    if associations.count > 5
+    if associations.count > 0
       field(f, attr,options) do
         selected_ids = klass.send(ActiveModel::Naming.plural(associations.first)).select("#{associations.first.class.table_name}.id").map(&:id)
         attr_ids = (attr.to_s.singularize+"_ids").to_sym
