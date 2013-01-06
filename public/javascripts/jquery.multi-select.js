@@ -467,13 +467,12 @@ $(document).on('click', '.ms-deselect-all', function () {
   return false;
 });
 
-
 $(function(){
   $('select[multiple]').each(function(i,item){
     var missing_ids = $.parseJSON($(item).attr('data-mismatches'));
     $.each(missing_ids, function(index,missing_id){
-      var missing_name = $(item).find('option[value="'+$(item).attr('id')+'"]').text();
-      $('#ms-'+$(item).attr('id') +' ul li span:contains("'+missing_id+'")').addClass('delete');
+      opt_id = (missing_id +"").replace(/[^A-Za-z0-9]*/gi, '_')+'-selectable';
+      $('#ms-'+$(item).attr('id')).find('#'+opt_id).addClass('delete');
     })
   })
 });
