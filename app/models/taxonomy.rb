@@ -90,6 +90,7 @@ class Taxonomy < ActiveRecord::Base
     a[:medium_ids] = a[:medium_ids].uniq.compact
     a[:compute_resource_ids] =  a[:compute_resource_ids].uniq.compact
     a[:subnet_ids] = a[:subnet_ids].uniq.compact
+    # flatten smart_proxy id's since array of arrays is returned
     a[:smart_proxy_ids] = a[:smart_proxy_ids].flatten.uniq.compact
     a[:user_ids] = a[:user_ids].uniq.compact
     return a

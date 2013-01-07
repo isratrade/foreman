@@ -25,68 +25,68 @@
       </div>
 
       <div class="tab-pane" id="users">
-        <%= multiple_checkboxes f, :users, taxonomy, User.except_admin,
+        <%= multiple_selects f, :users, taxonomy, User.except_admin,
            {:disabled => used_and_selected_ids[:user_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:user_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="smart_proxies">
-        <%= multiple_checkboxes f, :smart_proxies, taxonomy, SmartProxy,
+        <%= multiple_selects f, :smart_proxies, taxonomy, SmartProxy,
            {:disabled => used_and_selected_ids[:smart_proxy_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:smart_proxy_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="subnets">
-        <%= multiple_checkboxes f, :subnets, taxonomy, Subnet,
+        <%= multiple_selects f, :subnets, taxonomy, Subnet,
             {:disabled => used_and_selected_ids[:subnet_ids]},
             {'data-mismatches' => need_to_be_selected_ids[:subnet_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="compute_resources">
-        <%= multiple_checkboxes f, :compute_resources, taxonomy, ComputeResource,
+        <%= multiple_selects f, :compute_resources, taxonomy, ComputeResource,
             {:disabled => used_and_selected_ids[:compute_resource_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:compute_resource_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="media">
-        <%= multiple_checkboxes f, :media, taxonomy, Medium,
+        <%= multiple_selects f, :media, taxonomy, Medium,
            {:disabled => used_and_selected_ids[:medium_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:medium_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="template">
-        <%= multiple_checkboxes f, :config_templates, taxonomy, ConfigTemplate,
+        <%= multiple_selects f, :config_templates, taxonomy, ConfigTemplate,
            {:disabled => used_and_selected_ids[:config_template_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:config_template_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="domains">
-        <%= multiple_checkboxes f, :domains, taxonomy, Domain,
+        <%= multiple_selects f, :domains, taxonomy, Domain,
            {:disabled => used_and_selected_ids[:domain_ids]},
            {'data-mismatches' => need_to_be_selected_ids[:domain_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="environments">
-        <%= multiple_checkboxes f, :environments, taxonomy, Environment,
+        <%= multiple_selects f, :environments, taxonomy, Environment,
             {:disabled => used_and_selected_ids[:environment_ids]},
             {'data-mismatches' => need_to_be_selected_ids[:environment_ids].to_json} %>
       </div>
 
       <div class="tab-pane" id="hostgroups">
-        <%= multiple_checkboxes f, :hostgroups, taxonomy, Hostgroup,
+        <%= multiple_selects f, :hostgroups, taxonomy, Hostgroup,
             {:disabled => used_and_selected_ids[:hostgroup_ids]},
             {'data-mismatches' => need_to_be_selected_ids[:hostgroup_ids].to_json} %>
      </div>
 
       <% if taxonomy.is_a?(Location) && SETTINGS[:locations_enabled] %>
         <div class="tab-pane" id="organizations">
-          <%= multiple_checkboxes f, :organizations, taxonomy, Organization,
+          <%= multiple_selects f, :organizations, taxonomy, Organization,
             {:disabled => used_and_selected_ids[:organization_ids]},
             {'data-mismatches' => need_to_be_selected_ids[:organization_ids].to_json} %>
         </div>
       <% elsif taxonomy.is_a?(Organization) && SETTINGS[:organizations_enabled] %>
         <div class="tab-pane" id="locations">
-          <%= multiple_checkboxes f, :locations, taxonomy, Location,
+          <%= multiple_selects f, :locations, taxonomy, Location,
             {:disabled => used_and_selected_ids[:location_ids]},
             {'data-mismatches' => need_to_be_selected_ids[:location_ids].to_json} %>
         </div>

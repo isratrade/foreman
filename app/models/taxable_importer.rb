@@ -5,6 +5,7 @@ class TaxableImporter
     @taxonomy = taxonomy
   end
 
+
   def self.import_all
     Host.my_hosts.where('location_id > 0').each do |host|
       self.new(host, host.location).correct_mismatches
@@ -80,6 +81,51 @@ class TaxableImporter
         end
       end
     end
+  end
+
+  def missing_ids
+    missing_ids = Array.new
+    if @taxonomy.is_a?(Location)
+      if @host.organization_id.present? && !@taxonomy.organizations.pluck(:id).include?(@host.organization_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Organization", :taxable_id => @host.organization_id}
+      end
+    else
+      if @host.organization_id.present? && !@taxonomy.locations.pluck(:id).include?(@host.location_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Location", :taxable_id => @host.location_id}
+      end
+    end
+    if @host.hostgroup_id.present? && !@taxonomy.hostgroups.pluck(:id).include?(@host.hostgroup_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Hostgroup", :taxable_id => @host.hostgroup_id}
+    end
+    if @host.environment_id.present? && !@taxonomy.environments.pluck(:id).include?(@host.environment_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Environment", :taxable_id => @host.environment_id}
+    end
+    if @host.operatingsystem_id.present? && @host.configTemplate && !@taxonomy.config_templates.pluck(:id).include?(@host.configTemplate.id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "ConfigTemplate", :taxable_id => @host.configTemplate.id}
+    end
+    if @host.medium_id.present? && !@taxonomy.media.pluck(:id).include?(@host.medium_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Medium", :taxable_id => @host.medium_id}
+    end
+    if @host.compute_resource_id.present? && !@taxonomy.compute_resources.pluck(:id).include?(@host.compute_resource_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "ComputeResource", :taxable_id => @host.compute_resource_id}
+    end
+    if @host.subnet_id.present? && !@taxonomy.subnets.pluck(:id).include?(@host.subnet_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Subnet", :taxable_id => @host.subnet_id}
+    end
+    if @host.domain_id.present? && !@taxonomy.domains.pluck(:id).include?(@host.domain_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "Domain", :taxable_id => @host.domain_id}
+    end
+    if @host.smart_proxies.count > 0
+      @host.smart_proxies.each do |smart_proxy|
+        if smart_proxy.try(:id) && !@taxonomy.smart_proxies.pluck(:id).include?(smart_proxy.id)
+          missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "SmartProxy", :taxable_id => smart_proxy.id}
+        end
+      end
+    end
+    if @host.owner_id.present? && @host.owner_type == "User" && !User.find(@host.owner_id).admin && !@taxonomy.users.pluck(:id).include?(@host.owner_id)
+        missing_ids << {:taxonomy_id => @taxonomy.id, :taxable_type => "User", :taxable_id => @host.owner_id}
+    end
+    return missing_ids
   end
 
   def mismatches

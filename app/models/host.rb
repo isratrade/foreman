@@ -193,7 +193,7 @@ class Host < Puppet::Rails::Host
     include Orchestration::SSHProvision
     include HostTemplateHelpers
 
-    validates_uniqueness_of  :ip, :if => Proc.new {|host| host.require_ip_validation?}
+    validates_uniqueness_of  :ip, :if => Proc.new {|host| require_ip_validation?}
     validates_uniqueness_of  :mac, :unless => Proc.new { |host| host.compute? or !host.managed }
     validates_presence_of    :architecture_id, :operatingsystem_id, :if => Proc.new {|host| host.managed}
     validates_presence_of    :domain_id, :if => Proc.new {|host| host.managed}
@@ -802,6 +802,66 @@ class Host < Puppet::Rails::Host
     smart_proxies.compact.map(&:id)
   end
 
+  def import_missing_ids
+    if missing_ids.length > 0
+      missing_ids.each do |row|
+        TaxableTaxonomy.create!(:taxonomy_id => row[:taxonomy_id],
+                                :taxable_id => row[:taxable_id],
+                                :taxable_type => row[:taxable_type]
+                              )
+      end
+    end
+  end
+
+  def missing_ids
+    (missing_ids_for(location) if location) + (missing_ids_for(organization) if organization)
+  end
+
+  def missing_ids_for(taxonomy)
+    missing_ids = Array.new
+    if taxonomy.is_a?(Location)
+      if organization_id.present? && !taxonomy.organizations.pluck(:id).include?(organization_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Organization", :taxable_id => organization_id}
+      end
+    else
+      if organization_id.present? && !taxonomy.locations.pluck(:id).include?(location_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Location", :taxable_id => location_id}
+      end
+    end
+    if hostgroup_id.present? && !taxonomy.hostgroups.pluck(:id).include?(hostgroup_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Hostgroup", :taxable_id => hostgroup_id}
+    end
+    if environment_id.present? && !taxonomy.environments.pluck(:id).include?(environment_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Environment", :taxable_id => environment_id}
+    end
+    if operatingsystem_id.present? && configTemplate && !taxonomy.config_templates.pluck(:id).include?(configTemplate.id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "ConfigTemplate", :taxable_id => configTemplate.id}
+    end
+    if medium_id.present? && !taxonomy.media.pluck(:id).include?(medium_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Medium", :taxable_id => medium_id}
+    end
+    if compute_resource_id.present? && !taxonomy.compute_resources.pluck(:id).include?(compute_resource_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "ComputeResource", :taxable_id => compute_resource_id}
+    end
+    if subnet_id.present? && !taxonomy.subnets.pluck(:id).include?(subnet_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Subnet", :taxable_id => subnet_id}
+    end
+    if domain_id.present? && !taxonomy.domains.pluck(:id).include?(domain_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "Domain", :taxable_id => domain_id}
+    end
+    if smart_proxies.count > 0
+      smart_proxies.each do |smart_proxy|
+        if smart_proxy.try(:id) && !taxonomy.smart_proxies.pluck(:id).include?(smart_proxy.id)
+          missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "SmartProxy", :taxable_id => smart_proxy.id}
+        end
+      end
+    end
+    if owner_id.present? && owner_type == "User" && !User.find(owner_id).admin && !taxonomy.users.pluck(:id).include?(owner_id)
+        missing_ids << {:taxonomy_id => taxonomy.id, :taxable_type => "User", :taxable_id => owner_id}
+    end
+    return missing_ids
+  end
+
   private
   def lookup_keys_params
     return {} unless Setting["Enable_Smart_Variables_in_ENC"]
@@ -921,4 +981,6 @@ class Host < Puppet::Rails::Host
   def force_lookup_value_matcher
     lookup_values.each { |v| v.match = "fqdn=#{fqdn}" }
   end
+
+
 end
