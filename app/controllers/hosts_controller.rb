@@ -398,20 +398,38 @@ class HostsController < ApplicationController
 
   def update_multiple_location
     # simple validations
-    if (params[:location].nil?) or (id=params[:location][:id]).nil?
+    if (params[:location].nil?) || (id=params[:location][:id]).nil? || (params[:location][:id] == 'disabled')
       error 'No Location selected!'
       redirect_to(select_multiple_location_hosts_path) and return
     end
     location = Location.find(id) rescue nil
 
+    error_msg = "Cannot save:"
+    mismatch_error = false
     #update the hosts
     @hosts.each do |host|
-      host.location = location
-      host.save(:validate => false)
+      host.location_id = location.id
+      if params[:location][:optimistic_import] == 'yes'
+        host.import_missing_ids
+        host.save
+      else
+        if host.matching?
+          host.save
+        else
+          error_msg += "#{host.name} on #{location.name} \n"
+          mismatch_error = true
+        end
+      end
     end
 
-    notice 'Updated hosts: Changed Location'
-    redirect_back_or_to hosts_path
+    if mismatch_error
+      raise error_msg
+      #error error_msg
+      #redirect_to(select_multiple_location_hosts_path) and return
+    else
+      notice 'Updated hosts: Changed Location'
+      redirect_back_or_to hosts_path
+    end
   end
 
   def update_multiple_puppetrun
