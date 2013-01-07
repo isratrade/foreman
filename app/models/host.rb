@@ -809,7 +809,7 @@ class Host < Puppet::Rails::Host
   def import_missing_ids
     if missing_ids.length > 0
       missing_ids.each do |row|
-        TaxableTaxonomy.create!(:taxonomy_id => row[:taxonomy_id],
+      TaxableTaxonomy.create(:taxonomy_id => row[:taxonomy_id],
                                 :taxable_id => row[:taxable_id],
                                 :taxable_type => row[:taxable_type]
                               )
@@ -818,7 +818,7 @@ class Host < Puppet::Rails::Host
   end
 
   def missing_ids
-    (missing_ids_for(location) if location) + (missing_ids_for(organization) if organization)
+    (missing_ids_for(location) if location).to_a + (missing_ids_for(organization) if organization).to_a
   end
 
   def missing_ids_for(taxonomy)

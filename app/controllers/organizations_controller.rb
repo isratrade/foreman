@@ -56,6 +56,8 @@ class OrganizationsController < ApplicationController
 
   def edit
     Taxonomy.no_taxonomy_scope do
+      @used_and_selected_ids = @organization.used_and_selected_ids
+      @need_to_be_selected_ids = @organization.need_to_be_selected_ids
       render :edit
     end
   end
@@ -68,6 +70,8 @@ class OrganizationsController < ApplicationController
     if result
       process_success
     else
+      @used_and_selected_ids = @organization.used_and_selected_ids
+      @need_to_be_selected_ids = @organization.need_to_be_selected_ids
       process_error
     end
   end

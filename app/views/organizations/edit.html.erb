@@ -1,3 +1,6 @@
 <% title "Edit #{@organization}" %>
 
-<%= render 'taxonomy/form', :taxonomy => @organization %>
+<%= render 'taxonomy/form' , :taxonomy => @organization,
+                             :used_and_selected_ids => @used_and_selected_ids,
+                             :need_to_be_selected_ids => @need_to_be_selected_ids
+                              %>

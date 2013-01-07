@@ -423,9 +423,8 @@ class HostsController < ApplicationController
     end
 
     if mismatch_error
-      raise error_msg
-      #error error_msg
-      #redirect_to(select_multiple_location_hosts_path) and return
+      error "#{error_msg}"
+      redirect_to(select_multiple_location_hosts_path) and return
     else
       notice 'Updated hosts: Changed Location'
       redirect_back_or_to hosts_path

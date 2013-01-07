@@ -7,6 +7,8 @@
           <th> Name </th>
           <th> Hostgroup </th>
           <th> Environment </th>
+          <th> Location </th>
+          <th> Organization </th>
         </tr>
       </thead>
       <tbody>
@@ -15,6 +17,8 @@
             <td><%=h host %> </td>
             <td><%=h host.try(:hostgroup) %></td>
             <td><%=h host.try(:environment) %></td>
+            <td><%=h host.try(:location) %></td>
+            <td><%=h host.try(:organization) %></td>
           </tr>
         <% end -%>
       </tbody>
