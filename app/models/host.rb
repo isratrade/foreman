@@ -802,6 +802,10 @@ class Host < Puppet::Rails::Host
     smart_proxies.compact.map(&:id)
   end
 
+  def matching?
+    missing_ids.length == 0
+  end
+
   def import_missing_ids
     if missing_ids.length > 0
       missing_ids.each do |row|
