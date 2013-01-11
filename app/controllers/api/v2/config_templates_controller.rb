@@ -1,8 +1,6 @@
 module Api
   module V2
     class ConfigTemplatesController < V1::ConfigTemplatesController
-      include Foreman::Renderer
-
       before_filter :process_operatingsystems, :only => [:create, :update]
 
       def process_operatingsystems
