@@ -1,6 +1,16 @@
 object @config_template
 
-attributes :name, :template, :snippet, :audit_comment, :id, :template_kind_id, :operatingsystem_ids
+attributes :name, :template, :snippet, :audit_comment, :id
+
+node do |ct|
+  unless ct.template_kind.nil?
+    child :template_kind do
+      attributes :id, :name
+    end
+  else
+    {:template_kind => nil}
+  end
+end 
 
 node do |ct|
   unless ct.template_combinations.empty?
@@ -12,3 +22,12 @@ node do |ct|
   end
 end
 
+node do |ct|
+  unless ct.operatingsystems.empty?
+    child :operatingsystems do
+      attributes :id, :name
+    end
+  else
+    {:operatingsystems => []}
+  end
+end

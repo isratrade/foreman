@@ -1,8 +1,6 @@
 module Api
   module V2
     class TemplateCombinationsController < V2::BaseController
-      include Foreman::Renderer
-
       before_filter :find_resource, :only => [:show, :destroy]
       before_filter :find_parent_config_template, :only => [:index, :create]
 
