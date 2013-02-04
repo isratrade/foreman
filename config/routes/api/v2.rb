@@ -67,6 +67,19 @@ Foreman::Application.routes.draw do
         resources :template_combinations, :only => [:index, :create]
       end
       resources :template_combinations, :only => [:show, :destroy]
+
+      if SETTINGS[:locations_enabled]
+        resources :locations do
+          resources :organizations
+        end
+      end
+
+      if SETTINGS[:organizations_enabled]
+        resources :organizations do
+          resources :locations
+        end
+      end
+
     end
 
     match '*other', :to => 'v1/home#route_error', :constraints => ApiConstraints.new(:version => 2)
