@@ -20,6 +20,8 @@ class Api::V2::LocationsControllerTest < ActionController::TestCase
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
+    #assert *_ids are included in response. Test just for domain_ids
+    assert show_response["location"].any? {|k,v| k == "domain_ids" }
   end
 
   test "should not create invalid location" do
@@ -62,4 +64,15 @@ class Api::V2::LocationsControllerTest < ActionController::TestCase
 #    TODO was 500 since there is not include Authorization in taxonomy.rb
 #    assert_response :unprocessable_entity
   end
+
+  test "should update *_ids. test for domain_ids" do
+    # ignore all but Domain
+    @location.ignore_types = ["Hostgroup", "Environment", "User", "Medium", "Subnet", "SmartProxy", "ConfigTemplate", "ComputeResource"]
+    @location.save(:validate => false)
+    assert_difference('@location.domains.count', 4) do
+      put :update, { :id => @location.to_param, :location => { :domain_ids => Domain.pluck(:id) } }
+    end
+    assert_response :success
+  end
+
 end

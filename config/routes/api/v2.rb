@@ -13,7 +13,6 @@ Foreman::Application.routes.draw do
       resources :common_parameters, :except => [:new, :edit]
       # add "constraint" that unconstrained and allows :id to have dot notation ex. sat.redhat.com
       constraints(:id => /[^\/]+/) do
-        resources :domains, :except => [:new, :edit]
         resources :hosts, :except => [:new, :edit] do
           resources :reports       ,:only => [:index, :show] do
             get :last, :on => :collection
@@ -28,11 +27,8 @@ Foreman::Application.routes.draw do
         end
       end
       resources :dashboard, :only => [:index]
-      resources :environments, :except => [:new, :edit]
       resources :fact_values, :except => [:new, :edit]
-      resources :hostgroups, :except => [:new, :edit]
       resources :lookup_keys, :except => [:new, :edit]
-      resources :media, :except => [:new, :edit]
       resources :models, :except => [:new, :edit]
       resources :operatingsystems, :except => [:new, :edit] do
         member do
@@ -46,10 +42,6 @@ Foreman::Application.routes.draw do
         get :last, :on => :collection
       end
       resources :settings, :only => [:index, :show, :update]
-      resources :smart_proxies, :except => [:new, :edit]
-      resources :subnets, :except => [:new, :edit]
-      resources :usergroups, :except => [:new, :edit]
-      resources :users, :except => [:new, :edit]
       resources :template_kinds, :only => [:index]
 
       match '/', :to => 'home#index'
@@ -58,6 +50,52 @@ Foreman::Application.routes.draw do
 
     # new v2 routes that point to v2
     scope :module => :v2, :constraints => ApiConstraints.new(:version => 2) do
+
+      resources :domains, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+      resources :subnets, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+      resources :environments, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :usergroups, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :hostgroups, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :smart_proxies, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :users, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :media, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      constraints(:id => /[^\/]+/) do
+        resources :compute_resources, :except => [:new, :edit] do
+          resources :images, :except => [:new, :edit]
+          resources :locations, :only => [:index, :show]
+          resources :organizations, :only => [:index, :show]
+        end
+      end
 
       resources :config_templates, :except => [:new, :edit] do
         collection do
@@ -72,27 +110,27 @@ Foreman::Application.routes.draw do
         resources :locations do
 
           # scoped by location
-          resources :domains
-          resources :subnets
-          resources :hostgroups
-          resources :environments
-          resources :users
-          resources :config_templates
-          resources :compute_resources
-          resources :media
-          resources :smart_proxies
+          resources :domains, :only => [:index, :show]
+          resources :subnets, :only => [:index, :show]
+          resources :hostgroups, :only => [:index, :show]
+          resources :environments, :only => [:index, :show]
+          resources :users, :only => [:index, :show]
+          resources :config_templates, :only => [:index, :show]
+          resources :compute_resources, :only => [:index, :show]
+          resources :media, :only => [:index, :show]
+          resources :smart_proxies, :only => [:index, :show]
 
           # scoped by location AND organization
           resources :organizations do
-            resources :domains
-            resources :subnets
-            resources :hostgroups
-            resources :environments
-            resources :users
-            resources :config_templates
-            resources :compute_resources
-            resources :media
-            resources :smart_proxies
+            resources :domains, :only => [:index, :show]
+            resources :subnets, :only => [:index, :show]
+            resources :hostgroups, :only => [:index, :show]
+            resources :environments, :only => [:index, :show]
+            resources :users, :only => [:index, :show]
+            resources :config_templates, :only => [:index, :show]
+            resources :compute_resources, :only => [:index, :show]
+            resources :media, :only => [:index, :show]
+            resources :smart_proxies, :only => [:index, :show]
           end
 
         end
@@ -102,27 +140,27 @@ Foreman::Application.routes.draw do
         resources :organizations do
 
           # scoped by organization
-          resources :domains
-          resources :subnets
-          resources :hostgroups
-          resources :environments
-          resources :users
-          resources :config_templates
-          resources :compute_resources
-          resources :media
-          resources :smart_proxies
+          resources :domains, :only => [:index, :show]
+          resources :subnets, :only => [:index, :show]
+          resources :hostgroups, :only => [:index, :show]
+          resources :environments, :only => [:index, :show]
+          resources :users, :only => [:index, :show]
+          resources :config_templates, :only => [:index, :show]
+          resources :compute_resources, :only => [:index, :show]
+          resources :media, :only => [:index, :show]
+          resources :smart_proxies, :only => [:index, :show]
 
           # scoped by location AND organization
           resources :locations do
-            resources :domains
-            resources :subnets
-            resources :hostgroups
-            resources :environments
-            resources :users
-            resources :config_templates
-            resources :compute_resources
-            resources :media
-            resources :smart_proxies
+            resources :domains, :only => [:index, :show]
+            resources :subnets, :only => [:index, :show]
+            resources :hostgroups, :only => [:index, :show]
+            resources :environments, :only => [:index, :show]
+            resources :users, :only => [:index, :show]
+            resources :config_templates, :only => [:index, :show]
+            resources :compute_resources, :only => [:index, :show]
+            resources :media, :only => [:index, :show]
+            resources :smart_proxies, :only => [:index, :show]
           end
 
         end
