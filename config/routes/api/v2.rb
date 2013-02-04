@@ -51,9 +51,19 @@ Foreman::Application.routes.draw do
     # new v2 routes that point to v2
     scope :module => :v2, :constraints => ApiConstraints.new(:version => 2) do
 
-      resources :domains, :except => [:new, :edit] do
-        resources :locations, :only => [:index, :show]
-        resources :organizations, :only => [:index, :show]
+      # resources :hosts is also above in v1 the RESTful actions will NOT be called for v2. It is only for the nested resources :parameters
+      constraints(:id => /[^\/]+/) do
+        resources :hosts, :except => [:new, :edit] do
+          resources :parameters, :except => [:new, :edit]
+        end
+      end
+
+      constraints(:id => /[^\/]+/) do
+        resources :domains, :except => [:new, :edit] do
+          resources :locations, :only => [:index, :show]
+          resources :organizations, :only => [:index, :show]
+          resources :parameters, :except => [:new, :edit]
+        end
       end
       resources :subnets, :except => [:new, :edit] do
         resources :locations, :only => [:index, :show]
@@ -72,6 +82,7 @@ Foreman::Application.routes.draw do
       resources :hostgroups, :except => [:new, :edit] do
         resources :locations, :only => [:index, :show]
         resources :organizations, :only => [:index, :show]
+        resources :parameters, :except => [:new, :edit]
       end
 
       resources :smart_proxies, :except => [:new, :edit] do
@@ -95,6 +106,11 @@ Foreman::Application.routes.draw do
           resources :locations, :only => [:index, :show]
           resources :organizations, :only => [:index, :show]
         end
+      end
+
+      # resources :hosts is also above in v1 the RESTful actions will NOT be called for v2. It is only for the nested resources :parameters
+      resources :operatingsystems, :except => [:new, :edit] do
+        resources :parameters, :except => [:new, :edit]
       end
 
       resources :config_templates, :except => [:new, :edit] do
