@@ -70,16 +70,63 @@ Foreman::Application.routes.draw do
 
       if SETTINGS[:locations_enabled]
         resources :locations do
-          resources :organizations
+
+          # scoped by location
+          resources :domains
+          resources :subnets
+          resources :hostgroups
+          resources :environments
+          resources :users
+          resources :config_templates
+          resources :compute_resources
+          resources :media
+          resources :smart_proxies
+
+          # scoped by location AND organization
+          resources :organizations do
+            resources :domains
+            resources :subnets
+            resources :hostgroups
+            resources :environments
+            resources :users
+            resources :config_templates
+            resources :compute_resources
+            resources :media
+            resources :smart_proxies
+          end
+
         end
       end
 
       if SETTINGS[:organizations_enabled]
         resources :organizations do
-          resources :locations
+
+          # scoped by organization
+          resources :domains
+          resources :subnets
+          resources :hostgroups
+          resources :environments
+          resources :users
+          resources :config_templates
+          resources :compute_resources
+          resources :media
+          resources :smart_proxies
+
+          # scoped by location AND organization
+          resources :locations do
+            resources :domains
+            resources :subnets
+            resources :hostgroups
+            resources :environments
+            resources :users
+            resources :config_templates
+            resources :compute_resources
+            resources :media
+            resources :smart_proxies
+          end
+
         end
       end
-
     end
 
     match '*other', :to => 'v1/home#route_error', :constraints => ApiConstraints.new(:version => 2)
