@@ -13,6 +13,7 @@ Foreman::Application.routes.draw do
       resources :common_parameters, :except => [:new, :edit]
       # add "constraint" that unconstrained and allows :id to have dot notation ex. sat.redhat.com
       constraints(:id => /[^\/]+/) do
+        resources :domains, :except => [:new, :edit]
         resources :hosts, :except => [:new, :edit] do
           resources :reports       ,:only => [:index, :show] do
             get :last, :on => :collection
@@ -27,8 +28,11 @@ Foreman::Application.routes.draw do
         end
       end
       resources :dashboard, :only => [:index]
+      resources :environments, :except => [:new, :edit]
       resources :fact_values, :except => [:new, :edit]
+      resources :hostgroups, :except => [:new, :edit]
       resources :lookup_keys, :except => [:new, :edit]
+      resources :media, :except => [:new, :edit]
       resources :models, :except => [:new, :edit]
       resources :operatingsystems, :except => [:new, :edit] do
         member do
@@ -42,6 +46,10 @@ Foreman::Application.routes.draw do
         get :last, :on => :collection
       end
       resources :settings, :only => [:index, :show, :update]
+      resources :smart_proxies, :except => [:new, :edit]
+      resources :subnets, :except => [:new, :edit]
+      resources :usergroups, :except => [:new, :edit]
+      resources :users, :except => [:new, :edit]
       resources :template_kinds, :only => [:index]
 
       match '/', :to => 'home#index'
@@ -51,20 +59,34 @@ Foreman::Application.routes.draw do
     # new v2 routes that point to v2
     scope :module => :v2, :constraints => ApiConstraints.new(:version => 2) do
 
-      # resources :hosts is also above in v1 the RESTful actions will NOT be called for v2. It is only for the nested resources :parameters
+      resources :config_templates, :except => [:new, :edit] do
+        collection do
+          get 'build_pxe_default'
+          get 'revision'
+        end
+        resources :template_combinations, :only => [:index, :create]
+      end
+      resources :template_combinations, :only => [:show, :destroy]
+
+      # resources :hosts is also above in v1, so the RESTful actions will NOT be called for v2. It is only for the nested resources :parameters
       constraints(:id => /[^\/]+/) do
         resources :hosts, :except => [:new, :edit] do
           resources :parameters, :except => [:new, :edit]
         end
-      end
 
-      constraints(:id => /[^\/]+/) do
+        resources :compute_resources, :except => [:new, :edit] do
+          resources :images, :except => [:new, :edit]
+          resources :locations, :only => [:index, :show]
+          resources :organizations, :only => [:index, :show]
+        end
+
         resources :domains, :except => [:new, :edit] do
           resources :locations, :only => [:index, :show]
           resources :organizations, :only => [:index, :show]
           resources :parameters, :except => [:new, :edit]
         end
       end
+
       resources :subnets, :except => [:new, :edit] do
         resources :locations, :only => [:index, :show]
         resources :organizations, :only => [:index, :show]
@@ -100,27 +122,9 @@ Foreman::Application.routes.draw do
         resources :organizations, :only => [:index, :show]
       end
 
-      constraints(:id => /[^\/]+/) do
-        resources :compute_resources, :except => [:new, :edit] do
-          resources :images, :except => [:new, :edit]
-          resources :locations, :only => [:index, :show]
-          resources :organizations, :only => [:index, :show]
-        end
-      end
-
-      # resources :hosts is also above in v1 the RESTful actions will NOT be called for v2. It is only for the nested resources :parameters
       resources :operatingsystems, :except => [:new, :edit] do
         resources :parameters, :except => [:new, :edit]
       end
-
-      resources :config_templates, :except => [:new, :edit] do
-        collection do
-          get 'build_pxe_default'
-          get 'revision'
-        end
-        resources :template_combinations, :only => [:index, :create]
-      end
-      resources :template_combinations, :only => [:show, :destroy]
 
       if SETTINGS[:locations_enabled]
         resources :locations do
