@@ -64,11 +64,16 @@ Foreman::Application.routes.draw do
       resources :template_combinations, :only => [:show, :destroy]
 
       # The following resources are above in v1, so the RESTful actions will NOT be called for v2. Only nested resources not in v1 will be called for v2
-      # domains, compute_resources, subnets, environments, usergroups, hostgroups, smart_proxies, users, media
+      # hosts, domains, compute_resources, subnets, environments, usergroups, hostgroups, smart_proxies, users, media, operatingsystems
       constraints(:id => /[^\/]+/) do
+        resources :hosts, :except => [:new, :edit] do
+          resources :parameters, :except => [:new, :edit]
+        end
+
         resources :domains, :except => [:new, :edit] do
           resources :locations, :only => [:index, :show]
           resources :organizations, :only => [:index, :show]
+          resources :parameters, :except => [:new, :edit]
         end
 
         resources :compute_resources, :except => [:new, :edit] do
@@ -96,6 +101,7 @@ Foreman::Application.routes.draw do
       resources :hostgroups, :except => [:new, :edit] do
         resources :locations, :only => [:index, :show]
         resources :organizations, :only => [:index, :show]
+        resources :parameters, :except => [:new, :edit]
       end
 
       resources :smart_proxies, :except => [:new, :edit] do
@@ -111,6 +117,10 @@ Foreman::Application.routes.draw do
       resources :media, :except => [:new, :edit] do
         resources :locations, :only => [:index, :show]
         resources :organizations, :only => [:index, :show]
+      end
+
+      resources :operatingsystems, :except => [:new, :edit] do
+        resources :parameters, :except => [:new, :edit]
       end
 
       if SETTINGS[:locations_enabled]
