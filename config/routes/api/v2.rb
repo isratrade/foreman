@@ -34,11 +34,6 @@ Foreman::Application.routes.draw do
       resources :lookup_keys, :except => [:new, :edit]
       resources :media, :except => [:new, :edit]
       resources :models, :except => [:new, :edit]
-      resources :operatingsystems, :except => [:new, :edit] do
-        member do
-          get 'bootfiles'
-        end
-      end
       resources :ptables, :except => [:new, :edit]
       resources :puppetclasses, :except => [:new, :edit]
       resources :roles, :except => [:new, :edit]
@@ -67,6 +62,116 @@ Foreman::Application.routes.draw do
         resources :template_combinations, :only => [:index, :create]
       end
       resources :template_combinations, :only => [:show, :destroy]
+
+      # The following resources are above in v1, so the RESTful actions will NOT be called for v2. Only nested resources not in v1 will be called for v2
+      # domains, compute_resources, subnets, environments, usergroups, hostgroups, smart_proxies, users, media
+      constraints(:id => /[^\/]+/) do
+        resources :domains, :except => [:new, :edit] do
+          resources :locations, :only => [:index, :show]
+          resources :organizations, :only => [:index, :show]
+        end
+
+        resources :compute_resources, :except => [:new, :edit] do
+          resources :images, :except => [:new, :edit]
+          resources :locations, :only => [:index, :show]
+          resources :organizations, :only => [:index, :show]
+        end
+      end
+
+      resources :subnets, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :environments, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :usergroups, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :hostgroups, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :smart_proxies, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :users, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      resources :media, :except => [:new, :edit] do
+        resources :locations, :only => [:index, :show]
+        resources :organizations, :only => [:index, :show]
+      end
+
+      if SETTINGS[:locations_enabled]
+        resources :locations do
+
+          # scoped by location
+          resources :domains, :only => [:index, :show]
+          resources :subnets, :only => [:index, :show]
+          resources :hostgroups, :only => [:index, :show]
+          resources :environments, :only => [:index, :show]
+          resources :users, :only => [:index, :show]
+          resources :config_templates, :only => [:index, :show]
+          resources :compute_resources, :only => [:index, :show]
+          resources :media, :only => [:index, :show]
+          resources :smart_proxies, :only => [:index, :show]
+
+          # scoped by location AND organization
+          resources :organizations do
+            resources :domains, :only => [:index, :show]
+            resources :subnets, :only => [:index, :show]
+            resources :hostgroups, :only => [:index, :show]
+            resources :environments, :only => [:index, :show]
+            resources :users, :only => [:index, :show]
+            resources :config_templates, :only => [:index, :show]
+            resources :compute_resources, :only => [:index, :show]
+            resources :media, :only => [:index, :show]
+            resources :smart_proxies, :only => [:index, :show]
+          end
+
+        end
+      end
+
+      if SETTINGS[:organizations_enabled]
+        resources :organizations do
+
+          # scoped by organization
+          resources :domains, :only => [:index, :show]
+          resources :subnets, :only => [:index, :show]
+          resources :hostgroups, :only => [:index, :show]
+          resources :environments, :only => [:index, :show]
+          resources :users, :only => [:index, :show]
+          resources :config_templates, :only => [:index, :show]
+          resources :compute_resources, :only => [:index, :show]
+          resources :media, :only => [:index, :show]
+          resources :smart_proxies, :only => [:index, :show]
+
+          # scoped by location AND organization
+          resources :locations do
+            resources :domains, :only => [:index, :show]
+            resources :subnets, :only => [:index, :show]
+            resources :hostgroups, :only => [:index, :show]
+            resources :environments, :only => [:index, :show]
+            resources :users, :only => [:index, :show]
+            resources :config_templates, :only => [:index, :show]
+            resources :compute_resources, :only => [:index, :show]
+            resources :media, :only => [:index, :show]
+            resources :smart_proxies, :only => [:index, :show]
+          end
+
+        end
+      end
     end
 
     match '*other', :to => 'v1/home#route_error', :constraints => ApiConstraints.new(:version => 2)
