@@ -52,4 +52,13 @@ class Environment < ActiveRecord::Base
     super({ :only => [:name, :id] }.merge(options))
   end
 
+  def has
+    has = []
+    has << "hosts" if hosts.count > 0
+    has << "puppetclasses" if puppetclasses.count > 0
+    has << "config_templates" if config_templates.count > 0
+    has << "locations" if SETTINGS[:locations_enabled] && locations.count > 0
+    has << "organizations" if SETTINGS[:organizations_enabled] && organizations.count > 0
+  end
+
 end

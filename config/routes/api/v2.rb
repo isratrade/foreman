@@ -28,7 +28,6 @@ Foreman::Application.routes.draw do
         end
       end
       resources :dashboard, :only => [:index]
-      resources :environments, :except => [:new, :edit]
       resources :fact_values, :except => [:new, :edit]
       resources :hostgroups, :except => [:new, :edit]
       resources :lookup_keys, :except => [:new, :edit]
@@ -96,6 +95,9 @@ Foreman::Application.routes.draw do
       resources :environments, :except => [:new, :edit] do
         (resources :locations, :only => [:index, :show]) if SETTINGS[:locations_enabled]
         (resources :organizations, :only => [:index, :show]) if SETTINGS[:organizations_enabled]
+        resources :hosts, :only => [:index, :show]
+        resources :puppetclasses, :only => [:index, :show]
+        resources :config_templates, :only => [:index, :show]
       end
 
       resources :usergroups, :except => [:new, :edit] do
