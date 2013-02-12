@@ -11,6 +11,9 @@
   <% else %>
 	  <%= text_f f, :uuid, :label => "Image ID", :help_inline => "Image ID as provided by the compute resource, e.g. ami-.." %>
   <% end%>
+  <%= text_f f, :uuid, :label => "Image ID", :help_inline => "Image ID as provided by the compute resource, e.g. ami-.." %>
+  <%= text_f f, :iam_role, :label => "IAM Role", :help_inline => "(optional) IAM Role for Fog to use when creating this image." %>
+
   <%= submit_or_cancel f, false, :cancel_path => @compute_resource %>
 <% end %>
 
