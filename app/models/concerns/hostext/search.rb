@@ -53,7 +53,7 @@ module Hostext
         def self.search_by_user(key, operator, value)
           key_name = User.connection.quote_column_name(key.sub(/^.*\./,''))
           condition = sanitize_sql_for_conditions(["#{key_name} #{operator} ?", value_to_sql(operator, value)])
-          users = User.all(:conditions => condition)
+          users = User.where(condition)
           hosts = users.map(&:hosts).flatten
           opts  = hosts.empty? ? "< 0" : "IN (#{hosts.map(&:id).join(',')})"
 
@@ -62,8 +62,8 @@ module Hostext
 
         def self.search_by_puppetclass(key, operator, value)
           conditions  = sanitize_sql_for_conditions(["puppetclasses.name #{operator} ?", value_to_sql(operator, value)])
-          hosts       = Host.my_hosts.all(:conditions => conditions, :joins => :puppetclasses, :select => 'DISTINCT hosts.id').map(&:id)
-          host_groups = Hostgroup.all(:conditions => conditions, :joins => :puppetclasses, :select => 'DISTINCT hostgroups.id').map(&:id)
+          hosts       = Host.my_hosts.where(conditions).joins(:puppetclasses).select('DISTINCT hosts.id').map(&:id)
+          host_groups = Hostgroup.where(conditions).joins(:puppetclasses).select('DISTINCT hostgroups.id').map(&:id)
 
           opts = ''
           opts += "hosts.id IN(#{hosts.join(',')})"             unless hosts.blank?
