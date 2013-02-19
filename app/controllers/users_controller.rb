@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
 
   before_filter :find_user, :only => [:edit, :update, :destroy]
   skip_before_filter :require_mail, :only => [:edit, :update, :logout]

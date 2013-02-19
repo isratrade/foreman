@@ -1,5 +1,5 @@
 class LookupValuesController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :reject_non_json_requests
   before_filter :find_by_id, :except => [:index, :create]
   before_filter :setup_search_options, :only => :index

@@ -1,5 +1,5 @@
 class CommonParametersController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
 
   def index
     values = CommonParameter.search_for(params[:search], :order => params[:order])

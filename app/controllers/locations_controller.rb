@@ -1,4 +1,4 @@
 class LocationsController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
-  include Foreman::Controller::TaxonomiesController
+  include Foreman::AutoCompleteSearch
+  include Foreman::TaxonomiesController
 end

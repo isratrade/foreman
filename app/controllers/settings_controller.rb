@@ -1,5 +1,5 @@
 class SettingsController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :require_admin
 
   def index

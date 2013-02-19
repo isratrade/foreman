@@ -1,8 +1,6 @@
-require 'foreman/controller/environments'
-
 class PuppetclassesController < ApplicationController
-  include Foreman::Controller::Environments
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::Environments
+  include Foreman::AutoCompleteSearch
   before_filter :find_by_name, :only => [:edit, :update, :destroy, :assign]
   before_filter :setup_search_options, :only => :index
 

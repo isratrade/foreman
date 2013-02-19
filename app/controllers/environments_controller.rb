@@ -1,8 +1,6 @@
-require 'foreman/controller/environments'
-
 class EnvironmentsController < ApplicationController
-  include Foreman::Controller::Environments
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::Environments
+  include Foreman::AutoCompleteSearch
 
   before_filter :find_by_name, :only => %w{show edit update destroy}
 

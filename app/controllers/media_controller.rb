@@ -1,5 +1,5 @@
 class MediaController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :find_medium, :only => %w{show edit update destroy}
 
   def index

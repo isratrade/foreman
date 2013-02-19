@@ -1,7 +1,7 @@
 require 'audit_extensions'
 
 class AuditsController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
 
   before_filter :setup_search_options, :only => :index
 

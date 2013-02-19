@@ -1,8 +1,6 @@
-require 'foreman/controller/smart_proxy_auth'
-
 class FactValuesController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
-  include Foreman::Controller::SmartProxyAuth
+  include Foreman::AutoCompleteSearch
+  include Foreman::SmartProxyAuth
 
   add_puppetmaster_filters :create
   before_filter :setup_search_options, :only => :index
