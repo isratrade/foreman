@@ -52,7 +52,7 @@ module Orchestration::SSHProvision
       else
         raise 'Unable to find proper authentication method'
       end
-      self.client = Foreman::Provision::SSH.new ip, image.username, { :template => template_file.path, :uuid => uuid }.merge(credentials)
+      self.client = Provision::SSH.new ip, image.username, { :template => template_file.path, :uuid => uuid }.merge(credentials)
 
     rescue => e
       failure "Failed to login via SSH to #{name}: #{e}", e.backtrace
