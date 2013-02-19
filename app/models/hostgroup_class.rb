@@ -4,7 +4,7 @@ class HostgroupClass < ActiveRecord::Base
   belongs_to :puppetclass
 
   attr_accessible :hostgroup_id, :hostgroup, :puppetclass_id, :puppetclass
-  validates_presence_of :hostgroup_id, :puppetclass_id
+  validates :hostgroup_id, :puppetclass_id, :presence => true
 
   def name
     "#{hostgroup} - #{puppetclass}"

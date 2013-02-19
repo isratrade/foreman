@@ -3,7 +3,7 @@ class HostClass < ActiveRecord::Base
   belongs_to :host
   belongs_to :puppetclass
 
-  validates_presence_of :host_id, :puppetclass_id
+  validates :host_id, :puppetclass_id, :presence => true
 
   def name
     "#{host} - #{puppetclass}"

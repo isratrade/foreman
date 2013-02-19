@@ -9,11 +9,11 @@ class Subnet < ActiveRecord::Base
   has_many :subnet_domains, :dependent => :destroy
   has_many :domains, :through => :subnet_domains
   has_many :interfaces, :class_name => 'Nic::Base'
-  validates_presence_of   :network, :mask, :name
+  validates :network, :mask, :name, :presence => true
   validates_associated    :subnet_domains
-  validates_uniqueness_of :network
-  validates_format_of     :network, :mask,                        :with => Net::Validations::IP_REGEXP
-  validates_format_of     :gateway, :dns_primary, :dns_secondary, :with => Net::Validations::IP_REGEXP, :allow_blank => true, :allow_nil => true
+  validates :network, :uniqueness => true
+  validates :network, :mask, :format => {:with => Net::Validations::IP_REGEXP}
+  validates :gateway, :dns_primary, :dns_secondary, :format => {:with => Net::Validations::IP_REGEXP}, :allow_blank => true, :allow_nil => true
   validate :name_should_be_uniq_across_domains
 
   validate :validate_ranges

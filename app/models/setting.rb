@@ -6,17 +6,17 @@ class Setting < ActiveRecord::Base
   TYPES= %w{ integer boolean hash array }
   FROZEN_ATTRS = %w{ name default description category settings_type }
   NONZERO_ATTRS = %w{ puppet_interval idle_timeout entries_per_page max_trend }
-  validates_presence_of :name, :description
-  validates_presence_of :default, :unless => Proc.new { |s| !s.default } # broken validator
-  validates_uniqueness_of :name
-  validates_numericality_of :value, :if => Proc.new {|s| s.settings_type == "integer"}
-  validates_numericality_of :value, :if => Proc.new {|s| NONZERO_ATTRS.include?(s.name) }, :greater_than => 0
-  validates_inclusion_of :value, :in => [true,false], :if => Proc.new {|s| s.settings_type == "boolean"}
-  validates_inclusion_of :settings_type, :in => TYPES, :allow_nil => true, :allow_blank => true
+  validates :name, :description, :presence => true
+  validates :default, :presence => true, :unless => Proc.new { |s| !s.default } # broken validator
+  validates :name, :uniqueness => true
+  validates :value, :numericality => true, :if => Proc.new {|s| s.settings_type == "integer"}
+  validates :value, :numericality => {:greater_than => 0}, :if => Proc.new {|s| NONZERO_ATTRS.include?(s.name) }
+  validates :value, :inclusion => {:in => [true,false]}, :if => Proc.new {|s| s.settings_type == "boolean"}
+  validates :settings_type, :inclusion => {:in => TYPES}, :allow_nil => true, :allow_blank => true
   before_validation :fix_types
   before_save :save_as_settings_type
   validate :validate_attributes
-  default_scope :order => 'LOWER(settings.name)'
+  default_scope lambda { order('LOWER(settings.name)') }
 
   scoped_search :on => :name, :complete_value => :true
   scoped_search :on => :category, :complete_value => :true

@@ -4,9 +4,9 @@ class ConfigTemplate < ActiveRecord::Base
   audited
   self.auditing_enabled = !defined?(Rake)
   attr_accessible :name, :template, :template_kind_id, :snippet, :template_combinations_attributes, :operatingsystem_ids, :audit_comment
-  validates_presence_of :name, :template
-  validates_presence_of :template_kind_id, :unless => Proc.new {|t| t.snippet }
-  validates_uniqueness_of :name
+  validates :name, :template, :presence => true
+  validates :template_kind_id, :presence => true, :unless => Proc.new {|t| t.snippet }
+  validates :name, :uniqueness => true
   has_many :hostgroups, :through => :template_combinations
   has_many :environments, :through => :template_combinations
   has_many :template_combinations, :dependent => :destroy

@@ -35,14 +35,12 @@ class User < ActiveRecord::Base
                    :allow_blank => true
   validates :mail, :presence => true, :on => :update
 
-  validates_uniqueness_of :login, :message => "already exists"
-  validates_presence_of :login, :auth_source_id
-  validates_presence_of :password_hash, :if => Proc.new {|user| user.manage_password?}
+  validates :login, :uniqueness => {:message => "already exists"}
+  validates :login, :auth_source_id, :presence => true
+  validates :password_hash, :presence => true, :if => Proc.new {|user| user.manage_password?}
   validates_confirmation_of :password,  :if => Proc.new {|user| user.manage_password?}, :unless => Proc.new {|user| user.password.empty?}
-  validates_format_of :login, :with => /^[a-z0-9_\-@\.]*$/i
-  validates_length_of :login, :maximum => 100
-  validates_format_of :firstname, :lastname, :with => /^[\w\s\'\-\.]*$/i, :allow_nil => true
-  validates_length_of :firstname, :lastname, :maximum => 30, :allow_nil => true
+  validates :login, :format => {:with => /^[a-z0-9_\-@\.]*$/i}, :length => {:maximum => 100}
+  validates :firstname, :lastname, :format => {:with => /^[\w\s\'\-\.]*$/i}, :length => {:maximum => 30}, :allow_nil => true
 
   before_destroy EnsureNotUsedBy.new(:hosts), :ensure_admin_is_not_deleted
   validate :name_used_in_a_usergroup, :ensure_admin_is_not_renamed

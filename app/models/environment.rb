@@ -4,12 +4,10 @@ class Environment < ActiveRecord::Base
   has_many :puppetclasses, :through => :environment_classes, :uniq => true
   has_many :hosts
   has_many :trends, :as => :trendable, :class_name => "ForemanTrend"
-
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_format_of :name, :with => /^[\w\d]+$/, :message => "is alphanumeric and cannot contain spaces"
   has_many :config_templates, :through => :template_combinations, :dependent => :destroy
   has_many :template_combinations
+
+  validates :name, :uniqueness => true, :presence => true, :format => { :with => /^[\w\d]+$/, :message => "is alphanumeric and cannot contain spaces" }
 
   before_destroy EnsureNotUsedBy.new(:hosts)
 

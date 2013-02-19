@@ -162,8 +162,8 @@ class Host < Puppet::Rails::Host
   alias_attribute :hostname, :name
   alias_attribute :fqdn, :name
 
-  validates_uniqueness_of  :name
-  validates_presence_of    :name, :environment_id
+  validates :name, :uniqueness => true
+  validates :name, :environment_id, :presence => true
   validate :is_name_downcased?
 
   if SETTINGS[:unattended]
@@ -178,20 +178,19 @@ class Host < Puppet::Rails::Host
     include Orchestration::SSHProvision
     include HostTemplateHelpers
 
-    validates_uniqueness_of  :ip, :if => Proc.new {|host| host.require_ip_validation?}
-    validates_uniqueness_of  :mac, :unless => Proc.new { |host| host.compute? or !host.managed }
-    validates_presence_of    :architecture_id, :operatingsystem_id, :if => Proc.new {|host| host.managed}
-    validates_presence_of    :domain_id, :if => Proc.new {|host| host.managed}
-    validates_presence_of    :mac, :unless => Proc.new { |host| host.compute? or !host.managed  }
+    validates :ip, :uniqueness => true, :if => Proc.new {|host| host.require_ip_validation?}
+    validates :mac, :uniqueness => true, :unless => Proc.new { |host| host.compute? or !host.managed }
+    validates :architecture_id, :operatingsystem_id, :presence => true, :if => Proc.new {|host| host.managed}
+    validates :domain_id, :presence => true, :if => Proc.new {|host| host.managed}
+    validates :mac, :presence => true, :unless => Proc.new { |host| host.compute? or !host.managed  }
 
-    validates_length_of      :root_pass, :minimum => 8,:too_short => 'should be 8 characters or more'
-    validates_format_of      :mac, :with => Net::Validations::MAC_REGEXP, :unless => Proc.new { |host| host.compute? or !host.managed }
-    validates_format_of      :ip,        :with => Net::Validations::IP_REGEXP, :if => Proc.new { |host| host.require_ip_validation? }
-    validates_presence_of    :ptable_id, :message => "cant be blank unless a custom partition has been defined",
+    validates :root_pass, :length => {:minimum => 8, :too_short => 'should be 8 characters or more'}
+    validates :mac, :format => {:with => Net::Validations::MAC_REGEXP}, :unless => Proc.new { |host| host.compute? or !host.managed }
+    validates :ip, :format => {:with => Net::Validations::IP_REGEXP}, :if => Proc.new { |host| host.require_ip_validation? }
+    validates :ptable_id, :presence => {:message => "cant be blank unless a custom partition has been defined"},
       :if => Proc.new { |host| host.managed and host.disk.empty? and not defined?(Rake) and capabilities.include?(:build) }
-    validates_format_of      :serial,    :with => /[01],\d{3,}n\d/, :message => "should follow this format: 0,9600n8", :allow_blank => true, :allow_nil => true
-
-    validates_presence_of :puppet_proxy_id, :if => Proc.new {|h| h.managed? } if SETTINGS[:unattended]
+    validates :serial, :format => {:with => /[01],\d{3,}n\d/, :message => "should follow this format: 0,9600n8"}, :allow_blank => true, :allow_nil => true
+    validates :puppet_proxy_id, :presence => true, :if => Proc.new {|h| h.managed? } if SETTINGS[:unattended]
   end
 
   before_validation :set_hostgroup_defaults, :set_ip_address, :set_default_user, :normalize_addresses, :normalize_hostname, :force_lookup_value_matcher

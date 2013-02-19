@@ -20,10 +20,10 @@ class Role < ActiveRecord::Base
   BUILTIN_DEFAULT_USER  = 1
   BUILTIN_ANONYMOUS     = 2
 
-  scope :givable, { :conditions => "builtin = 0", :order => 'name' }
+  scope :givable, lambda { where(:builtin => 0).order(:name) }
   scope :builtin, lambda { |*args|
     compare = 'not' if args.first
-    { :conditions => "#{compare} builtin = 0" }
+    where("#{compare} builtin = 0")
   }
 
   before_destroy :check_deletable
@@ -34,11 +34,8 @@ class Role < ActiveRecord::Base
   serialize :permissions, Array
   attr_protected :builtin
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_length_of :name, :maximum => 30
-  validates_format_of :name, :with => /^\w[\w\s\'\-]*\w$/i
-  validates_inclusion_of :builtin, :in => 0..2
+  validates :name, :presence => true, :uniqueness => true, :length => {:maximum => 30}, :format => {:with => /^\w[\w\s\'\-]*\w$/i}
+  validates :builtin, :inclusion => {:in => 0..2}
 
   scoped_search :on => :name, :complete_value => true
 

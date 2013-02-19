@@ -13,13 +13,11 @@ module Nic
 
     before_validation :normalize_mac
 
-    validates_uniqueness_of :mac
-    validates_presence_of :mac
-    validates_format_of :mac, :with => Net::Validations::MAC_REGEXP
+    validates :mac, :uniqueness => true, :presence => true, :format => {:with => Net::Validations::MAC_REGEXP}
 
     validate :uniq_with_hosts
 
-    validates_presence_of :host
+    validates :host, :presence => true
 
     scope :bootable, where(:type => "Nic::Bootable")
     scope :bmc, where(:type => "Nic::BMC")

@@ -6,8 +6,8 @@ class Report < ActiveRecord::Base
   has_many :sources, :through => :logs
   has_many :logs, :dependent => :destroy
   has_one :environment, :through => :host
-  validates_presence_of :host_id, :reported_at, :status
-  validates_uniqueness_of :reported_at, :scope => :host_id
+  validates :host_id, :reported_at, :status, :presence => true
+  validates :reported_at, :uniqueness => {:scope => :host_id}
 
   scoped_search :in => :host,     :on => :name, :complete_value => true, :rename => :host
   scoped_search :in => :environment, :on => :name, :complete_value => true, :rename => :environment
