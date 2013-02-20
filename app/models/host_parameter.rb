@@ -1,5 +1,5 @@
 class HostParameter < Parameter
-  belongs_to :host, :foreign_key => :reference_id
+  belongs_to :managed_host, :foreign_key => :reference_id
   audited :except => [:priority], :associated_with => :host
   validates_uniqueness_of :name, :scope => :reference_id
 

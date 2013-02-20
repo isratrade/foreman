@@ -3,7 +3,6 @@ class Environment < ActiveRecord::Base
 
   has_many :environment_classes, :dependent => :destroy
   has_many :puppetclasses, :through => :environment_classes, :uniq => true
-  has_many :hosts
   has_many :managed_hosts
   has_many :trends, :as => :trendable, :class_name => "ForemanTrend"
 

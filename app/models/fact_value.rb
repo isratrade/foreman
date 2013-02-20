@@ -1,6 +1,5 @@
 class FactValue < ActiveRecord::Base
 
-  belongs_to :host
   belongs_to :managed_host
 
   belongs_to :fact_name

@@ -2,7 +2,6 @@ class Report < ActiveRecord::Base
   include Authorization
   include ReportCommon
 
-  belongs_to :host
   belongs_to :managed_host
   has_many :messages, :through => :logs
   has_many :sources, :through => :logs
