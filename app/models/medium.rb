@@ -3,6 +3,7 @@ class Medium < ActiveRecord::Base
   include Taxonomix
 
   has_and_belongs_to_many :operatingsystems
+  has_many :hosts
   has_many :managed_hosts
 
   # We need to include $ in this as $arch, $release, can be in this string

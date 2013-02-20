@@ -1,4 +1,5 @@
 class Parameter < ActiveRecord::Base
+  belongs_to :host, :foreign_key => :reference_id
   belongs_to :managed_host, :foreign_key => :reference_id
   include Authorization
 

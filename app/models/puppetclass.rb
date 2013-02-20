@@ -6,6 +6,7 @@ class Puppetclass < ActiveRecord::Base
   has_many :hostgroup_classes, :dependent => :destroy
   has_many :hostgroups, :through => :hostgroup_classes
   has_many :host_classes, :dependent => :destroy
+  has_many :hosts, :through => :host_classes
   has_many :managed_hosts, :through => :host_classes
 
   has_many :lookup_keys, :inverse_of => :puppetclass

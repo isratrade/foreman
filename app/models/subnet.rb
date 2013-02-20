@@ -3,6 +3,7 @@ class Subnet < ActiveRecord::Base
   include Authorization
   include Taxonomix
 
+  has_many :hosts
   has_many :managed_hosts
   belongs_to :dhcp, :class_name => "SmartProxy"
   belongs_to :tftp, :class_name => "SmartProxy"

@@ -3,23 +3,16 @@ require 'facts_importer'
 class ManagedHost < Host
   include Authorization
   include ReportCommon
-  belongs_to :model
+
   has_many :host_classes, :dependent => :destroy, :foreign_key => :host_id
   has_many :puppetclasses, :through => :host_classes
   has_many :fact_values, :dependent => :destroy, :foreign_key => :host_id
   has_many :fact_names, :through => :fact_values
-  belongs_to :hostgroup
   has_many :reports, :dependent => :destroy, :foreign_key => :host_id
   has_many :host_parameters, :dependent => :destroy, :foreign_key => :reference_id
   accepts_nested_attributes_for :host_parameters, :reject_if => lambda { |a| a[:value].blank? }, :allow_destroy => true
-  has_many :interfaces, :dependent => :destroy, :inverse_of => :host, :class_name => 'Nic::Base', :foreign_key => :host_id
+  has_many :interfaces, :dependent => :destroy, :inverse_of => :managed_host, :class_name => 'Nic::Base', :foreign_key => :host_id
   accepts_nested_attributes_for :interfaces, :reject_if => lambda { |a| a[:mac].blank? }, :allow_destroy => true
-  belongs_to :owner, :polymorphic => true
-  belongs_to :compute_resource
-  belongs_to :image
-  belongs_to :domain
-  belongs_to :location
-  belongs_to :organization
 
   has_one :token, :foreign_key => :host_id, :dependent => :destroy, :conditions => Proc.new {"expires >= '#{Time.now.utc.to_s(:db)}'"}
 
@@ -69,25 +62,6 @@ class ManagedHost < Host
 
   scope :recent,      lambda { |*args| {:conditions => ["last_report > ?", (args.first || (Setting[:puppet_interval] + 5).minutes.ago)]} }
   scope :out_of_sync, lambda { |*args| {:conditions => ["last_report < ? and enabled != ?", (args.first || (Setting[:puppet_interval] + 5).minutes.ago), false]} }
-
-  scope :with_fact, lambda { |fact,value|
-    if fact.nil? or value.nil?
-      raise "invalid fact"
-    else
-      { :joins  => "INNER JOIN fact_values fv_#{fact} ON fv_#{fact}.host_id = hosts.id
-                   INNER JOIN fact_names fn_#{fact}  ON fn_#{fact}.id      = fv_#{fact}.fact_name_id",
-        :select => "DISTINCT hosts.name, hosts.id", :conditions =>
-          ["fv_#{fact}.value = ? and fn_#{fact}.name = ? and fv_#{fact}.fact_name_id = fn_#{fact}.id", value, fact] }
-    end
-  }
-
-  scope :with_class, lambda { |klass|
-    if klass.nil?
-      raise "invalid class"
-    else
-      { :joins => :puppetclasses, :select => "hosts.name", :conditions => { :puppetclasses => { :name => klass } } }
-    end
-  }
 
   scope :with_os, lambda { where('hosts.operatingsystem_id IS NOT NULL') }
   scope :no_location, lambda { where(:location_id => nil) }
@@ -622,11 +596,11 @@ class ManagedHost < Host
   # e.g. how many hosts belongs to each os
   # returns sorted hash
   def self.count_habtm association
-    output = {}
-    counter = Host.count(:include => association.pluralize, :group => "#{association}_id")
+    assoc = ( Host.first.respond_to?(association.tableize.to_sym) ? association.tableize : (Host.first.respond_to?(association.to_sym) ? association : nil) )
+    counter = Host.includes(assoc.to_sym).group("#{assoc.tableize}.id").count
     # returns {:id => count...}
     #Puppetclass.find(counter.keys.compact)...
-    Hash[eval(association.camelize).send(:find, counter.keys.compact).map {|i| [i.to_label, counter[i.id]]}]
+    Hash[association.camelize.constantize.find(counter.keys.compact).map {|i| [i.to_label, counter[i.id]]}]
   end
 
   def resources_chart(timerange = 1.day.ago)
@@ -931,7 +905,7 @@ class ManagedHost < Host
     end if SETTINGS[:unattended] and managed? and os and capabilities.include?(:build)
 
     puppetclasses.uniq.each do |e|
-      unless environment.puppetclasses.include?(e)
+      unless environment.puppetclasses.map(&:id).include?(e.id)
         errors.add(:puppetclasses, "#{e} does not belong to the #{environment} environment")
         status = false
       end
