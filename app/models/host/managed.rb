@@ -1,27 +1,27 @@
-module Host
+require 'facts_importer'
 
-<<<<<<< HEAD
-class Host < Puppet::Rails::Host
+class Host::Managed < Host::Base
   include Authorization
   include ReportCommon
   belongs_to :model
-  has_many :host_classes, :dependent => :destroy
+  has_many :host_classes, :dependent => :destroy, :foreign_key => :host_id
   has_many :puppetclasses, :through => :host_classes
+  has_many :fact_values, :dependent => :destroy, :foreign_key => :host_id
+  has_many :fact_names, :through => :fact_values
   belongs_to :hostgroup
-  has_many :reports, :dependent => :destroy
+  has_many :reports, :dependent => :destroy, :foreign_key => :host_id
   has_many :host_parameters, :dependent => :destroy, :foreign_key => :reference_id
   accepts_nested_attributes_for :host_parameters, :reject_if => lambda { |a| a[:value].blank? }, :allow_destroy => true
-  has_many :interfaces, :dependent => :destroy, :inverse_of => :host, :class_name => 'Nic::Base'
+  has_many :interfaces, :dependent => :destroy, :inverse_of => :host, :class_name => 'Nic::Base', :foreign_key => :host_id
   accepts_nested_attributes_for :interfaces, :reject_if => lambda { |a| a[:mac].blank? }, :allow_destroy => true
   belongs_to :owner, :polymorphic => true
   belongs_to :compute_resource
   belongs_to :image
-  belongs_to :domain
+
   belongs_to :location
   belongs_to :organization
-  belongs_to :operatingsystem
 
-  has_one :token, :dependent => :destroy, :conditions => Proc.new {"expires >= '#{Time.now.utc.to_s(:db)}'"}
+  has_one :token, :foreign_key => :host_id, :dependent => :destroy, :conditions => Proc.new {"expires >= '#{Time.now.utc.to_s(:db)}'"}
 
   has_many :lookup_values, :finder_sql => Proc.new { normalize_hostname; %Q{ SELECT lookup_values.* FROM lookup_values WHERE (lookup_values.match = 'fqdn=#{fqdn}') } }, :dependent => :destroy
   # See "def lookup_values_attributes=" under, for the implementation of accepts_nested_attributes_for :lookup_values
@@ -69,6 +69,26 @@ class Host < Puppet::Rails::Host
 
   scope :recent,      lambda { |*args| {:conditions => ["last_report > ?", (args.first || (Setting[:puppet_interval] + 5).minutes.ago)]} }
   scope :out_of_sync, lambda { |*args| {:conditions => ["last_report < ? and enabled != ?", (args.first || (Setting[:puppet_interval] + 5).minutes.ago), false]} }
+
+  scope :with_fact, lambda { |fact,value|
+    if fact.nil? or value.nil?
+      raise "invalid fact"
+    else
+      { :joins  => "INNER JOIN fact_values fv_#{fact} ON fv_#{fact}.host_id = hosts.id
+                   INNER JOIN fact_names fn_#{fact}  ON fn_#{fact}.id      = fv_#{fact}.fact_name_id",
+        :select => "DISTINCT hosts.name, hosts.id", :conditions =>
+          ["fv_#{fact}.value = ? and fn_#{fact}.name = ? and fv_#{fact}.fact_name_id = fn_#{fact}.id", value, fact] }
+    end
+  }
+
+  scope :with_class, lambda { |klass|
+    if klass.nil?
+      raise "invalid class"
+    else
+      { :joins => :puppetclasses, :select => "hosts.name", :conditions => { :puppetclasses => { :name => klass } } }
+    end
+  }
+
   scope :with_os, lambda { where('hosts.operatingsystem_id IS NOT NULL') }
   scope :no_location, lambda { where(:location_id => nil) }
   scope :no_organization, lambda { where(:organization_id => nil) }
@@ -554,11 +574,11 @@ class Host < Puppet::Rails::Host
   # e.g. how many hosts belongs to each os
   # returns sorted hash
   def self.count_habtm association
-    assoc = ( Host.first.respond_to?(association.tableize.to_sym) ? association.tableize : (Host.first.respond_to?(association.to_sym) ? association : nil) )
-    counter = Host.includes(assoc.to_sym).group("#{assoc.tableize}.id").count
+    output = {}
+    counter = Host.count(:include => association.pluralize, :group => "#{association}_id")
     # returns {:id => count...}
     #Puppetclass.find(counter.keys.compact)...
-    Hash[association.camelize.constantize.find(counter.keys.compact).map {|i| [i.to_label, counter[i.id]]}]
+    Hash[eval(association.camelize).send(:find, counter.keys.compact).map {|i| [i.to_label, counter[i.id]]}]
   end
 
   def resources_chart(timerange = 1.day.ago)
@@ -618,31 +638,94 @@ class Host < Puppet::Rails::Host
         # We are constrained and the constraint is matched
         return true if (!current.domains.empty?    and current.domains.include?(domain)) or
         (!current.hostgroups.empty? and current.hostgroups.include?(hostgroup))
-=======
-  def self.method_missing(method, *args, &block)
-    if [:create, :new, :create!].include?(method)
-      if args[0]
-        args[0][:type] ||= 'Host::Managed'
-      else
-        args = [{:type => 'Host::Managed'}]
->>>>>>> 10968a2... Add STI to hosts table
       end
     end
-    Host::Managed.send(method,*args, &block)
+    errors.add :base, "You do not have permission to #{operation} this host"
+    false
   end
 
-  # the API base controller expects to call 'respond_to?' on this, which
-  # this module doesn't have. So we stub it out to make that logic work for
-  # the "find_by_*" classes that Rails will provide
-  def self.respond_to?(method, include_private = false)
-    if method.to_s =~ /^find_by_(.*)$/
-      true
-    else
-      super
+  def jumpstart?
+    operatingsystem.family == "Solaris" and architecture.name =~/Sparc/i rescue false
+  end
+
+  def set_hostgroup_defaults
+    return unless hostgroup
+    assign_hostgroup_attributes(%w{environment domain puppet_proxy puppet_ca_proxy})
+    if SETTINGS[:unattended] and (new_record? or managed?)
+      assign_hostgroup_attributes(%w{operatingsystem architecture})
+      assign_hostgroup_attributes(%w{medium ptable subnet}) if capabilities.include?(:build)
     end
   end
 
-<<<<<<< HEAD
+  def set_ip_address
+    self.ip ||= subnet.unused_ip if subnet if SETTINGS[:unattended] and (new_record? or managed?)
+  end
+
+  # returns a rundeck output
+  def rundeck
+    rdecktags = puppetclasses_names.map{|k| "class=#{k}"}
+    unless self.params["rundeckfacts"].empty?
+      rdecktags += self.params["rundeckfacts"].split(",").map{|rdf| "#{rdf}=#{fact(rdf)[0].value}"}
+    end
+    { name => { "description" => comment, "hostname" => name, "nodename" => name,
+      "osArch" => arch.name, "osFamily" => os.family, "osName" => os.name,
+      "osVersion" => os.release, "tags" => rdecktags, "username" => self.params["rundeckuser"] || "root" }
+    }
+  rescue => e
+    logger.warn "Failed to fetch rundeck info for #{to_s}: #{e}"
+    {}
+  end
+
+  def puppetrun!
+    unless puppet_proxy.present?
+      errors.add(:base, "no puppet proxy defined - cant continue")
+      logger.warn "unable to execute puppet run, no puppet proxies defined"
+      return false
+    end
+    ProxyAPI::Puppet.new({:url => puppet_proxy.url}).run fqdn
+  rescue => e
+    errors.add(:base, "failed to execute puppetrun: #{e}")
+    false
+  end
+
+  def overwrite?
+    @overwrite ||= false
+  end
+
+  # We have to coerce the value back to boolean. It is not done for us by the framework.
+  def overwrite=(value)
+    @overwrite = value == "true"
+  end
+
+  def require_ip_validation?
+    managed? and !compute? or (compute? and !compute_resource.provided_attributes.keys.include?(:ip))
+  end
+
+  # if certname does not exist, use hostname instead
+  def certname
+    read_attribute(:certname) || name
+  end
+
+  def progress_report_id
+    @progress_report_id ||= Foreman.uuid
+  end
+
+  def progress_report_id=(value)
+    @progress_report_id = value
+  end
+
+  def capabilities
+    compute_resource_id ? compute_resource.capabilities : [:build]
+  end
+
+  def provider
+    if compute_resource_id
+      compute_resource.provider_friendly_name
+    else
+      "BareMetal"
+    end
+  end
+
   # no need to store anything in the db if the password is our default
   def root_pass
     read_attribute(:root_pass) || hostgroup.try(:root_pass) || Setting[:root_pass]
@@ -800,7 +883,7 @@ class Host < Puppet::Rails::Host
     end if SETTINGS[:unattended] and managed? and os and capabilities.include?(:build)
 
     puppetclasses.uniq.each do |e|
-      unless environment.puppetclasses.map(&:id).include?(e.id)
+      unless environment.puppetclasses.include?(e)
         errors.add(:puppetclasses, "#{e} does not belong to the #{environment} environment")
         status = false
       end
@@ -867,6 +950,8 @@ class Host < Puppet::Rails::Host
     @tax_organization ||= TaxHost.new(organization, self)
   end
 
-=======
->>>>>>> 10968a2... Add STI to hosts table
+  def self.model_name
+    ActiveModel::Name.new(Host)
+  end
+
 end

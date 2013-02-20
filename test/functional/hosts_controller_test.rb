@@ -159,8 +159,7 @@ class HostsControllerTest < ActionController::TestCase
   end
 
   test "when host is saved after setBuild, the flash should inform it" do
-    mock(@host).setBuild {true}
-    mock(Host).find_by_name(@host.name) {@host}
+    Host.any_instance.stubs(:setBuild).returns(true)
     @request.env['HTTP_REFERER'] = hosts_path
 
     get :setBuild, {:id => @host.name}, set_session_user
@@ -171,8 +170,7 @@ class HostsControllerTest < ActionController::TestCase
   end
 
   test "when host is not saved after setBuild, the flash should inform it" do
-    mock(@host).setBuild {false}
-    mock(Host).find_by_name(@host.name) {@host}
+    Host.any_instance.stubs(:setBuild).returns(false)
     @request.env['HTTP_REFERER'] = hosts_path
 
     get :setBuild, {:id => @host.name}, set_session_user
