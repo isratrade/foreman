@@ -1,8 +1,8 @@
 class Architecture < ActiveRecord::Base
   include Authorization
-  include Hostmix
 
-  add_host_associations :has_many # Host STI
+  has_many :hosts
+  has_many :managed_hosts
   has_many :images, :dependent => :destroy
   has_and_belongs_to_many :operatingsystems
   validates_uniqueness_of :name

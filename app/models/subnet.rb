@@ -2,9 +2,9 @@ require 'ipaddr'
 class Subnet < ActiveRecord::Base
   include Authorization
   include Taxonomix
-  include Hostmix
 
-  add_host_associations :has_many # Host STI
+  has_many :hosts
+  has_many :managed_hosts
   belongs_to :dhcp, :class_name => "SmartProxy"
   belongs_to :tftp, :class_name => "SmartProxy"
   belongs_to :dns,  :class_name => "SmartProxy"

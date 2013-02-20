@@ -3,7 +3,6 @@ require "resolv"
 class Domain < ActiveRecord::Base
   include Authorization
   include Taxonomix
-  include Hostmix
 
   has_many :hosts
   has_many :managed_hosts

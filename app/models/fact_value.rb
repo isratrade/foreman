@@ -1,7 +1,8 @@
 class FactValue < ActiveRecord::Base
-  include Hostmix
 
-  add_host_associations :belongs_to # Host STI
+  belongs_to :host
+  belongs_to :managed_host
+
   belongs_to :fact_name
   delegate :name, :to => :fact_name
   has_many :hostgroup, :through => :host
