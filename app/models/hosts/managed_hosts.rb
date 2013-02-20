@@ -1,6 +1,6 @@
 require 'facts_importer'
 
-class Host::Managed < Host::Base
+class ManagedHost < Host
   include Authorization
   include ReportCommon
   belongs_to :model
@@ -17,7 +17,7 @@ class Host::Managed < Host::Base
   belongs_to :owner, :polymorphic => true
   belongs_to :compute_resource
   belongs_to :image
-
+  belongs_to :domain
   belongs_to :location
   belongs_to :organization
 
@@ -468,8 +468,8 @@ class Host::Managed < Host::Base
       return true unless last_compile.nil? or (last_compile + 1.minute < time)
       self.last_compile = time
     end
-    # save all other facts - pre 0.25 it was called setfacts
-    respond_to?("merge_facts") ? self.merge_facts(facts) : self.setfacts(facts)
+    # save all other facts
+    self.merge_facts(facts)
     save(:validate => false)
 
     populateFieldsFromFacts(facts)
@@ -483,6 +483,54 @@ class Host::Managed < Host::Base
 
   rescue Exception => e
     logger.warn "Failed to save #{name}: #{e}"
+  end
+
+  # Borrowed from Puppet::Rails:Host
+  def merge_facts(facts)
+    db_facts = {}
+
+    deletions = []
+    self.fact_values.find(:all, :include => :fact_name).each do |value|
+      deletions << value['id'] and next unless facts.include?(value['name'])
+      # Now store them for later testing.
+      db_facts[value['name']] ||= []
+      db_facts[value['name']] << value
+    end
+
+    # Now get rid of any parameters whose value list is different.
+    # This might be extra work in cases where an array has added or lost
+    # a single value, but in the most common case (a single value has changed)
+    # this makes sense.
+    db_facts.each do |name, value_hashes|
+      values = value_hashes.collect { |v| v['value'] }
+
+      unless values == facts[name]
+        value_hashes.each { |v| deletions << v['id'] }
+      end
+    end
+
+    # Perform our deletions.
+    FactValue.delete(deletions) unless deletions.empty?
+
+    # Get FactNames in one call
+    fact_names = FactName.where(:name => facts.keys)
+
+    # Create any needed new FactNames
+    facts.keys.dup.delete_if { |n| fact_names.map(&:name).include? n }.each do |needed|
+      fact_names << FactName.create(:name => needed)
+    end
+
+    # Lastly, add any new parameters.
+    fact_names.each do |fact_name|
+      next if db_facts.include?(fact_name.name)
+      value = facts[fact_name.name]
+      values = value.is_a?(Array) ? value : [value]
+      values.each do |v|
+        next if v.nil?
+        fact_values.build(:value => v, :fact_name => fact_name)
+      end
+    end
+
   end
 
   def populateFieldsFromFacts facts = self.facts_hash
