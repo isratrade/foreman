@@ -8,10 +8,10 @@ class Host::Managed < Host::Base
   has_many :fact_values, :dependent => :destroy, :foreign_key => :host_id
   has_many :fact_names, :through => :fact_values
   belongs_to :hostgroup
-  has_many :reports, :dependent => :destroy
+  has_many :reports, :dependent => :destroy, :foreign_key => :host_id
   has_many :host_parameters, :dependent => :destroy, :foreign_key => :reference_id
   accepts_nested_attributes_for :host_parameters, :reject_if => lambda { |a| a[:value].blank? }, :allow_destroy => true
-  has_many :interfaces, :dependent => :destroy, :inverse_of => :host, :class_name => 'Nic::Base'
+  has_many :interfaces, :dependent => :destroy, :inverse_of => :host, :class_name => 'Nic::Base', :foreign_key => :host_id
   accepts_nested_attributes_for :interfaces, :reject_if => lambda { |a| a[:mac].blank? }, :allow_destroy => true
   belongs_to :owner, :polymorphic => true
   belongs_to :compute_resource
@@ -21,7 +21,7 @@ class Host::Managed < Host::Base
   belongs_to :organization
   belongs_to :operatingsystem
 
-  has_one :token, :dependent => :destroy, :conditions => Proc.new {"expires >= '#{Time.now.utc.to_s(:db)}'"}
+  has_one :token, :foreign_key => :host_id, :dependent => :destroy, :conditions => Proc.new {"expires >= '#{Time.now.utc.to_s(:db)}'"}
 
   has_many :lookup_values, :finder_sql => Proc.new { normalize_hostname; %Q{ SELECT lookup_values.* FROM lookup_values WHERE (lookup_values.match = 'fqdn=#{fqdn}') } }, :dependent => :destroy
   # See "def lookup_values_attributes=" under, for the implementation of accepts_nested_attributes_for :lookup_values
@@ -448,8 +448,8 @@ class Host::Managed < Host::Base
       return true unless last_compile.nil? or (last_compile + 1.minute < time)
       self.last_compile = time
     end
-    # save all other facts - pre 0.25 it was called setfacts
-    respond_to?("merge_facts") ? self.merge_facts(facts) : self.setfacts(facts)
+    # save all other facts
+    self.merge_facts(facts)
     save(:validate => false)
 
     populateFieldsFromFacts(facts)
@@ -463,6 +463,54 @@ class Host::Managed < Host::Base
 
   rescue Exception => e
     logger.warn "Failed to save #{name}: #{e}"
+  end
+
+  # Borrowed from Puppet::Rails:Host
+  def merge_facts(facts)
+    db_facts = {}
+
+    deletions = []
+    self.fact_values.find(:all, :include => :fact_name).each do |value|
+      deletions << value['id'] and next unless facts.include?(value['name'])
+      # Now store them for later testing.
+      db_facts[value['name']] ||= []
+      db_facts[value['name']] << value
+    end
+
+    # Now get rid of any parameters whose value list is different.
+    # This might be extra work in cases where an array has added or lost
+    # a single value, but in the most common case (a single value has changed)
+    # this makes sense.
+    db_facts.each do |name, value_hashes|
+      values = value_hashes.collect { |v| v['value'] }
+
+      unless values == facts[name]
+        value_hashes.each { |v| deletions << v['id'] }
+      end
+    end
+
+    # Perform our deletions.
+    FactValue.delete(deletions) unless deletions.empty?
+
+    # Get FactNames in one call
+    fact_names = FactName.where(:name => facts.keys)
+
+    # Create any needed new FactNames
+    facts.keys.dup.delete_if { |n| fact_names.map(&:name).include? n }.each do |needed|
+      fact_names << FactName.create(:name => needed)
+    end
+
+    # Lastly, add any new parameters.
+    fact_names.each do |fact_name|
+      next if db_facts.include?(fact_name.name)
+      value = facts[fact_name.name]
+      values = value.is_a?(Array) ? value : [value]
+      values.each do |v|
+        next if v.nil?
+        fact_values.build(:value => v, :fact_name => fact_name)
+      end
+    end
+
   end
 
   def populateFieldsFromFacts facts = self.facts_hash
@@ -928,6 +976,10 @@ class Host::Managed < Host::Base
   def tax_organization
     return nil unless organization_id
     @tax_organization ||= TaxHost.new(organization, self)
+  end
+
+  def self.model_name
+    ActiveModel::Name.new(Host)
   end
 
 end
