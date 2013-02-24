@@ -9,6 +9,7 @@ class ActiveSupport::TestCase
   # -- they do not yet inherit this setting
 
   fixtures :all
+  set_fixture_class({:hosts => Host::Base})
 
   # Add more helper methods to be used by all tests here...
 

@@ -1,5 +1,5 @@
 class FactValue < ActiveRecord::Base
-  belongs_to :host
+  belongs_to_host
   belongs_to :fact_name
   delegate :name, :to => :fact_name
   has_many :hostgroup, :through => :host
