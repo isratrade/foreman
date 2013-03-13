@@ -1,6 +1,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery.ui.autocomplete
+//= require jquery.jnotify
 //= require scoped_search
 //= require twitter/bootstrap
 //= require charts

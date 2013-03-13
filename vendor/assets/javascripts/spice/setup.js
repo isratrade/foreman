@@ -1,19 +1,25 @@
-(function () {
-  "use strict";
+//= require ./enums
+//= require ./atKeynames
+//= require ./utils
+//= require ./png
+//= require ./lz
+//= require ./quic
+//= require ./bitmap
 
-  var extra = "", start, end;
+//= require ./spicedataview
+//= require ./spicetype
+//= require ./spicemsg
+//= require ./wire
+//= require ./spiceconn
+//= require ./display
+//= require ./main
 
-  start = "<script src='/javascripts/spice/"
-  end = "'><\/script>";
+//= require ./inputs
+//= require ./cursor
+//= require ./thirdparty/jsbn
+//= require ./thirdparty/rsa
+//= require ./thirdparty/prng4
+//= require ./thirdparty/rng
+//= require ./thirdparty/sha1
 
-  var required = ["enums.js", "atKeynames.js", "utils.js", "png.js", "lz.js", "quic.js", "bitmap.js",
-    "spicedataview.js", "spicetype.js", "spicemsg.js", "wire.js", "spiceconn.js", "display.js", "main.js",
-    "inputs.js", "cursor.js", "thirdparty/jsbn.js", "thirdparty/rsa.js", "thirdparty/prng4.js",
-    "thirdparty/rng.js", "thirdparty/sha1.js", "ticket.js"]
-
-  required.forEach (function(script) {
-    extra += start + script + end;
-  });
-
-  document.write(extra);
-}());
+//= require ./ticket
