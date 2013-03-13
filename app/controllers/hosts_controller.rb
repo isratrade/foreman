@@ -33,9 +33,9 @@ class HostsController < ApplicationController
     end
     respond_to do |format|
       format.html do
-        @hosts = search.paginate :page => params[:page], :include => included_associations
+        @hosts = search.includes(included_associations).paginate(:page => params[:page])
         # SQL optimizations queries
-        @last_reports = Report.maximum(:id, :group => :host_id, :conditions => {:host_id => @hosts})
+        @last_reports = Report.where(:host_id => @hosts.map(&:id)).group(:host_id).maximum(:id)
         # rendering index page for non index page requests (out of sync hosts etc)
         render :index if title and (@title = title)
       end
@@ -74,7 +74,7 @@ class HostsController < ApplicationController
 
   # Clone the host
   def clone
-    new = @host.clone
+    new = @host.dup
     load_vars_for_ajax
     flash[:warning] = "The marked fields will need reviewing"
     new.valid?
@@ -411,46 +411,25 @@ class HostsController < ApplicationController
   end
 
   def process_hostgroup
-    @hostgroup = Hostgroup.find(params[:hostgroup_id]) if params[:hostgroup_id].to_i > 0
+    @hostgroup = Hostgroup.find(params[:host][:hostgroup_id]) if params[:host][:hostgroup_id].to_i > 0
     return head(:not_found) unless @hostgroup
 
-    Taxonomy.as_taxonomy @organization, @location do
-      @architecture    = @hostgroup.architecture
-      @operatingsystem = @hostgroup.operatingsystem
-      @environment     = @hostgroup.environment
-      @domain          = @hostgroup.domain
-      @subnet          = @hostgroup.subnet
+    organization = Organization.find(params[:host][:organization_id]) unless params[:host][:organization_id].empty?
+    location = Location.find(params[:host][:location_id]) unless params[:host][:location_id].empty?
 
-      @host = Host.new
-      @host.hostgroup = @hostgroup
-      @host.compute_resource_id = params[:compute_resource_id] if params[:compute_resource_id].present?
-      @host.set_hostgroup_defaults
+    @architecture    = @hostgroup.architecture
+    @operatingsystem = @hostgroup.operatingsystem
+    @environment     = @hostgroup.environment
+    @domain          = @hostgroup.domain
+    @subnet          = @hostgroup.subnet
 
-
-      render :update do |page|
-        [:environment_id, :puppet_ca_proxy_id, :puppet_proxy_id].each do |field|
-          page["*[id*=#{field}]"].val(@hostgroup.send(field)) if @hostgroup.send(field).present?
-        end
-        page['#puppet_klasses'].html(render(:partial => 'puppetclasses/class_selection', :locals => {:obj => @host})) if @environment
-
-        if SETTINGS[:unattended]
-          if @architecture
-            page['#os_select'].html(render(:partial => 'common/os_selection/architecture', :locals => {:item => @host}))
-            page['#*[id*=architecture_id]'].val(@architecture.id)
-          end
-
-          page['#media_select'].html(render(:partial => 'common/os_selection/operatingsystem', :locals => {:item => @host})) if @operatingsystem
-
-          if @domain
-            page['*[id*=domain_id]'].val(@domain.id)
-            if @domain.subnets.any?
-              page['#subnet_select'].html(render(:partial => 'common/domain', :locals => {:item => @host}))
-              page['#host_subnet_id'].val(@subnet.id).change if @subnet
-            end
-          end
-        end
-      end
+    @host = Host.new(params[:host])
+    @host.set_hostgroup_defaults
+    
+    Taxonomy.as_taxonomy organization, location do
+      render :partial => "form"
     end
+
   end
 
   def process_taxonomy
