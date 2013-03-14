@@ -8,7 +8,7 @@ gem 'rest-client', :require => 'rest_client'
 gem "audited-activerecord", "3.0.0rc1"
 gem "will_paginate", "~> 3.0.2"
 gem "ancestry", "~> 1.3"
-gem 'scoped_search', '>=2.4.1'
+gem 'scoped_search', :git => "git://github.com/abenari/scoped_search.git"
 gem 'net-ldap'
 gem 'uuidtools'
 gem "apipie-rails", '0.0.16'
