@@ -6,6 +6,8 @@ Foreman::Application.routes.draw do
   post "reports/create"
   post "fact_values/create"
 
+  mount API => '/'
+
   resources :reports, :only => [:index, :show, :destroy, :create] do
     collection do
       get 'auto_complete_search'

@@ -43,6 +43,10 @@ module Foreman
     config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths += Dir["#{config.root}/app/controllers/concerns"]
 
+    # Grape API
+    config.paths.add "app/api", :glob => "**/*.rb"
+    config.autoload_paths += Dir["#{Rails.root}/app/api/*"]
+
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
