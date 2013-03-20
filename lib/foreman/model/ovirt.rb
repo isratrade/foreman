@@ -172,7 +172,7 @@ module Foreman::Model
 
 
     def client
-      #::Fog.mock! if Rails.env.test?
+      ::Fog.mock! if Rails.env.test?
       @client ||= ::Fog::Compute.new(
           :provider         => "ovirt",
           :ovirt_username   => user,
