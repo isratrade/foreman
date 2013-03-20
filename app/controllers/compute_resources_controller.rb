@@ -67,14 +67,44 @@ class ComputeResourcesController < ApplicationController
 
   #ajax methods
   def provider_selected
-    @compute_resource = ComputeResource.new_provider :provider => params[:provider]
-    render :partial => "compute_resources/form", :locals => { :compute_resource => @compute_resource }
+    uuid = params[:uuid]
+    uuid ||= params[:region]
+    uuid ||= params[:datacenter]
+    url = params[:compute_url]
+    url ||= params[:server]
+    @compute_resource = ComputeResource.new_provider({
+        :provider => params[:provider],
+        :name => params[:name],
+        :description => params[:description],
+        :user => params[:user],
+        :password => params[:password],
+        :url => url,
+        :uuid => uuid
+        })
+    respond_to do |format|
+     format.js
+    end
   end
 
   def test_connection
-    @compute_resource ||= ComputeResource.new_provider(params[:compute_resource])
+    uuid = params[:uuid]
+    uuid ||= params[:region]
+    uuid ||= params[:datacenter]
+    url = params[:compute_url]
+    url ||= params[:server]
+    @compute_resource ||= ComputeResource.new_provider({
+        :provider => params[:provider],
+        :name => params[:name],
+        :description => params[:description],
+        :user => params[:user],
+        :password => params[:password],
+        :url => url,
+        :uuid => uuid
+        })
     @compute_resource.test_connection
-    render :partial => "compute_resources/form", :locals => { :compute_resource => @compute_resource }
+    respond_to do |format|
+     format.js
+    end
   end
 
   def hardware_profile_selected

@@ -1,5 +1,5 @@
 <%= javascript "compute_resource" %>
-<%= form_for @compute_resource do |f| %>
+<%= form_for @compute_resource, :html => { :id => "compute_resource_form" } do |f| %>
   <%= base_errors_for @compute_resource %>
 
   <% if show_taxonomy_tabs? %>
@@ -16,7 +16,7 @@
     <div class="tab-content">
       <div class="tab-pane active" id="primary">
   <% end %>
-        <%= text_f f, :name %>
+        <%= text_f f, :name, {:value => f.object.name} %>
         <%= f.hidden_field(:provider, :id => '') if f.object.uuid.present? %>
         <%= selectable_f f, :provider, ComputeResource::PROVIDERS, { :include_blank => "Choose a provider"},
                          {:disabled=> f.object.uuid.present?, :'data-url'=> provider_selected_compute_resources_path, :onchange => 'providerSelected(this);'} %>

@@ -21,13 +21,25 @@ function providerSelected(item)
   }
   $("[type=submit]").attr("disabled",false);
   var url = $(item).attr('data-url');
+  var name = $("#compute_resource_name").val();
+  var description = $("#compute_resource_description").val();
+  var user = $("#compute_resource_user").val();
+  var password = $("#compute_resource_password").val();
+  var compute_url = $("#compute_resource_url").val();
+  var region = $("#compute_resource_region").val();
+  var uuid = $("#compute_resource_uuid").val();
   $.ajax({
-        type:'post',
+        type:'POST',
         url: url,
-        data:'provider=' + provider,
+        data: { provider : provider,
+                name : name,
+                description : description,
+                user : user,
+                password : password,
+                compute_url : compute_url,
+                uuid : uuid
+              },
         success: function(result){
-          $('#compute_connection').html($(result).find("#compute_connection"));
-          $('#compute_connection').append($(result).find(".alert-message"));
         }
   });
 }
@@ -35,13 +47,32 @@ function providerSelected(item)
 function testConnection(item) {
 
   $('#test_connection_indicator').show();
+  var provider = $("#compute_resource_provider").val();
+  var url = $(item).attr('data-url');
+  var name = $("#compute_resource_name").val();
+  var description = $("#compute_resource_description").val();
+  var user = $("#compute_resource_user").val();
+  var password = $("#compute_resource_password").val();
+  var compute_url = $("#compute_resource_url").val();
+  var region = $("#compute_resource_region").val();
+  var uuid = $("#compute_resource_uuid").val();
+  var server = $("#compute_resource_server").val();
+  var datacenter = $("#compute_resource_datacenter").val();
   $.ajax({
-    type:'put',
+    type:'PUT',
     url: $(item).attr('data-url'),
-    data: $('form').serialize(),
+    data: { provider : provider,
+            name : name,
+            description : description,
+            user : user,
+            password : password,
+            compute_url : compute_url,
+            region : region,
+            uuid : uuid,
+            server : server,
+            datacenter : datacenter
+          },
     success:function (result) {
-      $('#compute_connection').html($(result).find("#compute_connection"));
-      $('#compute_connection').prepend($(result).find(".alert-message"));
     },
     complete:function (result) {
       $('#test_connection_indicator').hide();

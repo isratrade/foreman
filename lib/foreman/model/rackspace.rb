@@ -1,7 +1,8 @@
 module Foreman::Model
   class Rackspace < ComputeResource
 
-    validates_presence_of :user, :password, :region
+    validates_presence_of :user, :password
+    validates_presence_of :region, :unless => :uuid?
 
     def provided_attributes
       super.merge({ :ip => :public_ip_address })
