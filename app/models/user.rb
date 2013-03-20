@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
   audited :except => [:last_login_on, :password, :password_hash, :password_salt, :password_confirmation]
   self.auditing_enabled = !(File.basename($0) == "rake" && ARGV.include?("db:migrate"))
 
-  attr_protected :password_hash, :password_salt, :admin
+  attr_protected :password_hash, :password_salt
   attr_accessor :password, :password_confirmation, :editing_self
 
   belongs_to :auth_source
