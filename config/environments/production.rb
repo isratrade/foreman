@@ -61,6 +61,35 @@ Foreman::Application.configure do
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
   #  config.assets.precompile += %w()
+  #
+  javascript = %w(compute_resource
+                  lookup_keys
+                  config_template
+                  ace/ace
+                  ace/theme-twilight
+                  ace/theme-dawn
+                  ace/theme-clouds
+                  ace/mode-diff
+                  config_template
+                  diff
+                  host_edit
+                  jquery.cookie
+                  host_checkbox
+                  nfs_visibility
+                  noVNC/ui
+                  noVNC/vnc
+                  noVNC
+                  reports
+                  spice/setup
+                  spice
+                  trends
+                  charts
+                 )
+  stylesheets = %w(wizard.scss
+                   bootstrap_and_overrides.scss
+                                 )
+
+  config.assets.precompile += javascript.map{|js| js + ".js"} + stylesheets
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
