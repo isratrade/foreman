@@ -150,6 +150,11 @@ Spork.prefork do
       assert page.has_content?("is used by"), "flash message 'is used by' was expected but it was not found on the page."
     end
 
+    def fix_mismatches
+      Location.all_import_missing_ids
+      Organization.all_import_missing_ids
+    end
+
   end
 
 end
