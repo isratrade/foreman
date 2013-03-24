@@ -64,6 +64,7 @@ Foreman::Application.configure do
                                  taxonomy.js
                                  trends.js
                                  vendor.js
+                                 ace/ace.js
                                  )
 
 end

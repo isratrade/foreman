@@ -75,6 +75,7 @@ Foreman::Application.configure do
                                  taxonomy.js
                                  trends.js
                                  vendor.js
+                                 ace/ace.js
                                  )
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
