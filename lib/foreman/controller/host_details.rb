@@ -18,7 +18,9 @@ module Foreman::Controller::HostDetails
 
   def domain_selected
     respond_to do |format|
-      format.html {assign_parameter "domain", "common/"}
+      format.html {
+        assign_parameter "domain", "common/"
+      }
       format.json do
         taxonomy_scope
         Taxonomy.as_taxonomy @organization, @location do
@@ -41,8 +43,8 @@ module Foreman::Controller::HostDetails
   def assign_parameter name, root = ""
     taxonomy_scope
     Taxonomy.as_taxonomy @organization, @location do
-      if params["#{name}_id"].to_i > 0 and eval("@#{name} = #{name.capitalize}.find(params['#{name}_id'])")
-        item = eval("@#{controller_name.singularize} || #{controller_name.singularize.capitalize}.new(params[:#{controller_name.singularize}])")
+      if params["#{name}_id"].to_i > 0 and eval("@#{name} = #{name.classify}.find(params['#{name}_id'])")
+        item = eval("@#{controller_name.singularize} || #{controller_name.classify}.new(params[:#{controller_name.singularize}])")
         render :partial => root + name, :locals => { :item => item }
       else
         head(:not_found)
