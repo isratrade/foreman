@@ -40,31 +40,31 @@ Foreman::Application.configure do
   # Raise exception on mass assignment protection for Active Record models
   config.active_record.mass_assignment_sanitizer = :strict
 
-  # Compress JavaScripts and CSS
-  config.assets.compress = true
+  # # Compress JavaScripts and CSS
+  # config.assets.compress = true
 
-  # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = false
+  # # Don't fallback to assets pipeline if a precompiled asset is missed
+  # config.assets.compile = false
 
-  # Generate digests for assets URLs
-  config.assets.digest = true
+  # # Generate digests for assets URLs
+  # config.assets.digest = true
 
-  # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w(compute_resource.js
-                                 charts.js
-                                 config_template.js
-                                 host_checkbox.js
-                                 host_edit.js
-                                 jrails.js
-                                 lookup_keys.js
-                                 nfs_visiblity.js
-                                 noVNC.js
-                                 reports.js
-                                 spice.js
-                                 taxonomy.js
-                                 trends.js
-                                 vendor.js
-                                 ace/ace.js
-                                 )
+  # # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
+  # config.assets.precompile += %w(compute_resource.js
+  #                                charts.js
+  #                                config_template.js
+  #                                host_checkbox.js
+  #                                host_edit.js
+  #                                jrails.js
+  #                                lookup_keys.js
+  #                                nfs_visiblity.js
+  #                                noVNC.js
+  #                                reports.js
+  #                                spice.js
+  #                                taxonomy.js
+  #                                trends.js
+  #                                vendor.js
+  #                                ace/ace.js
+  #                                )
 
 end
