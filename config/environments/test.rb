@@ -39,4 +39,17 @@ Foreman::Application.configure do
 
   # Raise exception on mass assignment protection for Active Record models
   config.active_record.mass_assignment_sanitizer = :strict
+
+  # Don't fallback to assets pipeline if a precompiled asset is missed
+  config.assets.compile = true
+
+  # Compress JavaScripts and CSS
+  config.assets.compress = false
+
+  # Expands the lines which load the assets
+  config.assets.debug = false
+
+  # Generate digests for assets URLs
+  config.assets.digest = false
+
 end
