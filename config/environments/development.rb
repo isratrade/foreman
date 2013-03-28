@@ -47,5 +47,8 @@ Foreman::Application.configure do
   # Generate digests for assets URLs
   config.assets.digest = false
 
+  # Reduces log
+  config.quiet_assets = true
+
 end
 
