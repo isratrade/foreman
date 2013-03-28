@@ -44,14 +44,15 @@ function onContentLoad(){
   })
 
   //set the tooltips
+  $('a[rel="popover"]').popover({html: true});
+  $('[rel="twipsy"]').tooltip();
+  $('*[title]').not('*[rel]').tooltip();
   $('[data-table=inline]').not('.dataTable').dataTable(
       {
         "sDom": "<'row'<'span6'f>r>t<'row'<'span6'i><'span6'p>>",
         "sPaginationType": "bootstrap"
       }
   );
-
-  $('[rel="twipsy"]').tooltip();
 
   // Prevents all links with the disabled attribute set to "disabled"
   // from being clicked.
