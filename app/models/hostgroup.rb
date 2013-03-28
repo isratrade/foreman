@@ -89,7 +89,7 @@ class Hostgroup < ActiveRecord::Base
   end
 
   def puppetclass_ids
-    classes.reorder('').pluck("puppetclasses.id")
+    classes.reorder('').pluck(:id)
   end
 
   # returns self and parent parameters as a hash
