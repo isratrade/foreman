@@ -10,7 +10,7 @@ class HostsController < ApplicationController
 
   PUPPETMASTER_ACTIONS=[ :externalNodes, :lookup ]
   SEARCHABLE_ACTIONS= %w[index active errors out_of_sync pending disabled ]
-  AJAX_REQUESTS=%w{compute_resource_selected hostgroup_or_environment_selected current_parameters}
+  AJAX_REQUESTS=%w{compute_resource_selected hostgroup_or_environment_selected current_parameters puppetclass_parameters}
 
   add_puppetmaster_filters PUPPETMASTER_ACTIONS
   before_filter :ajax_request, :only => AJAX_REQUESTS
@@ -23,6 +23,7 @@ class HostsController < ApplicationController
     storeconfig_klasses clone pxe_config toggle_manage power console]
   before_filter :taxonomy_scope, :only => [:hostgroup_or_environment_selected, :process_hostgroup]
   before_filter :set_host_type, :only => [:update]
+  before_filter :refresh_host, :only => [:current_parameters, :puppetclass_parameters, :hostgroup_or_environment_selected]
   helper :hosts, :reports
 
   def index (title = nil)
@@ -123,26 +124,25 @@ class HostsController < ApplicationController
 
   # form AJAX methods
   def compute_resource_selected
-    compute = ComputeResource.find(params[:compute_resource_id]) if params[:compute_resource_id].to_i > 0
+    compute = ComputeResource.find_by_id(params[:compute_resource_id])
     render :partial => "compute", :locals => {:compute_resource => compute} if compute
   end
 
   def hostgroup_or_environment_selected
-    return head(:method_not_allowed) unless request.xhr?
-
     Taxonomy.as_taxonomy @organization, @location do
-      @environment = Environment.find(params[:environment_id]) unless params[:environment_id].empty?
-      @hostgroup   = Hostgroup.find(params[:hostgroup_id])     unless params[:hostgroup_id].empty?
-      @host        = Host.find(params[:host_id])               if params[:host_id].to_i > 0
-      if @environment or @hostgroup
-        @host ||= Host.new
-        @host.hostgroup   = @hostgroup if @hostgroup
-        @host.environment = @environment if @environment
-        render :partial => 'puppetclasses/class_selection', :locals => {:obj => (@host)}
-      else
-        head(:not_found)
-      end
+      # @host comes from before_filter :refresh_host
+      render :partial => 'puppetclasses/class_selection', :locals => {:obj => (@host)}
     end
+  end
+
+  def current_parameters
+    # @host comes from before_filter :refresh_host
+    render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
+  end
+
+  def puppetclass_parameters
+    # @host comes from before_filter :refresh_host
+    render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
   end
 
   #returns a yaml file ready to use for puppet external nodes script
@@ -456,17 +456,27 @@ class HostsController < ApplicationController
     render :partial => "provisioning", :locals => {:templates => templates}
   end
 
-  def current_parameters
-    @host = Host.new params['host']
-    render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
-  end
-
-  def puppetclass_parameters
-    @host = Host.new params['host']
-    render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
-  end
-
   private
+
+  def refresh_host
+    @host = Host::Managed.find_by_id(params['host_id'])
+    if @host
+      @host.attributes = params['host']
+    else
+      @host ||= Host::Managed.new(params['host'])
+    end
+    # @host = Host::Base.find_by_id(params['host_id'])
+    # logger.info "PARAMS HOST ID IS #{params['host_id']}"
+    # logger.info "PARAMS IS #{params}"
+    # logger.info "HOST IS #{@host.attributes}"
+    # @host ||= Host::Managed.new(params['host'])
+    # logger.info "NEWHOST IS #{@host}"
+    # # If we found a host from another STI type, convert it so we can call Managed methods on it
+    # unless @host.class.name == "Host::Managed"
+    #   @host      = @host.becomes(Host::Managed)
+    #   @host.type = "Host::Managed"
+    # end
+  end
 
   def set_host_type
     return unless params[:host] and params[:host][:type]
