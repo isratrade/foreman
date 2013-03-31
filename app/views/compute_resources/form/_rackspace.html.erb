@@ -1,6 +1,7 @@
 <%= text_f f, :url, :label => "Authentication URL", :class => "input-xlarge", :help_block => "e.g. https://identity.api.rackspacecloud.com" %>
 <%= text_f f, :user, :label => "Username" %>
-<%= password_f f, :password, :label => "API Key" %>
+<%= password_f f, :password, :label => "API Key", :value => f.object.password %>
+
 <% flavors = f.object.flavors rescue [] -%>
 <%= selectable_f(f, :region, f.object.regions, {}, {:label => 'Region',
                  :help_inline => link_to_function("Test Connection", "testConnection(this)",
