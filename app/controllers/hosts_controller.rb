@@ -478,12 +478,22 @@ class HostsController < ApplicationController
   end
 
   def current_parameters
-    @host = Host.new params['host']
+    if params['host']['id'].present?
+      @host = Host.find(params['host']['id'])
+      @host.attributes = params['host']
+    else
+      @host = Host.new params['host']
+    end
     render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
   end
 
   def puppetclass_parameters
-    @host = Host.new params['host']
+    if params['host']['id'].present?
+      @host = Host.find(params['host']['id'])
+      @host.attributes = params['host']
+    else
+      @host = Host.new params['host']
+    end
     render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
   end
 
