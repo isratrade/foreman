@@ -1,5 +1,5 @@
 <%= text_f f, :user, :label => "Access Key" %>
-<%= password_f f, :password, :label => "Secret Key" %>
+<%= password_f f, :password, :label => "Secret Key", :value => f.object.password %>
 
 <% regions = f.object.regions rescue [] %>
 <%= selectable_f(f, :region, regions, {}, {:label => 'Region', :disabled => regions.empty?,
