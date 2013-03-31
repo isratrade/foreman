@@ -123,6 +123,7 @@ class HostsController < ApplicationController
 
   # form AJAX methods
   def compute_resource_selected
+    return head(:method_not_allowed) unless request.xhr?
     compute = ComputeResource.find(params[:compute_resource_id]) if params[:compute_resource_id].to_i > 0
     render :partial => "compute", :locals => {:compute_resource => compute} if compute
   end
@@ -133,9 +134,9 @@ class HostsController < ApplicationController
     Taxonomy.as_taxonomy @organization, @location do
       @environment = Environment.find(params[:environment_id]) unless params[:environment_id].empty?
       @hostgroup   = Hostgroup.find(params[:hostgroup_id])     unless params[:hostgroup_id].empty?
-      @host        = Host.find(params[:host_id])               if params[:host_id].to_i > 0
+      @host        = Host::Managed.find_by_id(params['host_id'])
       if @environment or @hostgroup
-        @host ||= Host.new
+        @host ||= Host::Managed.new
         @host.hostgroup   = @hostgroup if @hostgroup
         @host.environment = @environment if @environment
         render :partial => 'puppetclasses/class_selection', :locals => {:obj => (@host)}
@@ -143,6 +144,20 @@ class HostsController < ApplicationController
         head(:not_found)
       end
     end
+  end
+
+  def current_parameters
+    return head(:method_not_allowed) unless request.xhr?
+    @host = Host::Managed.find_by_id(params['host_id'])
+    @host ||= Host::Managed.new
+    render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
+  end
+
+  def puppetclass_parameters
+    return head(:method_not_allowed) unless request.xhr?
+    @host = Host::Managed.find_by_id(params['host_id'])
+    @host ||= Host::Managed.new
+    render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
   end
 
   #returns a yaml file ready to use for puppet external nodes script
@@ -454,16 +469,6 @@ class HostsController < ApplicationController
     end.compact
     return not_found if templates.empty?
     render :partial => "provisioning", :locals => {:templates => templates}
-  end
-
-  def current_parameters
-    @host = Host.new params['host']
-    render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
-  end
-
-  def puppetclass_parameters
-    @host = Host.new params['host']
-    render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
   end
 
   private

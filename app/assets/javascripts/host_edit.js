@@ -414,10 +414,11 @@ function override_class_param(item){
 }
 
 function reload_params(){
+  var host_id = $("form").data('id')
   var url = $('#params-tab').data('url');
   var data = $("[data-submit='progress_bar']").serialize().replace('method=put', 'method=post');
+  data = data + '&host_id=' + host_id
   load_with_placeholder('inherited_parameters', url, data)
-
   var url2 = $('#params-tab').data('url2');
   load_with_placeholder('inherited_puppetclasses_parameters', url2, data)
 }
