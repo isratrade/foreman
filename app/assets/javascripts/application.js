@@ -380,9 +380,9 @@ $(function() {
 
 function update_puppetclasses(element) {
   var host_id = $(element).attr('data-host-id');
-  var env_id = $('*[id*=environment_id]').val();
+  var env_id = $('*[id*=environment_id]').attr('value');
   var url = $(element).attr('data-url');
-  var hostgroup_id = $('*[id*=hostgroup_id]').val();
+  var hostgroup_id = $('*[id*=hostgroup_id]').attr('value');
   if (env_id == "") return;
   $.ajax({
     type: 'post',
