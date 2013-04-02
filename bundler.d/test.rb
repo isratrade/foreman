@@ -14,5 +14,6 @@ group :test do
   gem 'database_cleaner'
   gem 'launchy'
   gem 'spork'
-  gem 'spork-testunit'
+  gem 'spork-testunit', :platforms => :ruby_18
+  gem "spork-minitest", "~> 1.0.0.beta2", :platforms => :ruby_19
 end
