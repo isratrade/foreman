@@ -9,7 +9,7 @@ group :test do
   gem 'single_test'
   gem 'ci_reporter', '>= 1.6.3', :require => false
   gem 'minitest', '~> 3.5', :platforms => :ruby_19
-  gem 'minitest-spec-rails', :platforms => :ruby_19
+  gem 'minitest-spec-rails', :platforms => :ruby_19  # Drop in MiniTest::Spec support for Rails 3.
   gem 'capybara'
   gem 'database_cleaner'
   gem 'launchy'

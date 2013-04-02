@@ -12,6 +12,7 @@ Spork.prefork do
   ENV["RAILS_ENV"] = "test"
   require File.expand_path('../../config/environment', __FILE__)
   require 'rails/test_help'
+  require 'minitest/autorun'
   require 'capybara/rails'
 
   class ActiveSupport::TestCase
@@ -102,6 +103,7 @@ Spork.prefork do
   DatabaseCleaner.strategy = :truncation
 
   class ActionDispatch::IntegrationTest
+    include Rails.application.routes.url_helpers
     # Make the Capybara DSL available in all integration tests
     include Capybara::DSL
 
