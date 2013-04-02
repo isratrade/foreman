@@ -8,42 +8,50 @@ class HostTest < ActionDispatch::IntegrationTest
     fix_mismatches
   end
 
-  # context - BareMetal NO orgs/locations
-  test "create new baremetal host without org or loc" do
-    SETTINGS[:organizations_enabled] = false
-    SETTINGS[:locations_enabled] = false
+  # context - BareMetal WITH orgs/locations
+  test "create new baremetal host with org or loc" do
+    turn_on_locations_organizations
     click_new_and_enter_name
+    select_location_and_organization
     select_compute_resource("Bare Metal")
     create_baremetal_host_steps
   end
 
-  # context - BareMetal WITH orgs/locations
-  test "create new baremetal host with org or loc" do
-    SETTINGS[:organizations_enabled] = true
-    SETTINGS[:locations_enabled] = true
+  # context - BareMetal WITHOUT orgs/locations
+  test "create new baremetal host without org or loc" do
+    turn_off_locations_organizations
     click_new_and_enter_name
-    select_location_and_organization
     select_compute_resource("Bare Metal")
     create_baremetal_host_steps
   end
 
   # context - ec2 WITH orgs/locations
   test "create new ec2 host with org or loc" do
-    SETTINGS[:organizations_enabled] = true
-    SETTINGS[:locations_enabled] = true
+    turn_on_locations_organizations
     click_new_and_enter_name
     select_location_and_organization
     select_compute_resource("amazon123 (eu-west-1-EC2)")
     create_ec2_host_steps
   end
 
-  # context - ec2 WITH orgs/locations
+  # context - ec2 WITHOUT orgs/locations
   test "create new ec2 host without org or loc" do
-    SETTINGS[:organizations_enabled] = false
-    SETTINGS[:locations_enabled] = false
+    turn_off_locations_organizations
     click_new_and_enter_name
     select_compute_resource("amazon123 (eu-west-1-EC2)")
     create_ec2_host_steps
+  end
+
+
+  # HELPERS
+  def turn_on_locations_organizations
+    SETTINGS[:organizations_enabled] = true
+    SETTINGS[:locations_enabled] = true
+  end
+
+  def turn_off_locations_organizations
+    SETTINGS[:organizations_enabled] = false
+    SETTINGS[:locations_enabled] = false
   end
 
   def click_new_and_enter_name
