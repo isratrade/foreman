@@ -130,7 +130,6 @@ class ComputeResourcesVmsControllerTest < ActionController::TestCase
   end
 
   def get_test_vm
-    Fog.unmock!
     @compute_resource.vms.index {|vm| vm.name == "test" and @test_vm = vm}
   end
 
