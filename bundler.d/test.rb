@@ -1,6 +1,6 @@
 group :test do
   gem 'mocha', :require => false
-  gem 'minitest', '~> 3.5'
+  gem 'minitest'
   gem 'single_test'
   gem 'rake'
   gem 'ci_reporter', '>= 1.6.3', :require => false
