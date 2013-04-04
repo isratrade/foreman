@@ -28,10 +28,6 @@ Spork.prefork do
       Rails.logger
     end
 
-    class Test::Unit::TestCase
-      include RR::Adapters::TestUnit
-    end
-
     def set_session_user
       SETTINGS[:login] ? {:user => User.admin.id, :expires_at => 5.minutes.from_now} : {}
     end
