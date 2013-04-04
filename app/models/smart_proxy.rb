@@ -75,7 +75,7 @@ class SmartProxy < ActiveRecord::Base
   end
 
   def associate_features
-    return true if Rails.env == "test"
+    return true if Rails.env.test?
 
     name_map = SmartProxy.name_map
     reason = false
