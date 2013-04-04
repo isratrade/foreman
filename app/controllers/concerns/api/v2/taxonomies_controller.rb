@@ -1,6 +1,5 @@
 module Api::V2::TaxonomiesController
   extend ActiveSupport::Concern
-  extend Apipie::DSL::Concern
 
   included do
     before_filter :find_taxonomy, :only => %w{show update destroy settings
@@ -10,6 +9,8 @@ module Api::V2::TaxonomiesController
     before_filter :find_nested_object, :only => %w(index show)
     before_filter :params_match_database, :only => %w(create update)
   end
+
+  extend Apipie::DSL::Concern
 
   def_param_group :resource do
     param :resource, Hash, :required => true, :action_aware => true do
