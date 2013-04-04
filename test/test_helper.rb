@@ -11,7 +11,15 @@ Spork.prefork do
   require 'rails/test_help'
   require "minitest/autorun"
   require 'capybara/rails'
+
+  # Turn of Apipie validation for tests
   Apipie.configuration.validate = false
+
+  # Configure test output using turn gem
+  Turn.config do |config|
+    config.format = :dot
+    config.natural = true
+  end
 
   class ActiveSupport::TestCase
     # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
