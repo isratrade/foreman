@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'spork'
+# $LOAD_PATH required for testdrb party of spork-minitest
+$LOAD_PATH << "test"
 
 Spork.prefork do
   # Loading more in this block will cause your tests to run faster. However,
