@@ -32,55 +32,48 @@ class RoleTest < ActiveSupport::TestCase
     assert_equal size - 2, role.permissions.size
   end
 
-  context "System roles" do
-    should "return the anonymous role" do
+  # context - System roles
+  test "should return the anonymous role" do
       role = Role.anonymous
       assert role.builtin?
       assert_equal Role::BUILTIN_ANONYMOUS, role.builtin
-    end
+  end
 
-    context "with a missing anonymous role" do
-      setup do
-        Role.delete_all("builtin = #{Role::BUILTIN_ANONYMOUS}")
-      end
-
-      should "create a new anonymous role" do
-        assert_difference('Role.count') do
-          Role.anonymous
-        end
-      end
-
-      should "return the anonymous role" do
-        role = Role.anonymous
-        assert role.builtin?
-        assert_equal Role::BUILTIN_ANONYMOUS, role.builtin
-      end
+  # context "with a missing anonymous role"
+  test "create a new anonymous role" do
+    Role.delete_all("builtin = #{Role::BUILTIN_ANONYMOUS}")
+    assert_difference('Role.count') do
+      Role.anonymous
     end
   end
 
-  context "Default_user" do
-    should "return the default_user role" do
-      role = Role.default_user
-      assert role.builtin?
-      assert_equal Role::BUILTIN_DEFAULT_USER, role.builtin
-    end
+  test "return the anonymous role" do
+    Role.delete_all("builtin = #{Role::BUILTIN_ANONYMOUS}")
+    role = Role.anonymous
+    assert role.builtin?
+    assert_equal Role::BUILTIN_ANONYMOUS, role.builtin
+  end
 
-    context "with a missing default_user role" do
-      setup do
-        Role.delete_all("builtin = #{Role::BUILTIN_DEFAULT_USER}")
-      end
+  # context "Default_user"
+  test "return the default_user role" do
+    role = Role.default_user
+    assert role.builtin?
+    assert_equal Role::BUILTIN_DEFAULT_USER, role.builtin
+  end
 
-      should "create a new default_user role" do
-        assert_difference('Role.count') do
-          Role.default_user
-        end
-      end
-
-      should "return the default_user role" do
-        role = Role.default_user
-        assert role.builtin?
-        assert_equal Role::BUILTIN_DEFAULT_USER, role.builtin
-      end
+  # context "with a missing default_user role"
+  test "create a new default_user role" do
+    Role.delete_all("builtin = #{Role::BUILTIN_DEFAULT_USER}")
+    assert_difference('Role.count') do
+      Role.default_user
     end
   end
+
+  test "return the default_user role if missing default user role" do
+    Role.delete_all("builtin = #{Role::BUILTIN_DEFAULT_USER}")
+    role = Role.default_user
+    assert role.builtin?
+    assert_equal Role::BUILTIN_DEFAULT_USER, role.builtin
+  end
+
 end

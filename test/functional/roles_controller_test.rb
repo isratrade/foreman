@@ -1,36 +1,6 @@
-# redMine - project management software
-# Copyright (C) 2006-2007  Jean-Philippe Lang
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-require File.dirname(__FILE__) + '/../test_helper'
-require 'roles_controller'
-
-# Re-raise errors caught by the controller.
-class RolesController; def rescue_action(e) raise e end; end
+require 'test_helper'
 
 class RolesControllerTest < ActionController::TestCase
-  fixtures :roles, :users
-
-  def setup
-    @controller = RolesController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-    User.current = nil
-    @request.session[:user] = users(:admin).id # admin
-  end
 
   def test_get_index
     get :index, {}, set_session_user
@@ -119,6 +89,4 @@ class RolesControllerTest < ActionController::TestCase
     assert Role.find(1).permissions.empty?
   end
 
-  viewable = %w{Architecture Audit AuthSourceLdap Dashboard Domain Environment LookupKey FactValue CommonParameter Hostgroup Host Medium Model Operatingsystem Ptable Puppetclass Report Setting Statistic Usergroup User}
-  editable = %w{Architecture Audit AuthSourceLdap           Domain Environment LookupKey           CommonParameter Hostgroup Host Medium Model Operatingsystem Ptable Puppetclass Report                   Usergroup User}
 end
