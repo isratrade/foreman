@@ -5,7 +5,7 @@ class Api::V1::AuditsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:audits)
+    refute_nil assigns(:audits)
     audits = ActiveSupport::JSON.decode(@response.body)
     assert !audits.empty?
   end

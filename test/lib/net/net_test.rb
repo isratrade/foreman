@@ -10,7 +10,7 @@ class NetTest < ActiveSupport::TestCase
 
   test "should have a logger" do
     record = Net::Record.new :hostname => "test", "proxy" => smart_proxies(:one)
-    assert_not_nil record.logger
+    refute_nil record.logger
   end
 
   test "should default logger to rails logger" do

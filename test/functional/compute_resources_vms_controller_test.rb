@@ -27,7 +27,7 @@ class ComputeResourcesVmsControllerTest < ActionController::TestCase
     assert !computes.empty?
     assert computes.is_a?(Array)
     assert computes.length >= 1
-    assert_not_nil computes.index{|vm| vm["uuid"] == @test_vm.uuid}
+    refute_nil computes.index{|vm| vm["uuid"] == @test_vm.uuid}
   end
 
   test "should not show vm when not permitted" do

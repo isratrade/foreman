@@ -4,7 +4,7 @@ class LookupKeysControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, {}, set_session_user
     assert_response :success
-    assert_not_nil assigns(:lookup_keys)
+    refute_nil assigns(:lookup_keys)
   end
 
   test "should get edit" do

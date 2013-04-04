@@ -22,7 +22,7 @@ class Api::V1::BookmarksControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:bookmarks)
+    refute_nil assigns(:bookmarks)
   end
 
   test "should show bookmark" do

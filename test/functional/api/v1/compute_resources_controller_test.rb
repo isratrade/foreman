@@ -15,7 +15,7 @@ class Api::V1::ComputeResourcesControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:compute_resources)
+    refute_nil assigns(:compute_resources)
     compute_resources = ActiveSupport::JSON.decode(@response.body)
     assert !compute_resources.empty?
   end

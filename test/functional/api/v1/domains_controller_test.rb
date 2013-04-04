@@ -4,7 +4,7 @@ class Api::V1::DomainsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:domains)
+    refute_nil assigns(:domains)
   end
 
   test "should show domain" do

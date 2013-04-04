@@ -9,11 +9,11 @@ class PuppetSettingTest < ActiveSupport::TestCase
   end
 
   test "should always have puppetconfdir available" do
-    assert_not_nil SETTINGS[:puppetconfdir]
+    refute_nil SETTINGS[:puppetconfdir]
   end
 
   test "should always have puppetvardir available" do
-    assert_not_nil SETTINGS[:puppetvardir]
+    refute_nil SETTINGS[:puppetvardir]
   end
 
   test "should find puppetmasterd on Puppet 2.x" do
@@ -52,7 +52,7 @@ class PuppetSettingTest < ActiveSupport::TestCase
     ps = PuppetSetting.new
     ps.expects(:which).with('puppet', kind_of(Array)).returns(false)
     File.stubs(:exists?).with('/opt/puppet/bin/puppet').returns(false)
-    assert_raise(RuntimeError, /unable to find/) { ps.send(:puppetmaster) }
+    assert_raises(RuntimeError, /unable to find/) { ps.send(:puppetmaster) }
   end
 
   test "should not modify PATH when 'puppetgem' setting enabled" do
@@ -87,6 +87,6 @@ class PuppetSettingTest < ActiveSupport::TestCase
     ps.instance_variable_set(:@puppetmaster, '/foo')
     ps.expects('`').with('/foo --configprint foo 2>&1').returns('bar')
     $?.expects(:success?).returns(false)
-    assert_raise(RuntimeError, /unable to get foo/) { ps.get('foo') }
+    assert_raises(RuntimeError, /unable to get foo/) { ps.get('foo') }
   end
 end

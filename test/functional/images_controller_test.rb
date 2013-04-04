@@ -9,7 +9,7 @@ class ImagesControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { :compute_resource_id => @image.compute_resource_id }, set_session_user
     assert_response :success
-    assert_not_nil assigns(:images)
+    refute_nil assigns(:images)
   end
 
   test "should get new" do

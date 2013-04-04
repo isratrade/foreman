@@ -7,7 +7,7 @@ class Api::V1::AuthSourceLdapsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:auth_source_ldaps)
+    refute_nil assigns(:auth_source_ldaps)
     auth_source_ldaps = ActiveSupport::JSON.decode(@response.body)
     assert !auth_source_ldaps.empty?
   end

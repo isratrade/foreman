@@ -5,7 +5,7 @@ class TFTPOrchestrationTest < ActiveSupport::TestCase
     if unattended?
       h = hosts(:one)
       assert h.tftp?
-      assert_not_nil h.tftp
+      refute_nil h.tftp
     end
   end
 

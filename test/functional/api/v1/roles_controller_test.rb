@@ -7,7 +7,7 @@ class Api::V1::RolesControllerTest < ActionController::TestCase
   test "should get index" do
     get :index
     assert_response :success
-    assert_not_nil assigns(:roles)
+    refute_nil assigns(:roles)
     roles = ActiveSupport::JSON.decode(@response.body)
     assert !roles.empty?
   end

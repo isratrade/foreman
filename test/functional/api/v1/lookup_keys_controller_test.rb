@@ -7,7 +7,7 @@ class Api::V1::LookupKeysControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:lookup_keys)
+    refute_nil assigns(:lookup_keys)
     lookup_keys = ActiveSupport::JSON.decode(@response.body)
     assert !lookup_keys.empty?
   end

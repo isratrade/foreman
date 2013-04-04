@@ -165,7 +165,7 @@ class HostsControllerTest < ActionController::TestCase
     get :setBuild, {:id => @host.name}, set_session_user
     assert_response :found
     assert_redirected_to hosts_path
-    assert_not_nil flash[:notice]
+    refute_nil flash[:notice]
     assert flash[:notice] == "Enabled #{@host} for rebuild on next boot"
   end
 
@@ -176,7 +176,7 @@ class HostsControllerTest < ActionController::TestCase
     get :setBuild, {:id => @host.name}, set_session_user
     assert_response :found
     assert_redirected_to hosts_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
     assert flash[:error] =~ /Failed to enable #{@host} for installation/
   end
 
@@ -356,7 +356,7 @@ class HostsControllerTest < ActionController::TestCase
     # check that we have hosts and their hostgroup is empty
     host_names.each do |name|
       host = Host.find_by_name name
-      assert_not_nil host
+      refute_nil host
       assert_nil host.hostgroup
     end
 
@@ -365,7 +365,7 @@ class HostsControllerTest < ActionController::TestCase
 
     host_names.each do |name|
       host = Host.find_by_name name
-      assert_not_nil host
+      refute_nil host
       assert_equal host.hostgroup, hostgroup
     end
   end

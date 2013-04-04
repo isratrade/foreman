@@ -168,7 +168,7 @@ class HostTest < ActiveSupport::TestCase
       @one.roles      = [Role.find_by_name("Edit hosts")]
     end
     assert @host.update_attributes(:name => "blahblahblah")
-    assert_no_match /do not have permission/, @host.errors.full_messages.join("\n")
+    refute_match /do not have permission/, @host.errors.full_messages.join("\n")
   end
 
   test "hosts can be edited when domains permit" do
@@ -178,7 +178,7 @@ class HostTest < ActiveSupport::TestCase
       @one.domains    = [Domain.find_by_name("mydomain.net")]
     end
     assert @host.update_attributes(:name => "blahblahblah")
-    assert_no_match /do not have permission/, @host.errors.full_messages.join("\n")
+    refute_match /do not have permission/, @host.errors.full_messages.join("\n")
   end
 
   test "hosts cannot be edited when domains deny" do
@@ -214,7 +214,7 @@ class HostTest < ActiveSupport::TestCase
                        :architecture => architectures(:x86_64), :environment => environments(:production),
                        :subnet => subnets(:one), :disk => "empty partition")
     assert !host.new_record?
-    assert_no_match /do not have permission/, host.errors.full_messages.join("\n")
+    refute_match /do not have permission/, host.errors.full_messages.join("\n")
   end
 
   test "hosts can be created when hostgroups permit" do
@@ -229,7 +229,7 @@ class HostTest < ActiveSupport::TestCase
                        :subnet => subnets(:one),
                        :disk => "empty partition", :hostgroup => hostgroups(:common))
     assert !host.new_record?
-    assert_no_match /do not have permission/, host.errors.full_messages.join("\n")
+    refute_match /do not have permission/, host.errors.full_messages.join("\n")
   end
 
   test "hosts cannot be created when hostgroups deny" do
@@ -262,7 +262,7 @@ class HostTest < ActiveSupport::TestCase
       @one.roles = [Role.find_by_name("Destroy hosts")]
     end
     assert @host.destroy
-    assert_no_match /do not have permission/, @host.errors.full_messages.join("\n")
+    refute_match /do not have permission/, @host.errors.full_messages.join("\n")
   end
 
   test "hosts can be destroyed when ownership permits" do
@@ -272,7 +272,7 @@ class HostTest < ActiveSupport::TestCase
       @host.update_attribute :owner,  users(:one)
     end
     assert @host.destroy
-    assert_no_match /do not have permission/, @host.errors.full_messages.join("\n")
+    refute_match /do not have permission/, @host.errors.full_messages.join("\n")
   end
 
   test "hosts cannot be destroyed when ownership denies" do
@@ -361,7 +361,7 @@ class HostTest < ActiveSupport::TestCase
     h.architecture = architectures(:sparc)
     assert !h.valid?
     assert_equal hg.operatingsystem, h.operatingsystem
-    assert_not_equal hg.architecture , h.architecture
+    refute_equal hg.architecture , h.architecture
     assert_equal h.architecture, architectures(:sparc)
   end
 
@@ -407,7 +407,7 @@ class HostTest < ActiveSupport::TestCase
     h.root_pass = "token"
     h.hostgroup = nil
     assert h.save
-    assert_not_equal pw, h.root_pass
+    refute_equal pw, h.root_pass
   end
 
   test "should allow to revert to default root pw" do
@@ -434,7 +434,7 @@ class HostTest < ActiveSupport::TestCase
     # Check it changes
     h.root_pass = "token"
     assert h.save
-    assert_not_equal first.split('$')[2], h.root_pass.split('$')[2]
+    refute_equal first.split('$')[2], h.root_pass.split('$')[2]
   end
 
   test "should pass through existing salt when saving root pw" do
@@ -473,8 +473,8 @@ class HostTest < ActiveSupport::TestCase
     host = Host.create :name => "myhost1", :mac => "aabbecddeeff", :ip => "2.3.4.3", :hostgroup => hostgroups(:common), :managed => true
     assert host.valid?
     assert !host.new_record?
-    assert_not_nil host.certname
-    assert_not_equal host.name, host.certname
+    refute_nil host.certname
+    refute_equal host.name, host.certname
   end
 
   test "should not save uuid on non managed hosts" do

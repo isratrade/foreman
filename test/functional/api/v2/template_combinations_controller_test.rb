@@ -1,6 +1,10 @@
 require 'test_helper'
 
-class Api::V2::TemplateCombinationsControllerTest < ActionController::TestCase
+module Api
+  module V2
+
+
+    class TemplateCombinationsControllerTest < ActionController::TestCase
 
   test "should get index" do
     get :index, {:config_template_id => config_templates(:mystring2).id}
@@ -19,8 +23,10 @@ class Api::V2::TemplateCombinationsControllerTest < ActionController::TestCase
 
   test "should create valid" do
     TemplateCombination.any_instance.stubs(:valid?).returns(true)
-    post :create, { :template_combination => { :environment_id => environments(:production).id, :hostgroup_id => hostgroups(:unusual).id },
+    as_admin do
+      post :create, { :template_combination => { :environment_id => environments(:production).id, :hostgroup_id => hostgroups(:unusual).id },
         :config_template_id => config_templates(:mystring2).id }
+    end
     template_combination = ActiveSupport::JSON.decode(@response.body)
     assert template_combination["template_combination"]["environment_id"] == environments(:production).id
     assert template_combination["template_combination"]["hostgroup_id"] == hostgroups(:unusual).id
@@ -35,4 +41,6 @@ class Api::V2::TemplateCombinationsControllerTest < ActionController::TestCase
     assert_response :ok
     assert !TemplateCombination.exists?(template_combinations(:two).id)
   end
+end
+end
 end

@@ -42,7 +42,7 @@ class AccessPermissionsTest < ActiveSupport::TestCase
     next unless filters.select { |f| f.filter == :require_admin }.empty?
 
     test "route #{path} should have a permission that grants access" do
-      assert_not_equal [], Foreman::AccessControl.permissions.select { |p| p.actions.include? path }
+      refute_equal [], Foreman::AccessControl.permissions.select { |p| p.actions.include? path }
     end
   end
 end

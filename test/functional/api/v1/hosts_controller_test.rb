@@ -17,7 +17,7 @@ class Api::V1::HostsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:hosts)
+    refute_nil assigns(:hosts)
     hosts = ActiveSupport::JSON.decode(@response.body)
     assert !hosts.empty?
   end

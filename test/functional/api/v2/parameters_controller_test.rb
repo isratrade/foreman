@@ -7,7 +7,7 @@ class Api::V2::ParametersControllerTest < ActionController::TestCase
   test "should get index for specific host" do
     get :index, {:host_id => hosts(:one).to_param }
     assert_response :success
-    assert_not_nil assigns(:parameters)
+    refute_nil assigns(:parameters)
     parameters = ActiveSupport::JSON.decode(@response.body)
     assert !parameters.empty?
   end
@@ -15,7 +15,7 @@ class Api::V2::ParametersControllerTest < ActionController::TestCase
   test "should get index for specific domain" do
     get :index, {:domain_id => domains(:mydomain).to_param }
     assert_response :success
-    assert_not_nil assigns(:parameters)
+    refute_nil assigns(:parameters)
     parameters = ActiveSupport::JSON.decode(@response.body)
     assert !parameters.empty?
   end
@@ -23,7 +23,7 @@ class Api::V2::ParametersControllerTest < ActionController::TestCase
   test "should get index for specific hostgroup" do
     get :index, {:hostgroup_id => hostgroups(:common).to_param }
     assert_response :success
-    assert_not_nil assigns(:parameters)
+    refute_nil assigns(:parameters)
     parameters = ActiveSupport::JSON.decode(@response.body)
     assert !parameters.empty?
   end
@@ -32,7 +32,7 @@ class Api::V2::ParametersControllerTest < ActionController::TestCase
   test "should get index for specific os" do
     get :index, {:operatingsystem_id => operatingsystems(:redhat).to_param }
     assert_response :success
-    assert_not_nil assigns(:parameters)
+    refute_nil assigns(:parameters)
     parameters = ActiveSupport::JSON.decode(@response.body)
     assert !parameters.empty?
   end

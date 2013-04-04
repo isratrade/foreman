@@ -11,8 +11,8 @@ class DnsOrchestrationTest < ActiveSupport::TestCase
       assert h.valid?
       assert h.dns?
       assert h.reverse_dns?
-      assert_not_nil h.dns_a_record
-      assert_not_nil h.dns_ptr_record
+      refute_nil h.dns_a_record
+      refute_nil h.dns_ptr_record
     end
   end
 
@@ -23,7 +23,7 @@ class DnsOrchestrationTest < ActiveSupport::TestCase
       assert h.valid?
       assert h.dns?
       assert !h.reverse_dns?
-      assert_not_nil h.dns_a_record
+      refute_nil h.dns_a_record
       assert_nil h.dns_ptr_record
     end
   end
@@ -48,7 +48,7 @@ class DnsOrchestrationTest < ActiveSupport::TestCase
       assert !h.dns?
       assert h.reverse_dns?
       assert_equal nil, h.dns_a_record
-      assert_not_nil h.dns_ptr_record
+      refute_nil h.dns_ptr_record
     end
   end
 end

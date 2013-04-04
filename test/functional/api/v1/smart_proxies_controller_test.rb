@@ -7,7 +7,7 @@ class Api::V1::SmartProxiesControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:smart_proxies)
+    refute_nil assigns(:smart_proxies)
     smart_proxies = ActiveSupport::JSON.decode(@response.body)
     assert !smart_proxies.empty?
   end
@@ -17,7 +17,7 @@ class Api::V1::SmartProxiesControllerTest < ActionController::TestCase
       get :index, { :type => 'tftp' }
     end
     assert_response :success
-    assert_not_nil assigns(:smart_proxies)
+    refute_nil assigns(:smart_proxies)
     smart_proxies = ActiveSupport::JSON.decode(@response.body)
     assert !smart_proxies.empty?
 

@@ -4,7 +4,7 @@ class BookmarksControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, {}, set_session_user
     assert_response :success
-    assert_not_nil assigns(:bookmarks)
+    refute_nil assigns(:bookmarks)
   end
 
   test "should get new" do

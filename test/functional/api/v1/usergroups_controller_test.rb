@@ -7,7 +7,7 @@ class Api::V1::UsergroupsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:usergroups)
+    refute_nil assigns(:usergroups)
     usergroups = ActiveSupport::JSON.decode(@response.body)
     assert !usergroups.empty?
   end

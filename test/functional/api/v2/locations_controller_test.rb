@@ -12,7 +12,7 @@ class Api::V2::LocationsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:locations)
+    refute_nil assigns(:locations)
   end
 
   test "should show location" do

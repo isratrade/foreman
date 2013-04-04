@@ -5,7 +5,7 @@ class EnvironmentsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, {}, set_session_user
     assert_response :success
-    assert_not_nil assigns(:environments)
+    refute_nil assigns(:environments)
   end
 
   test "should get json index" do

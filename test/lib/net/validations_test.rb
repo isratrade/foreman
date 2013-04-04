@@ -11,7 +11,7 @@ class ValidationsTest < ActiveSupport::TestCase
   end
 
   test "mac should be invalid" do
-    assert_raise Net::Validations::Error do
+    assert_raises Net::Validations::Error do
       validate_mac "abc123asdas"
     end
   end

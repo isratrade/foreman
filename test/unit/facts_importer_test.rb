@@ -10,7 +10,7 @@ class FactsImporterTest < ActiveSupport::TestCase
 
   test "should return list of interfaces" do
     assert importer.interfaces.present?
-    assert_not_nil importer.primary_interface
+    refute_nil importer.primary_interface
     assert importer.interfaces.keys.include?(importer.primary_interface)
   end
 
@@ -20,7 +20,7 @@ class FactsImporterTest < ActiveSupport::TestCase
 
   test "should raise on an invalid os" do
     @importer = Facts::Importer.new({})
-    assert_raise RuntimeError do
+    assert_raises RuntimeError do
       importer.operatingsystem
     end
   end

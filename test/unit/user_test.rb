@@ -87,8 +87,8 @@ class UserTest < ActiveSupport::TestCase
   test "when a user login, his last login time should be updated" do
     user = users(:internal)
     last_login = user.last_login_on
-    assert_not_nil User.try_to_login(user.login, "changeme")
-    assert_not_equal last_login, User.find(user.id).last_login_on
+    refute_nil User.try_to_login(user.login, "changeme")
+    refute_equal last_login, User.find(user.id).last_login_on
   end
 
   test "should not be able to delete the admin account" do
@@ -105,7 +105,7 @@ class UserTest < ActiveSupport::TestCase
   test "create_admin should fail when the validation fails" do
     Setting.administrator = 'root@invalid_domain'
     User.delete(User.admin.id)
-    assert_raise ActiveRecord::RecordInvalid do
+    assert_raises ActiveRecord::RecordInvalid do
       User.create_admin
     end
   end

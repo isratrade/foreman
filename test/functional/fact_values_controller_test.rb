@@ -15,7 +15,7 @@ class FactValuesControllerTest < ActionController::TestCase
     get :index, {}, set_session_user
     assert_response :success
     assert_template FactValue.unconfigured? ? 'welcome' : 'index'
-    assert_not_nil :fact_values
+    refute_nil :fact_values
   end
 
   def test_create_invalid

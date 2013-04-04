@@ -7,7 +7,7 @@ class Api::V1::PtablesControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:ptables)
+    refute_nil assigns(:ptables)
     ptables = ActiveSupport::JSON.decode(@response.body)
     assert !ptables.empty?
   end

@@ -7,12 +7,12 @@ class Api::V1::ModelsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:models)
+    refute_nil assigns(:models)
   end
 
   test "should show model" do
     get :show, { :id => models(:one).to_param }
-    assert_not_nil assigns(:model)
+    refute_nil assigns(:model)
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
@@ -23,7 +23,7 @@ class Api::V1::ModelsControllerTest < ActionController::TestCase
       post :create, { :model => valid_attrs }
     end
     assert_response :created
-    assert_not_nil assigns(:model)
+    refute_nil assigns(:model)
   end
 
   test "should update model" do

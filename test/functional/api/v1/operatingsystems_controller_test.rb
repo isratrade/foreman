@@ -12,13 +12,13 @@ class Api::V1::OperatingsystemsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:operatingsystems)
+    refute_nil assigns(:operatingsystems)
   end
 
   test "should show os" do
     get :show, { :id => operatingsystems(:redhat).to_param }
     assert_response :success
-    assert_not_nil assigns(:operatingsystem)
+    refute_nil assigns(:operatingsystem)
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
 
@@ -29,7 +29,7 @@ class Api::V1::OperatingsystemsControllerTest < ActionController::TestCase
       post :create, { :operatingsystem => os }
     end
     assert_response :success
-    assert_not_nil assigns(:operatingsystem)
+    refute_nil assigns(:operatingsystem)
   end
 
 

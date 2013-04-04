@@ -10,14 +10,14 @@ class Api::V1::MediaControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:media)
+    refute_nil assigns(:media)
     medium = ActiveSupport::JSON.decode(@response.body)
     assert !medium.empty?
   end
 
   test "should show medium" do
     get :show, { :id => media(:one).to_param }
-    assert_not_nil assigns(:medium)
+    refute_nil assigns(:medium)
     assert_response :success
     show_response = ActiveSupport::JSON.decode(@response.body)
     assert !show_response.empty?
@@ -28,7 +28,7 @@ class Api::V1::MediaControllerTest < ActionController::TestCase
       post :create, { :medium => new_medium }
     end
     assert_response :created
-    assert_not_nil assigns(:medium)
+    refute_nil assigns(:medium)
   end
 
   test "should update medium" do

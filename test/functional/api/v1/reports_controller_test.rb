@@ -5,7 +5,7 @@ class Api::V1::ReportsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:reports)
+    refute_nil assigns(:reports)
     reports = ActiveSupport::JSON.decode(@response.body)
     assert !reports.empty?
   end
@@ -27,7 +27,7 @@ class Api::V1::ReportsControllerTest < ActionController::TestCase
   test "should get reports for given host only" do
     get :index, {:host_id => hosts(:one).to_param }
     assert_response :success
-    assert_not_nil assigns(:reports)
+    refute_nil assigns(:reports)
     reports = ActiveSupport::JSON.decode(@response.body)
     assert !reports.empty?
     assert_equal 1, reports.count
@@ -36,7 +36,7 @@ class Api::V1::ReportsControllerTest < ActionController::TestCase
   test "should return empty result for host with no reports" do
     get :index, {:host_id => hosts(:two).to_param }
     assert_response :success
-    assert_not_nil assigns(:reports)
+    refute_nil assigns(:reports)
     reports = ActiveSupport::JSON.decode(@response.body)
     assert reports.empty?
     assert_equal 0, reports.count
@@ -45,7 +45,7 @@ class Api::V1::ReportsControllerTest < ActionController::TestCase
   test "should get last report" do
     get :last
     assert_response :success
-    assert_not_nil assigns(:report)
+    refute_nil assigns(:report)
     report = ActiveSupport::JSON.decode(@response.body)
     assert !report.empty?
   end
@@ -53,7 +53,7 @@ class Api::V1::ReportsControllerTest < ActionController::TestCase
   test "should get last report for given host only" do
     get :last, {:host_id => hosts(:one).to_param }
     assert_response :success
-    assert_not_nil assigns(:report)
+    refute_nil assigns(:report)
     report = ActiveSupport::JSON.decode(@response.body)
     assert !report.empty?
   end

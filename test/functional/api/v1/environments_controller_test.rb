@@ -7,7 +7,7 @@ class Api::V1::EnvironmentsControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:environments)
+    refute_nil assigns(:environments)
     envs = ActiveSupport::JSON.decode(@response.body)
     assert !envs.empty?
   end

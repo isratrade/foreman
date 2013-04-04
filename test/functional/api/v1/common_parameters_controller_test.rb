@@ -7,7 +7,7 @@ class Api::V1::CommonParametersControllerTest < ActionController::TestCase
   test "should get index" do
     get :index, { }
     assert_response :success
-    assert_not_nil assigns(:common_parameters)
+    refute_nil assigns(:common_parameters)
     common_parameters = ActiveSupport::JSON.decode(@response.body)
     assert !common_parameters.empty?
   end

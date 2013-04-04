@@ -37,7 +37,7 @@ class RolesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'index'
 
-    assert_not_nil assigns(:roles)
+    refute_nil assigns(:roles)
     assert_equal Role.all.sort, [assigns(:roles)].flatten.sort
 
     assert_tag :tag => 'a', :attributes => { :href => '/roles/1/edit' },
@@ -91,7 +91,7 @@ class RolesControllerTest < ActionController::TestCase
     delete :destroy, {:id => roles(:manager)}, set_session_user
     assert_redirected_to roles_path
     assert_equal 'Role is in use', flash[:error]
-    assert_not_nil Role.find_by_id(roles(:manager).id)
+    refute_nil Role.find_by_id(roles(:manager).id)
   end
 
   def test_get_report
@@ -99,7 +99,7 @@ class RolesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'report'
 
-    assert_not_nil assigns(:roles)
+    refute_nil assigns(:roles)
     assert_equal Role.all.sort, assigns(:roles).sort
 
   end

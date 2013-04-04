@@ -7,7 +7,7 @@ class ReportsControllerTest < ActionController::TestCase
   def test_index
     get :index, {}, set_session_user
     assert_response :success
-    assert_not_nil assigns('reports')
+    refute_nil assigns('reports')
     assert_template 'index'
   end
 

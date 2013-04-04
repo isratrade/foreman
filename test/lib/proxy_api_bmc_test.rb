@@ -26,7 +26,7 @@ class ProxyApiBmcTest < ActiveSupport::TestCase
   end
 
   test "constructor should complete" do
-    assert_not_nil(@testbmc)
+    refute_nil(@testbmc)
   end
 
   test "base url should equal /bmc" do
@@ -49,34 +49,32 @@ class ProxyApiBmcTest < ActiveSupport::TestCase
   end
 
   test "boot function should raise nomethod exception when function does not exist" do
-    assert_raise NoMethodError do
+    assert_raises NoMethodError do
       @testbmc.boot_fake(@options)
     end
   end
 
   test "power function should raise nomethod exception when function does not exist" do
-    assert_raise NoMethodError do
+    assert_raises NoMethodError do
       @testbmc.power_fake(@options)
     end
   end
 
   test "identify function should raise nomethod exception when function does not exist" do
-    assert_raise NoMethodError do
+    assert_raises NoMethodError do
       @testbmc.identify_fake(@options)
     end
   end
 
   test "lan function should raise nomethod exception when function does not exist" do
-    assert_raise NoMethodError do
+    assert_raises NoMethodError do
       @testbmc.lan_fake(@options)
     end
   end
 
   test "boot function should not raise nomethod exception when function does exist" do
     @testbmc.stubs(:put).returns(fake_response(["fakedata"]))
-    assert_nothing_raised do
-        @testbmc.boot_pxe(@options)
-      end
+    @testbmc.boot_pxe(@options)
   end
 
   test "boot function should create correct url for bootdevice pxe" do
@@ -86,7 +84,6 @@ class ProxyApiBmcTest < ActiveSupport::TestCase
     @testbmc.stubs(:put).returns(fake_response(["fakedata"]))
     @testbmc.expects(:put).with(data, expected_path).at_least_once
     @testbmc.boot_pxe(@options)
-
   end
 
   test "boot function should create correct url for bootdevice disk" do
