@@ -1,7 +1,5 @@
 require 'rubygems'
 require 'spork'
-#uncomment the following line to use spork with the debugger
-#require 'spork/ext/ruby-debug'
 
 Spork.prefork do
   # Loading more in this block will cause your tests to run faster. However,
@@ -12,18 +10,16 @@ Spork.prefork do
   require File.expand_path('../../config/environment', __FILE__)
   require 'rails/test_help'
   require 'capybara/rails'
+  Apipie.configuration.validate = false
 
   class ActiveSupport::TestCase
     # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-    #
     # Note: You'll currently still have to declare fixtures explicitly in integration tests
     # -- they do not yet inherit this setting
-
     fixtures :all
-
     set_fixture_class({ :hosts => Host::Base })
-    # Add more helper methods to be used by all tests here...
 
+    # Add more helper methods to be used by all tests here...
     def logger
       Rails.logger
     end
@@ -89,8 +85,6 @@ Spork.prefork do
     end
   end
 
-  Apipie.configuration.validate = false
-
   # Transactional fixtures do not work with Selenium tests, because Capybara
   # uses a separate server thread, which the transactions would be hidden
   # from. We hence use DatabaseCleaner to truncate our test database.
@@ -105,8 +99,6 @@ Spork.prefork do
   end
 
 end
-
-
 
 Spork.each_run do
   # This code will be run each time you run your specs.
@@ -125,9 +117,7 @@ Spork.each_run do
 
   class ActionDispatch::IntegrationTest
 
-    def setup
-      login_admin
-    end
+    setup :login_admin
 
     teardown do
       DatabaseCleaner.clean       # Truncate the database
@@ -142,10 +132,6 @@ Spork.each_run do
       fill_in "login_login", :with => "admin"
       fill_in "login_password", :with => "secret"
       click_button "Login"
-    end
-
-    def logout_admin
-      click_link "Sign Out"
     end
 
   end
