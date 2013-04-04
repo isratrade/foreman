@@ -1,6 +1,6 @@
 group :test do
   gem 'mocha', :require => false
-  gem 'minitest', '~> 3.5', :platforms => :ruby_19
+  gem 'minitest', '~> 3.5'
   gem 'single_test'
   gem 'shoulda', "3.0.1"
   gem 'rr'
