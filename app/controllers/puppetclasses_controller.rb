@@ -43,8 +43,14 @@ class PuppetclassesController < ApplicationController
 
   # form AJAX methods
   def parameters
+    # get host
+    host = Host::Base.find_by_id(params['host_id'])
+    host ||= Host::Managed.new(params[:host])
+    # refresh environment and hostgroup
+    host.environment_id   = params[:environment_id]
+    host.hostgroup_id = params[:hostgroup_id]
+
     puppetclass = Puppetclass.find(params[:id])
-    host = Host.new(params[:host])
     render :partial => "puppetclasses/class_parameters", :locals => {:klass => puppetclass, :host => host}
   end
 

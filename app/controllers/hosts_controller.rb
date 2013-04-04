@@ -10,7 +10,7 @@ class HostsController < ApplicationController
 
   PUPPETMASTER_ACTIONS=[ :externalNodes, :lookup ]
   SEARCHABLE_ACTIONS= %w[index active errors out_of_sync pending disabled ]
-  AJAX_REQUESTS=%w{compute_resource_selected hostgroup_or_environment_selected current_parameters}
+  AJAX_REQUESTS=%w{compute_resource_selected hostgroup_or_environment_selected current_parameters puppetclass_parameters}
 
   add_puppetmaster_filters PUPPETMASTER_ACTIONS
   before_filter :ajax_request, :only => AJAX_REQUESTS
@@ -129,18 +129,40 @@ class HostsController < ApplicationController
   end
 
   def hostgroup_or_environment_selected
-    return head(:method_not_allowed) unless request.xhr?
-
     Taxonomy.as_taxonomy @organization, @location do
       @environment = Environment.find(params[:environment_id]) unless params[:environment_id].empty?
       @hostgroup   = Hostgroup.find(params[:hostgroup_id])     unless params[:hostgroup_id].empty?
       if @environment or @hostgroup
+        # @host comes from before_filter :refresh_host
         @host.hostgroup   = @hostgroup if @hostgroup
         @host.environment = @environment if @environment
         render :partial => 'puppetclasses/class_selection', :locals => {:obj => (@host)}
       else
         head(:not_found)
       end
+    end
+  end
+
+  def current_parameters
+    # @host comes from before_filter :refresh_host
+    # update domain,os,hostgroup to what's in the form (since @host is retrieved from db)
+    @host.domain_id  = params['host']['domain_id']
+    @host.operatingsystem_id  = params['host']['operatingsystem_id']
+    @host.hostgroup_id  = params['host']['hostgroup_id']
+    render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
+  end
+
+  def puppetclass_parameters
+    # @host comes from before_filter :refresh_host
+    @environment = Environment.find(params[:environment_id]) unless params[:environment_id].empty?
+    @hostgroup   = Hostgroup.find(params[:hostgroup_id])     unless params[:hostgroup_id].empty?
+    if @environment or @hostgroup
+      # @host comes from before_filter :refresh_host
+      @host.hostgroup   = @hostgroup if @hostgroup
+      @host.environment = @environment if @environment
+      render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
+    else
+      head(:not_found)
     end
   end
 
@@ -455,36 +477,16 @@ class HostsController < ApplicationController
     render :partial => "provisioning", :locals => {:templates => templates}
   end
 
-  def current_parameters
-    render :partial => "common_parameters/inherited_parameters", :locals => {:inherited_parameters => @host.host_inherited_params(true)}
-  end
-
-  def puppetclass_parameters
-    render :partial => "puppetclasses/classes_parameters", :locals => { :obj => @host}
-  end
-
   private
 
   def refresh_host
-    if params['host'].present?
-      if params['host']['id'].present?
-        @host = Host::Base.find(params['host']['id'])
-      else
-        @host = Host::Managed.new params['host']
-      end
-    elsif params['host_id'].present?
-      @host = Host::Base.find(params[:host_id]) if params[:host_id].to_i > 0
-    end
-    @host ||= Host::Managed.new
-
-    # If we found a host from another STI type, convert it so we can call Managed
-    # methods on it
-    if @host.class != Host::Managed
+    @host = Host::Base.find_by_id(params['host_id'])
+    @host ||= Host::Managed.new(params['host'])
+    # If we found a host from another STI type, convert it so we can call Managed methods on it
+    unless @host.class.name == "Host::Managed"
       @host      = @host.becomes(Host::Managed)
       @host.type = "Host::Managed"
     end
-
-    @host.attributes = params['host'] if params['host'].present?
   end
 
   def set_host_type
