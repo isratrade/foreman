@@ -1,4 +1,6 @@
 class Setting < ActiveRecord::Base
+  self.inheritance_column = 'category'
+
   attr_accessible :name, :value, :description, :category, :settings_type, :default
   # audit the changes to this model
   audited :only => [:value], :on => [:update]
@@ -20,6 +22,12 @@ class Setting < ActiveRecord::Base
   before_validation :save_as_settings_type
   validate :validate_attributes
   default_scope :order => 'LOWER(settings.name)'
+
+  # The DB may contain settings from disabled plugins - filter them out here
+  scope :live_descendants, lambda {
+    descends = self.descendants.map { |setting| setting.to_s }
+    return { :conditions => sanitize_sql_for_conditions([" (settings.category in (?))", descends]) }
+  }
 
   scoped_search :on => :name, :complete_value => :true
   scoped_search :on => :category, :complete_value => :true
@@ -136,4 +144,45 @@ class Setting < ActiveRecord::Base
     end
     true
   end
+
+  # Methods for loading default settings
+
+  def self.load_defaults
+    # We may be executing something like rake db:migrate:reset, which destroys this table; only continue if the table exists
+    Setting.first rescue return false
+    # STI classes will load their own defaults
+    true
+  end
+
+  def self.set name, description, default, value = nil
+    value ||= SETTINGS[name.to_sym]
+    {:name => name, :value => value, :description => description, :default => default}
+  end
+
+  def self.create opts
+    # ensures we don't have cache left overs in settings
+    Rails.logger.debug "removing #{opts[:name]} from cache"
+    Rails.cache.delete(opts[:name].to_s)
+
+    if (s=Setting.first(:conditions => {:name => (opts[:name])})).nil?
+      Setting.create!(opts)
+    else
+      s.update_attribute(:default, opts[:default]) unless s.default == opts[:default]
+    end
+  end
+
+  def self.model_name
+    ActiveModel::Name.new(Setting)
+  end
+
+  def self.core_sti_models
+    %w[General Puppet Auth Provisioning]
+  end
+
+  # Load the core setting models here so that the controller has the right
+  # descendants to check against.
+  core_sti_models.each do |c|
+    require_dependency File.join("app","models","setting","#{c.downcase}.rb")
+  end
+
 end
