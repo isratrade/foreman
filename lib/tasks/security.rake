@@ -1,9 +1,7 @@
-require 'foreman/util'
-
 namespace :security do
   desc 'Generate new security token'
   task :generate_token do
-    include Foreman::Util
+    include Util
     File.open("config/initializers/local_secret_token.rb", "w") do |fd|
       fd.write("# Be sure to restart your server when you modify this file.
 

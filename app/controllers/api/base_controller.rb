@@ -1,7 +1,7 @@
 module Api
   #TODO: inherit from application controller after cleanup
   class BaseController < ActionController::Base
-    include Foreman::ThreadSession::Cleaner
+    include ThreadSession::Cleaner
 
     before_filter :set_default_response_format, :authorize, :add_version_header
 

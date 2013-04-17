@@ -12,138 +12,141 @@
 # http://rails-bestpractices.com/posts/47-fetch-current-user-in-models
 #
 
-module Foreman
-  module ThreadSession
+module ThreadSession
 
-    # module to be include in controller to clear the session data
-    # after (and evenutally before) the request processing.
-    # Without it we're risking inter-users interference.
-    module Cleaner
-      def self.included(base)
-        base.around_filter :clear_thread
-      end
+  # module to be include in controller to clear the session data
+  # after (and evenutally before) the request processing.
+  # Without it we're risking inter-users interference.
+  module Cleaner
+    extend ActiveSupport::Concern
 
-      def clear_thread
-        if Thread.current[:user] && !Rails.env.test?
-          Rails.logger.warn("Current user is set, but not expected. Clearing")
-          Thread.current[:user] = nil
-        end
-        yield
-      ensure
-        [:user, :organization, :location].each do |key|
-          Thread.current[key] = nil
-        end
-      end
+    included do
+      around_filter :clear_thread
     end
 
-    # include this in the User model
-    module UserModel
-      def self.included(base)
-        base.class_eval do
-          def self.current
-            Thread.current[:user]
-          end
-
-          def self.current=(o)
-            unless o.nil? || o.is_a?(self)
-              raise(ArgumentError, "Unable to set current User, expected class '#{self}', got #{o.inspect}")
-            end
-
-            Rails.logger.debug "Setting current user thread-local variable to " + (o.is_a?(User) ? o.login : 'nil')
-            Thread.current[:user] = o
-          end
-
-          # Executes given block on behalf of a different user. Example:
-          #
-          # User.as :admin do
-          #   ...
-          # end
-          #
-          # Use with care!
-          #
-          # @param [String] login to find from the database
-          # @param [block] block to execute
-          def self.as login
-            old_user = current
-            self.current = User.find_by_login(login)
-            yield if block_given?
-          ensure
-            self.current = old_user
-          end
-        end
+    def clear_thread
+      if Thread.current[:user] && !Rails.env.test?
+        Rails.logger.warn("Current user is set, but not expected. Clearing")
+        Thread.current[:user] = nil
+      end
+      yield
+    ensure
+      [:user, :organization, :location].each do |key|
+        Thread.current[key] = nil
       end
     end
-
-    # include this in the Organization model object
-    module OrganizationModel
-      def self.included(base)
-        base.class_eval do
-          def self.current
-            Thread.current[:organization]
-          end
-
-          def self.current=(organization)
-            unless organization.nil? || organization.is_a?(self) || organization.is_a?(Array)
-              raise(ArgumentError, "Unable to set current organization, expected class '#{self}', got #{organization.inspect}")
-            end
-
-            Rails.logger.debug "Setting current organization thread-local variable to #{organization || "none"}"
-            Thread.current[:organization] = organization
-          end
-
-          # Executes given block in the scope of an org:
-          #
-          # Organization.as_org organization do
-          #   ...
-          # end
-          #
-          # @param [org]
-          # @param [block] block to execute
-          def self.as_org org
-            old_org = current
-            self.current = org
-            yield if block_given?
-          ensure
-            self.current = old_org
-          end
-        end
-      end
-    end
-
-    module LocationModel
-      def self.included(base)
-        base.class_eval do
-          def self.current
-            Thread.current[:location]
-          end
-
-          def self.current=(location)
-            unless location.nil? || location.is_a?(self) || location.is_a?(Array)
-              raise(ArgumentError, "Unable to set current location, expected class '#{self}'. got #{location.inspect}")
-            end
-
-            Rails.logger.debug "Setting current location thread-local variable to #{location || "none"}"
-            Thread.current[:location] = location
-          end
-
-          # Executes given block without the scope of a location:
-          #
-          # Location.as_location location do
-          #   ...
-          # end
-          #
-          # @param [location]
-          # @param [block] block to execute
-          def self.as_location location
-            old_location = current
-            self.current = location
-            yield if block_given?
-          ensure
-            self.current = old_location
-          end
-        end
-      end
-    end
-
   end
+
+  # include this in the User model
+  module UserModel
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+
+      def current
+        Thread.current[:user]
+      end
+
+      def current=(o)
+        unless o.nil? || o.is_a?(self)
+          raise(ArgumentError, "Unable to set current User, expected class '#{self}', got #{o.inspect}")
+        end
+
+        Rails.logger.debug "Setting current user thread-local variable to " + (o.is_a?(User) ? o.login : 'nil')
+        Thread.current[:user] = o
+      end
+
+      # Executes given block on behalf of a different user. Example:
+      #
+      # User.as :admin do
+      #   ...
+      # end
+      #
+      # Use with care!
+      #
+      # @param [String] login to find from the database
+      # @param [block] block to execute
+      def as login
+        old_user = current
+        self.current = User.find_by_login(login)
+        yield if block_given?
+      ensure
+        self.current = old_user
+      end
+    end
+  end
+
+  # include this in the Organization model object
+  module OrganizationModel
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+
+      def current
+        Thread.current[:organization]
+      end
+
+      def current=(organization)
+        unless organization.nil? || organization.is_a?(self) || organization.is_a?(Array)
+          raise(ArgumentError, "Unable to set current organization, expected class '#{self}', got #{organization.inspect}")
+        end
+
+        Rails.logger.debug "Setting current organization thread-local variable to #{organization || "none"}"
+        Thread.current[:organization] = organization
+      end
+
+      # Executes given block in the scope of an org:
+      #
+      # Organization.as_org organization do
+      #   ...
+      # end
+      #
+      # @param [org]
+      # @param [block] block to execute
+      def as_org org
+        old_org = current
+        self.current = org
+        yield if block_given?
+      ensure
+        self.current = old_org
+      end
+    end
+  end
+
+  module LocationModel
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+
+      def current
+        Thread.current[:location]
+      end
+
+      def current=(location)
+        unless location.nil? || location.is_a?(self) || location.is_a?(Array)
+          raise(ArgumentError, "Unable to set current location, expected class '#{self}'. got #{location.inspect}")
+        end
+
+        Rails.logger.debug "Setting current location thread-local variable to #{location || "none"}"
+        Thread.current[:location] = location
+      end
+
+      # Executes given block without the scope of a location:
+      #
+      # Location.as_location location do
+      #   ...
+      # end
+      #
+      # @param [location]
+      # @param [block] block to execute
+      def as_location location
+        old_location = current
+        self.current = location
+        yield if block_given?
+      ensure
+        self.current = old_location
+      end
+    end
+  end
+
 end

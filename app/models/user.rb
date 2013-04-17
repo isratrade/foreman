@@ -1,9 +1,9 @@
 require 'digest/sha1'
-require 'foreman/thread_session'
+require 'thread_session'
 
 class User < ActiveRecord::Base
   include Authorization
-  include Foreman::ThreadSession::UserModel
+  include ThreadSession::UserModel
   include Taxonomix
   audited :except => [:last_login_on, :password, :password_hash, :password_salt, :password_confirmation]
   self.auditing_enabled = !(File.basename($0) == "rake" && ARGV.include?("db:migrate"))

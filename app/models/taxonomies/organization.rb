@@ -1,5 +1,5 @@
 class Organization < Taxonomy
-  include Foreman::ThreadSession::OrganizationModel
+  include ThreadSession::OrganizationModel
 
   has_and_belongs_to_many :locations
   has_many :hosts, :dependent => :nullify

@@ -1,5 +1,5 @@
-require 'foreman/util'
-include Foreman::Util
+require 'util'
+include Util
 
 unless Foreman::Application.config.secret_token
   tmp = Rails.root.join("tmp")

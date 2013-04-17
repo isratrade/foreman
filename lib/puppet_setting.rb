@@ -1,9 +1,9 @@
 require 'rubygems'
 require 'puppet'
-require 'foreman/util'
+require 'util'
 
 class PuppetSetting
-  include Foreman::Util
+  include Util
 
   def get(*name)
     cmd = "#{puppetmaster} --configprint #{name.join(",")} 2>&1"

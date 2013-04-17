@@ -1,7 +1,7 @@
 require 'foreman/controller/auto_complete_search'
 
 class ApplicationController < ActionController::Base
-  include Foreman::ThreadSession::Cleaner
+  include ThreadSession::Cleaner
 
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   rescue_from ScopedSearch::QueryNotSupported, :with => :invalid_search_query
