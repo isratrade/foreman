@@ -2,6 +2,8 @@ require 'securerandom'
 
 module Foreman
   module Util
+    extend ActiveSupport::Concern
+
     # searches for binaries in predefined directories and user PATH
     # accepts a binary name and an array of paths to search first
     # if path is omitted will search only in user PATH
