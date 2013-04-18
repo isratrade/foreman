@@ -1,5 +1,3 @@
-require 'foreman/controller/smart_proxy_auth'
-
 class ReportsController < ApplicationController
   include Foreman::AutoCompleteSearch
   include Foreman::SmartProxyAuth

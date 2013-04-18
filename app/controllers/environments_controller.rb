@@ -1,5 +1,3 @@
-require 'foreman/controller/environments'
-
 class EnvironmentsController < ApplicationController
   include Foreman::Environments
   include Foreman::AutoCompleteSearch

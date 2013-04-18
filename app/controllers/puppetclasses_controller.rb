@@ -1,5 +1,3 @@
-require 'foreman/controller/environments'
-
 class PuppetclassesController < ApplicationController
   include Foreman::Environments
   include Foreman::AutoCompleteSearch
