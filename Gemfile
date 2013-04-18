@@ -1,5 +1,4 @@
 require File.expand_path('../config/settings', __FILE__)
-require File.expand_path('../lib/regexp_extensions', __FILE__)
 
 source 'https://rubygems.org'
 
