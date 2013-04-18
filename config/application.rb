@@ -20,9 +20,6 @@ else
   end
 end
 
-require File.expand_path('../../lib/timed_cached_store.rb', __FILE__)
-require File.expand_path('../../lib/core_extensions', __FILE__)
-
 Bundler.require(:jsonp) if SETTINGS[:support_jsonp]
 
 module Foreman
