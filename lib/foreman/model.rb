@@ -1,2 +1,0 @@
-module Foreman::Model
-end
