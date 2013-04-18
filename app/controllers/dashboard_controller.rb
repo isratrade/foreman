@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :prefetch_data, :only => :index
 
   def index

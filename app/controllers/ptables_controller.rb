@@ -1,5 +1,5 @@
 class PtablesController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :find_ptable, :only => %w{show edit update destroy}
 
   def index

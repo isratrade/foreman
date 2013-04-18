@@ -1,4 +1,4 @@
-module Foreman::Controller::TaxonomiesController
+module Foreman::TaxonomiesController
   extend ActiveSupport::Concern
 
   included do

@@ -3,10 +3,10 @@ require 'foreman/controller/smart_proxy_auth'
 require 'foreman/controller/taxonomy_multiple'
 
 class HostsController < ApplicationController
-  include Foreman::Controller::HostDetails
-  include Foreman::Controller::AutoCompleteSearch
-  include Foreman::Controller::TaxonomyMultiple
-  include Foreman::Controller::SmartProxyAuth
+  include Foreman::HostDetails
+  include Foreman::AutoCompleteSearch
+  include Foreman::TaxonomyMultiple
+  include Foreman::SmartProxyAuth
 
   PUPPETMASTER_ACTIONS=[ :externalNodes, :lookup ]
   SEARCHABLE_ACTIONS= %w[index active errors out_of_sync pending disabled ]

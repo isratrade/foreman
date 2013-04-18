@@ -1,5 +1,5 @@
 class LookupKeysController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :find_by_key, :except => :index
   before_filter :setup_search_options, :only => :index
 

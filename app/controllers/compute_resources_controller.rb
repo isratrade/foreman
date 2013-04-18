@@ -1,5 +1,5 @@
 class ComputeResourcesController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   AJAX_REQUESTS = %w{hardware_profile_selected cluster_selected}
   before_filter :ajax_request, :only => AJAX_REQUESTS
   before_filter :find_by_id, :only => [:show, :edit, :update, :destroy] + AJAX_REQUESTS

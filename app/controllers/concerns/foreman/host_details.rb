@@ -1,7 +1,7 @@
 # This module extract repeating methods which handle host assoications of hostgroups, os etc
 # Mainly used within the host and the hostgroup controllers
 
-module Foreman::Controller::HostDetails
+module Foreman::HostDetails
 
   def architecture_selected
     assign_parameter "architecture", "common/os_selection/"

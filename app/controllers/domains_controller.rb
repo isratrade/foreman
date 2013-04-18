@@ -1,5 +1,5 @@
 class DomainsController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :find_by_name, :only => %w{show edit update destroy}
 
   def index

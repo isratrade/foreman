@@ -1,7 +1,7 @@
 require 'resolv'
 require 'uri'
 
-module Foreman::Controller::SmartProxyAuth
+module Foreman::SmartProxyAuth
   extend ActiveSupport::Concern
 
   module ClassMethods

@@ -1,5 +1,5 @@
 class SubnetsController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
 
   def index
     values = Subnet.search_for(params[:search], :order => params[:order])

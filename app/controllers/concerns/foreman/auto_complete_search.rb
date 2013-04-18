@@ -1,4 +1,4 @@
-module Foreman::Controller::AutoCompleteSearch
+module Foreman::AutoCompleteSearch
   extend ActiveSupport::Concern
 
   def auto_complete_search

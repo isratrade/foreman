@@ -1,5 +1,5 @@
 class OperatingsystemsController < ApplicationController
-  include Foreman::Controller::AutoCompleteSearch
+  include Foreman::AutoCompleteSearch
   before_filter :find_os, :only => %w{show edit update destroy bootfiles}
 
   def index
