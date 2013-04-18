@@ -1,5 +1,3 @@
-require 'foreman/access_control'
-
 # Permissions
 Foreman::AccessControl.map do |map|
   map.security_block :architectures do |map|
