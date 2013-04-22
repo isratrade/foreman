@@ -164,7 +164,7 @@ class Setting < ActiveRecord::Base
     Rails.logger.debug "removing #{opts[:name]} from cache"
     Rails.cache.delete(opts[:name].to_s)
 
-    if (s=Setting.first(:conditions => {:name => (opts[:name])})).nil?
+    if (s = Setting.find_by_name(opts[:name].to_s).nil?
       Setting.create!(opts)
     else
       s.update_attribute(:default, opts[:default]) unless s.default == opts[:default]
@@ -173,16 +173,6 @@ class Setting < ActiveRecord::Base
 
   def self.model_name
     ActiveModel::Name.new(Setting)
-  end
-
-  def self.core_sti_models
-    %w[General Puppet Auth Provisioning]
-  end
-
-  # Load the core setting models here so that the controller has the right
-  # descendants to check against.
-  core_sti_models.each do |c|
-    require_dependency File.join("app","models","setting","#{c.downcase}.rb")
   end
 
 end
