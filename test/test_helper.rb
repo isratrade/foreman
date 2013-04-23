@@ -20,6 +20,11 @@ Spork.prefork do
   require 'rails/test_help'
   require 'capybara/rails'
 
+  # To prevent Postgres' errors "permission denied: "RI_ConstraintTrigger"
+  if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+    ActiveRecord::Migration.execute "SET CONSTRAINTS ALL DEFERRED;"
+  end
+
   class ActiveSupport::TestCase
     # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
     #
