@@ -64,6 +64,9 @@ module Foreman
     config.autoload_paths += %W(#{config.root}/app/models/trends)
     config.autoload_paths += %W(#{config.root}/app/models/taxonomies)
     config.autoload_paths += %W(#{config.root}/app/models/foreman/model)
+    config.autoload_paths += %W(#{config.root}/app/models/host)
+    config.autoload_paths += %W(#{config.root}/app/models/nic)
+    config.autoload_paths += %W(#{config.root}/app/models/smart_proxies)
     # TODO - what is Dir[ ] vs. %W
     # TODO I think app/mailers and responders is default after 3.2.3
    config.autoload_paths += Dir["#{config.root}/app/models/**/*"]
