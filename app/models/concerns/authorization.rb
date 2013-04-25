@@ -1,10 +1,10 @@
 module Authorization
-  def self.included(base)
-    base.class_eval do
-      before_save    :enforce_edit_permissions
-      before_destroy :enforce_destroy_permissions
-      before_create  :enforce_create_permissions
-    end
+  extend ActiveSupport::Concern
+
+  included do
+    before_save    :enforce_edit_permissions
+    before_destroy :enforce_destroy_permissions
+    before_create  :enforce_create_permissions
   end
 
   # We must enforce the security model
@@ -30,7 +30,7 @@ module Authorization
     klasses = klass.pluralize
     return true if User.current and User.current.allowed_to?("#{operation}_#{klasses}".to_sym)
 
-    errors.add :base, _("You do not have permission to %{operation} this %{klass}") % { :operation => operation, :klass => klass }
+    errors.add :base, "You do not have permission to #{operation} this #{klass}"
     @permission_failed = operation
     false
   end
@@ -42,6 +42,7 @@ module Authorization
   end
 
   private
+
   def enforce?
     return false if (User.current and User.current.admin?)
     return true  if defined?(Rake) and Rails.env == "test"
