@@ -1,3 +1,4 @@
+require 'foreman/util'
 include Foreman::Util
 
 unless Foreman::Application.config.secret_token

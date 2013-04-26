@@ -1,3 +1,5 @@
+require 'foreman/util'
+
 namespace :security do
   desc 'Generate new security token'
   task :generate_token do
