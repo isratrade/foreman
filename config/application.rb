@@ -45,6 +45,11 @@ module Foreman
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/lib)
     # will be default in Rails 4 models/concerns and controllers controllers
+    config.autoload_paths += %W(#{config.root}/app/models/setting)
+    config.autoload_paths += %W(#{config.root}/app/models/host)
+    config.autoload_paths += %W(#{config.root}/app/models/nic)
+    config.autoload_paths += %W(#{config.root}/app/models/foreman/model)
+    config.autoload_paths += %W(#{config.root}/app/models/smart_proxies)
     config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
     config.autoload_paths += %W(#{config.root}/app/controllers/concerns/api)
     config.autoload_paths += %W(#{config.root}/app/controllers/concerns/foreman)
@@ -63,10 +68,6 @@ module Foreman
     config.autoload_paths += %W(#{config.root}/app/models/parameters)
     config.autoload_paths += %W(#{config.root}/app/models/trends)
     config.autoload_paths += %W(#{config.root}/app/models/taxonomies)
-    config.autoload_paths += %W(#{config.root}/app/models/foreman/model)
-    config.autoload_paths += %W(#{config.root}/app/models/host)
-    config.autoload_paths += %W(#{config.root}/app/models/nic)
-    config.autoload_paths += %W(#{config.root}/app/models/smart_proxies)
     # TODO - what is Dir[ ] vs. %W
     # TODO I think app/mailers and responders is default after 3.2.3
    config.autoload_paths += Dir["#{config.root}/app/models/**/*"]
