@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'puppet'
+require 'foreman/util'
 
 class PuppetSetting
   include Foreman::Util
