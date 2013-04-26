@@ -44,6 +44,8 @@ module Foreman
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/lib)
+    config.autoload_paths += %W(#{config.root}/models/concerns)
+    config.autoload_paths += %W(#{config.root}/controllers/concerns)
     config.autoload_paths += %W(#{config.root}/models/**/*.rb)
     config.autoload_paths += %W(#{config.root}/controllers/**/*.rb)
 
