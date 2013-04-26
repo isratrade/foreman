@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'foreman/util'
 
 class UtilTest < ActiveSupport::TestCase
   include Foreman::Util
