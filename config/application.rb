@@ -44,34 +44,36 @@ module Foreman
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/lib)
-    # will be default in Rails 4 models/concerns and controllers controllers
-    config.autoload_paths += %W(#{config.root}/app/models/setting)
-    config.autoload_paths += %W(#{config.root}/app/models/host)
-    config.autoload_paths += %W(#{config.root}/app/models/nic)
-    config.autoload_paths += %W(#{config.root}/app/models/foreman/model)
-    config.autoload_paths += %W(#{config.root}/app/models/smart_proxies)
-    config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
-    config.autoload_paths += %W(#{config.root}/app/controllers/concerns/api)
-    config.autoload_paths += %W(#{config.root}/app/controllers/concerns/foreman)
-    config.autoload_paths += %W(#{config.root}/app/models/concerns)
-    config.autoload_paths += %W(#{config.root}/app/models/concerns/foreman)
-    config.autoload_paths += %W(#{config.root}/app/models/concerns/fog_extensions)
-    config.autoload_paths += %W(#{config.root}/app/models/concerns/hostext)
-    config.autoload_paths += %W(#{config.root}/app/models/concerns/orchestration)
-    config.autoload_paths += %W(#{config.root}/app/services)
-    config.autoload_paths += %W(#{config.root}/app/observers)
-    config.autoload_paths += %W(#{config.root}/app/mailers)
-    config.autoload_paths += %W(#{config.root}/app/responders)
-    config.autoload_paths += %W(#{config.root}/app/models/auth_sources)
-    config.autoload_paths += %W(#{config.root}/app/models/compute_resources)
-    config.autoload_paths += %W(#{config.root}/app/models/operatingsystems)
-    config.autoload_paths += %W(#{config.root}/app/models/parameters)
-    config.autoload_paths += %W(#{config.root}/app/models/trends)
-    config.autoload_paths += %W(#{config.root}/app/models/taxonomies)
-    # TODO - what is Dir[ ] vs. %W
-    # TODO I think app/mailers and responders is default after 3.2.3
-   config.autoload_paths += Dir["#{config.root}/app/models/**/*"]
-   config.autoload_paths += Dir["#{config.root}/app/models/**/**/*"]
+    config.autoload_paths += %W(#{config.root}/models/**/*.rb)
+    config.autoload_paths += %W(#{config.root}/controllers/**/*.rb)
+
+   #  config.autoload_paths += %W(#{config.root}/app/models/setting)
+   #  config.autoload_paths += %W(#{config.root}/app/models/host)
+   #  config.autoload_paths += %W(#{config.root}/app/models/nic)
+   #  config.autoload_paths += %W(#{config.root}/app/models/foreman/model)
+   #  config.autoload_paths += %W(#{config.root}/app/models/smart_proxies)
+   #  config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
+   #  config.autoload_paths += %W(#{config.root}/app/controllers/concerns/api)
+   #  config.autoload_paths += %W(#{config.root}/app/controllers/concerns/foreman)
+   #  config.autoload_paths += %W(#{config.root}/app/models/concerns)
+   #  config.autoload_paths += %W(#{config.root}/app/models/concerns/foreman)
+   #  config.autoload_paths += %W(#{config.root}/app/models/concerns/fog_extensions)
+   #  config.autoload_paths += %W(#{config.root}/app/models/concerns/hostext)
+   #  config.autoload_paths += %W(#{config.root}/app/models/concerns/orchestration)
+   #  config.autoload_paths += %W(#{config.root}/app/services)
+   #  config.autoload_paths += %W(#{config.root}/app/observers)
+   #  config.autoload_paths += %W(#{config.root}/app/mailers)
+   #  config.autoload_paths += %W(#{config.root}/app/responders)
+   #  config.autoload_paths += %W(#{config.root}/app/models/auth_sources)
+   #  config.autoload_paths += %W(#{config.root}/app/models/compute_resources)
+   #  config.autoload_paths += %W(#{config.root}/app/models/operatingsystems)
+   #  config.autoload_paths += %W(#{config.root}/app/models/parameters)
+   #  config.autoload_paths += %W(#{config.root}/app/models/trends)
+   #  config.autoload_paths += %W(#{config.root}/app/models/taxonomies)
+   #  # TODO - what is Dir[ ] vs. %W
+   #  # TODO I think app/mailers and responders is default after 3.2.3
+   # config.autoload_paths += Dir["#{config.root}/app/models/**/*"]
+   # config.autoload_paths += Dir["#{config.root}/app/models/**/**/*"]
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
