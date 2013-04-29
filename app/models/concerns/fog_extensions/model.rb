@@ -1,24 +1,27 @@
 module FogExtensions
   module Model
-    extend ActiveSupport::Concern
-
-    included do
-      attr_accessor :_delete
+    def self.included(base)
+      base.send :include, InstanceMethods
+      base.class_eval do
+        attr_accessor :_delete
+      end
     end
 
-    def persisted?
-      !!identity
-    end
+    module InstanceMethods
 
-    def to_json(options={ })
-      ActiveSupport::JSON.encode(self, options)
-    end
+      def persisted?
+        !!identity
+      end
 
-    def as_json(options = { })
-      attr = attributes.dup
-      attr.delete(:client)
-      attr
-    end
+      def to_json(options={ })
+        ActiveSupport::JSON.encode(self, options)
+      end
 
+      def as_json(options = { })
+        attr = attributes.dup
+        attr.delete(:client)
+        attr
+      end
+    end
   end
 end
