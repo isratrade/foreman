@@ -105,7 +105,7 @@ class LocationsControllerTest < ActionController::TestCase
   end
   test "should clone location with assocations" do
     location = taxonomies(:location1)
-    location_dup = location.clone
+    location_dup = location.dup
 
     assert_difference "Location.count", 1 do
       post :create, {:location => {:name => "location_dup_name",

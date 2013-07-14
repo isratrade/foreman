@@ -105,7 +105,7 @@ class OrganizationsControllerTest < ActionController::TestCase
   end
   test "should clone organization with assocations" do
     organization = taxonomies(:organization1)
-    organization_dup = organization.clone
+    organization_dup = organization.dup
 
     assert_difference "Organization.count", 1 do
       post :create, {:organization => {:name => "organization_dup_name",
