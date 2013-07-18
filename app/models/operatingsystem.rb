@@ -30,7 +30,11 @@ class Operatingsystem < ActiveRecord::Base
 
   before_save :deduce_family
   audited :allow_mass_assignment => true
+<<<<<<< HEAD
   default_scope :order => 'LOWER(operatingsystems.name)'
+=======
+  default_scope lambda { order('operatingsystems.name') }
+>>>>>>> d8547ba... fixes #2801 - remove LOWER() from default_scope that could cause Postgres error
 
   scoped_search :on => :name, :complete_value => :true
   scoped_search :on => :major, :complete_value => :true

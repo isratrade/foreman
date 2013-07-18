@@ -11,7 +11,11 @@ class Usergroup < ActiveRecord::Base
 
   # The text item to see in a select dropdown menu
   alias_attribute :select_title, :to_s
+<<<<<<< HEAD
   default_scope :order => 'LOWER(usergroups.name)'
+=======
+  default_scope lambda { order('usergroups.name') }
+>>>>>>> d8547ba... fixes #2801 - remove LOWER() from default_scope that could cause Postgres error
   scoped_search :on => :name, :complete_value => :true
   validate :ensure_uniq_name
 
