@@ -21,6 +21,7 @@
 //= require ./router
 //= require showdown
 //= require moment
+//= require foremanjs
 
 $(function() {
   onContentLoad();
