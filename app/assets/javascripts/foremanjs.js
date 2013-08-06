@@ -28,3 +28,25 @@ Ember.Handlebars.registerBoundHelper('markdown', function(input) {
   return new Ember.Handlebars.SafeString(showdown.makeHtml(input));
 });
 
+App.Router.map(function() {
+  this.resource('about');
+  this.resource('domains', function(){
+    this.resource('domain', { path: ':domain_id'});
+  })
+});
+
+App.DomainsRoute = Ember.Route.extend({
+  model: function() {
+    return App.Domain.find();
+  }
+});
+
+App.DomainController = Ember.ObjectController.extend();
+
+App.Domain = DS.Model.extend({
+  name: DS.attr('string'),
+  fullname: DS.attr('string'),
+  createdAt: DS.attr('date'),
+  updatedAt: DS.attr('date')
+});
+
