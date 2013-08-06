@@ -11,4 +11,6 @@ group :assets do
   gem "quiet_assets"
   gem 'gettext_i18n_rails_js', '>= 0.0.8'
   gem 'gettext', '>= 1.9.3', :require => false
+  gem 'ember-rails'
+  gem 'ember-source', '1.0.0.rc6.4' # or the version you need
 end
