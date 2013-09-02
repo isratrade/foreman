@@ -98,6 +98,17 @@ module HostCommon
     write_attribute(:root_pass, p)
   end
 
+  def smart_variables
+    puppetclass_ids = self.all_puppetclasses.map(&:id)
+    LookupKey.global_parameters_for_class(puppetclass_ids)
+  end
+
+  def smart_class_parameters
+    puppetclass_ids = self.all_puppetclasses.map(&:id)
+    environment_id = self.environment_id
+    LookupKey.parameters_for_class(puppetclass_ids, environment_id)
+  end
+
   private
 
   # fall back to our puppet proxy in case our puppet ca is not defined/used.

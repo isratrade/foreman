@@ -4,10 +4,17 @@ module Api
       include Api::Version2
       include Foreman::Controller::SmartProxyAuth
 
-      before_filter :find_resource, :only => :puppetrun
+      before_filter :find_resource, :only => [:puppetrun, :show]
       add_puppetmaster_filters :facts
 
       api :GET, "/hosts/:id/puppetrun", "Force a puppet run on the agent."
+
+      def index
+        @hosts = Host.my_hosts.search_for(*search_options).paginate(paginate_options)
+      end
+
+      def show
+      end
 
       def puppetrun
         return deny_access unless Setting[:puppetrun]

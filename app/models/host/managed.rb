@@ -569,6 +569,11 @@ class Host::Managed < Host::Base
     end
   end
 
+  def compute_resource_name
+    return "Bare Metal" if compute_resource_id.blank?
+    compute_resource.name
+  end
+
   # no need to store anything in the db if the password is our default
   def root_pass
     read_attribute(:root_pass) || hostgroup.try(:root_pass) || Setting[:root_pass]
