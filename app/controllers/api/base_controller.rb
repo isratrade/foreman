@@ -4,7 +4,7 @@ module Api
     include Foreman::Controller::Authentication
     include Foreman::ThreadSession::Cleaner
 
-    before_filter :set_default_response_format, :authorize, :add_version_header
+    before_filter :set_default_response_format, :authorize, :add_version_header, :root_node_name
 
     cache_sweeper :topbar_sweeper
 
@@ -158,6 +158,14 @@ module Api
     def add_version_header
       response.headers["Foreman_version"]= SETTINGS[:version]
       response.headers["Foreman_api_version"]= api_version
+    end
+
+    def root_node_name
+      @root_node_name = if Rabl.configuration.use_controller_name_as_json_root
+                          controller_name.split('/').last
+                        else
+                          Rabl.configuration.json_root_default_name
+                        end
     end
 
     # this method is used with nested resources, where obj_id is passed into the parameters hash.
