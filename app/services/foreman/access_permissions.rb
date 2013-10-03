@@ -4,13 +4,21 @@ require 'foreman/access_control'
 Foreman::AccessControl.map do |map|
   map.security_block :architectures do |map|
     map.permission :view_architectures,
-                   :architectures => [:index, :show, :auto_complete_search], :"api/v1/architectures" => [:index, :show]
+                   :architectures => [:index, :show, :auto_complete_search],
+                   :"api/v1/architectures" => [:index, :show],
+                   :"api/v2/architectures" => [:index, :show]
     map.permission :create_architectures,
-                   :architectures => [:new, :create], :"api/v1/architectures" => [:new, :create]
+                   :architectures => [:new, :create],
+                   :"api/v1/architectures" => [:create],
+                   :"api/v2/architectures" => [:create]
     map.permission :edit_architectures,
-                   :architectures => [:edit, :update], :"api/v1/architectures" => [:edit, :update]
+                   :architectures => [:edit, :update],
+                   :"api/v1/architectures" => [:update],
+                   :"api/v2/architectures" => [:update]
     map.permission :destroy_architectures,
-                   :architectures => [:destroy], :"api/v1/architectures" => [:destroy]
+                   :architectures => [:destroy],
+                   :"api/v1/architectures" => [:destroy],
+                   :"api/v2/architectures" => [:destroy]
   end
 
   map.security_block :authentication_providers do |map|
