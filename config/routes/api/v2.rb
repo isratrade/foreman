@@ -33,11 +33,6 @@ Foreman::Application.routes.draw do
       resources :lookup_keys, :except => [:new, :edit]
       resources :media, :except => [:new, :edit]
       resources :models, :except => [:new, :edit]
-      resources :operatingsystems, :except => [:new, :edit] do
-        member do
-          get 'bootfiles'
-        end
-      end
       resources :ptables, :except => [:new, :edit]
       resources :roles, :except => [:new, :edit]
       resources :reports, :only => [:index, :show, :destroy] do
@@ -174,7 +169,10 @@ Foreman::Application.routes.draw do
         (resources :organizations, :only => [:index, :show]) if SETTINGS[:organizations_enabled]
       end
 
-      resources :operatingsystems, :only => [] do
+      resources :operatingsystems, :except => [:new, :edit] do
+        member do
+          get 'bootfiles'
+        end
         resources :parameters, :except => [:new, :edit] do
           collection do
             delete '/', :to => :reset
