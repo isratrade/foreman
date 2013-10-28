@@ -6,8 +6,6 @@ Foreman::Application.routes.draw do
     # new v2 routes that point to v2
     scope :module => :v2, :constraints => ApiConstraints.new(:version => 2) do
 
-      resources :architectures, :except => [:new, :edit]
-
       resources :audits, :only => [:index, :show]
 
       resources :auth_source_ldaps, :except => [:new, :edit]
@@ -15,6 +13,15 @@ Foreman::Application.routes.draw do
       resources :bookmarks, :except => [:new, :edit]
 
       resources :common_parameters, :except => [:new, :edit]
+
+      resources :architectures, :except => [:new, :edit] do
+        constraints(:id => /[^\/]+/) do
+          resources :hosts
+        end
+        resources :hostgroups
+        resources :images
+        resources :operatingsystems
+      end
 
       resources :config_templates, :except => [:new, :edit] do
         (resources :locations, :only => [:index, :show]) if SETTINGS[:locations_enabled]

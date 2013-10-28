@@ -2,16 +2,22 @@ module Api
   module V2
     class ArchitecturesController < V2::BaseController
       before_filter :find_resource, :only => %w{show update destroy}
+      before_filter :find_optional_nested_object
 
-      api :GET, "/architectures/", "List all architectures."
+      api :GET, "/architectures", "List all architectures."
+      api :GET, "/operatingsystems/:operatingsystem_id/architectures", "List all architectures for operatingsystem"
+      param :operatingsystem_id, String, :desc => "id of nested operatingsystem"
       param :search, String, :desc => "filter results"
       param :order, String, :desc => "sort results"
       param :page, String, :desc => "paginate results"
       param :per_page, String, :desc => "number of entries per request"
 
       def index
-        @architectures = Architecture.includes(:operatingsystems).
-          search_for(*search_options).paginate(paginate_options)
+        @architectures = if nested_obj
+                           nested_obj.architectures.search_for(*search_options).paginate(paginate_options)
+                         else
+                           Architecture.search_for(*search_options).paginate(paginate_options)
+                         end
       end
 
       api :GET, "/architectures/:id/", "Show an architecture."
