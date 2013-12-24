@@ -78,6 +78,13 @@ Foreman::Application.routes.draw do
             delete '/', :to => :reset
           end
         end
+        resources :architectures, :except => [:new, :edit]
+        resources :config_templates, :except => [:new, :edit]
+        resources :ptables, :except => [:new, :edit]
+        resources :media, :except => [:new, :edit]
+        resources :hosts, :except => [:new, :edit]
+        resources :hostgroups, :except => [:new, :edit]
+        resources :trends, :except => [:new, :edit]
       end
 
       resources :puppetclasses, :except => [:new, :edit] do

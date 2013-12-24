@@ -34,6 +34,11 @@ module Api
           param :description, String
           param :family, String
           param :release_name, String
+          param :architecture_ids, Array, :desc => 'architecture IDs'
+          param :media_ids, Array, :desc => 'media IDs'
+          param :ptable_ids, Array, :desc => 'partition table IDs'
+          param :config_template_ids, Array, :desc => 'config template IDs'
+          param :parameter_ids, Array, :desc => 'config template IDs'
         end
       end
 
@@ -71,6 +76,69 @@ module Api
         render :json => @operatingsystem.pxe_files(medium, arch)
       rescue => e
         render :json => e.to_s, :status => :unprocessable_entity
+      end
+
+      api :GET, "/operatingsystems/:id/parameters", "List all parameters for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only.
+      def parameters
+      end
+
+      api :GET, "/operatingsystems/:id/media", "List all media for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only
+      def media
+      end
+
+      api :GET, "/operatingsystems/:id/ptables", "List all ptables for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only
+      def ptables
+      end
+
+      api :GET, "/operatingsystems/:id/config_templates", "List all config_templates for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only
+      def config_templates
+      end
+
+      api :GET, "/operatingsystems/:id/architectures", "List all architectures for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only
+      def architectures
+      end
+
+      api :GET, "/operatingsystems/:id/hosts", "List all hosts for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only
+      def hosts
+      end
+
+      api :GET, "/operatingsystems/:id/hostgroups", "List all hostgroups for an operating system."
+      param :search, String, :desc => "filter results", :required => false
+      param :order, String, :desc => "sort results", :required => false, :desc => "for example, name ASC, or name DESC"
+      param :page, String, :desc => "paginate results"
+      param :per_page, String, :desc => "number of entries per request"
+      # action for documentation purposes only
+      def hostgroups
       end
 
     end

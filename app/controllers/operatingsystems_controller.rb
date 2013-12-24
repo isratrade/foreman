@@ -30,6 +30,7 @@ class OperatingsystemsController < ApplicationController
   end
 
   def update
+    debugger
     if @operatingsystem.update_attributes(params[:operatingsystem])
       process_success
     else
