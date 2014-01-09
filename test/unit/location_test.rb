@@ -166,4 +166,74 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal 'Location', Audit.unscoped.last.auditable_type
   end
 
+  #Location inheritance tests
+  test "inherited location should have correct label" do
+    parent = taxonomies(:location1)
+    location = Location.create :name => "rack1", :parent_id => parent.id
+    assert_equal "Location 1/rack1", location.label
+  end
+
+  test "inherited_ids for inherited location" do
+    parent = taxonomies(:location1)
+    location = Location.create :name => "rack1", :parent_id => parent.id
+    # check that inherited_ids of location matches selected_ids of parent
+    location.inherited_ids.each do |k,v|
+      assert_equal v.uniq, parent.selected_ids[k].uniq
+    end
+  end
+
+  test "selected_or_inherited_ids for inherited location" do
+    parent = taxonomies(:location1)
+    location = Location.create :name => "rack1", :parent_id => parent.id
+    # add subnet to location
+    assert TaxableTaxonomy.create(:taxonomy_id => location.id, :taxable_id => subnets(:two).id, :taxable_type => "Subnet")
+    # check that inherited_ids of location matches selected_ids of parent, except for subnet
+    location.selected_or_inherited_ids.each do |k,v|
+      assert_equal v.uniq, parent.selected_ids[k].uniq unless k == 'subnet_ids'
+      assert_equal v.uniq, ([subnets(:two).id] + parent.selected_ids[k].uniq) if k == 'subnet_ids'
+    end
+    # check that inherited_ids of location matches selected_ids of parent
+  end
+
+  test "used_and_selected_or_inherited_ids for inherited location" do
+    parent = taxonomies(:location1)
+    location = Location.create :name => "rack1", :parent_id => parent.id
+    # check that inherited_ids of location matches selected_ids of parent
+    location.used_and_selected_or_inherited_ids.each do |k,v|
+      assert_equal v.uniq, parent.used_and_selected_ids[k].uniq
+    end
+  end
+
+  test "need_to_be_selected_ids for inherited location" do
+    parent = taxonomies(:location1)
+    location = Location.create :name => "rack1", :parent_id => parent.id
+    # no hosts were assigned to location, so no missing ids need to be selected
+    location.need_to_be_selected_ids.each do |k,v|
+      assert v.empty?
+    end
+  end
+
+  test "multiple inheritence" do
+    parent1 = taxonomies(:location1)
+    assert_equal [subnets(:one).id], parent1.selected_ids["subnet_ids"]
+
+    # inherit from parent 1
+    parent2 = Location.create :name => "floor1", :parent_id => parent1.id
+    assert TaxableTaxonomy.create(:taxonomy_id => parent2.id, :taxable_id => subnets(:two).id, :taxable_type => "Subnet")
+    assert_equal [subnets(:one).id, subnets(:two).id].sort, parent2.selected_or_inherited_ids["subnet_ids"].sort
+
+    # inherit from parent 2
+    location = Location.create :name => "rack1", :parent_id => parent2.id
+    assert TaxableTaxonomy.create(:taxonomy_id => parent2.id, :taxable_id => subnets(:three).id, :taxable_type => "Subnet")
+    assert_equal [subnets(:one).id, subnets(:two).id, subnets(:three).id].sort, location.selected_or_inherited_ids["subnet_ids"].sort
+   end
+
+  test "cannot delete location that is a parent for nested location" do
+    parent1 = taxonomies(:location2)
+    location = Location.create :name => "floor1", :parent_id => parent1.id
+    assert_raise Ancestry::AncestryException do
+      parent1.destroy
+    end
+  end
+
 end

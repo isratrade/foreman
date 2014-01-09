@@ -503,6 +503,7 @@ function multiSelectOnLoad(){
 
   $('select[multiple]').each(function(i,item){
     var mismatches = $(item).attr('data-mismatches');
+    var inheriteds = $(item).attr('data-inheriteds');
     if (!(mismatches == null || mismatches == 'undefined')) {
       var missing_ids = $.parseJSON(mismatches);
       $.each(missing_ids, function(index,missing_id){
@@ -510,5 +511,13 @@ function multiSelectOnLoad(){
         $('#ms-'+$(item).attr('id')).find('#'+opt_id).addClass('delete').tooltip({title: __("Select this since it belongs to a host"), placement: "left"});
       })
     }
+    if (!(inheriteds == null || inheriteds == 'undefined')) {
+      var inherited_ids = $.parseJSON(inheriteds);
+      $.each(inherited_ids, function(index,inherited_id){
+        opt_id = (inherited_id +"").replace(/[^A-Za-z0-9]*/gi, '_')+'-selection';
+        $('#ms-'+$(item).attr('id')).find('#'+opt_id).addClass('inherited').tooltip({title: _("This is inherited from parent"), placement: "right"});
+      })
+    }
+
   })
 }

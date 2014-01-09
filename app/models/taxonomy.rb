@@ -1,12 +1,15 @@
 class Taxonomy < ActiveRecord::Base
   audited :allow_mass_assignment => true
   has_associated_audits
+  has_ancestry :orphan_strategy => :restrict
 
   serialize :ignore_types, Array
   validates :name, :presence => true, :uniqueness => {:scope => :type}
 
   belongs_to :user
   before_destroy EnsureNotUsedBy.new(:hosts)
+  before_save :set_label, :on => [:create, :update, :destroy]
+  after_save :set_other_labels, :on => [:update, :destroy]
 
   has_many :taxable_taxonomies, :dependent => :destroy
   has_many :users, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'User'
@@ -24,7 +27,9 @@ class Taxonomy < ActiveRecord::Base
   validate :check_for_orphans, :unless => Proc.new {|t| t.new_record?}
   before_validation :sanitize_ignored_types
 
-  delegate :import_missing_ids, :to => :tax_host
+  delegate :import_missing_ids, :need_to_be_selected_ids, :used_ids, :selected_ids, :used_and_selected_ids, :mismatches, :missing_ids, :check_for_orphans,
+           :inherited_ids, :used_and_selected_or_inherited_ids, :selected_or_inherited_ids, :need_to_be_selected_ids_for_taxonomy,
+           :to => :tax_host
 
   def to_param
     "#{id.to_s.parameterize}"
@@ -125,10 +130,12 @@ class Taxonomy < ActiveRecord::Base
     end
   end
 
-  private
+  def get_label
+    return name if ancestry.empty?
+    ancestors.map{|a| a.name + "/"}.join + name
+  end
 
-  delegate :need_to_be_selected_ids, :used_ids, :selected_ids, :used_and_selected_ids, :mismatches, :missing_ids, :check_for_orphans,
-           :to => :tax_host
+  private
 
   def sanitize_ignored_types
     self.ignore_types ||= []
@@ -141,6 +148,20 @@ class Taxonomy < ActiveRecord::Base
 
   def hash_key_to_class(key)
     key.to_s.gsub(/_ids?\Z/, '').classify
+  end
+
+  def set_label
+    self.label = get_label if (name_changed? || ancestry_changed? || label.blank?)
+  end
+
+  def set_other_labels
+    if name_changed? || ancestry_changed?
+      Taxonomy.where("ancestry IS NOT NULL").each do |taxonomy|
+        if taxonomy.path_ids.include?(self.id)
+          taxonomy.update_attributes(:label => taxonomy.get_label)
+        end
+      end
+    end
   end
 
 end

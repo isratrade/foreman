@@ -23,7 +23,7 @@ module Taxonomix
     end
 
     def inner_select taxonomy
-      taxonomy_ids = Array.wrap(taxonomy).map(&:id).join(',')
+      taxonomy_ids = taxonomy.path_ids.join(',')
       "SELECT taxable_id from taxable_taxonomies WHERE taxable_type = '#{self.name}' AND taxonomy_id in (#{taxonomy_ids}) "
     end
 

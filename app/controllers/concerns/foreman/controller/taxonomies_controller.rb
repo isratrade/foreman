@@ -35,6 +35,12 @@ module Foreman::Controller::TaxonomiesController
     end
   end
 
+  def nest
+    @taxonomy = taxonomy_class.new
+    @taxonomy.parent_id = params[:id]
+    render 'taxonomies/new'
+  end
+
   # cannot name this method "clone" since Object has a clone method and the mixin doesn't overwrite it
   def clone_taxonomy
     @old_name = @taxonomy.name
@@ -72,6 +78,10 @@ module Foreman::Controller::TaxonomiesController
     result = Taxonomy.no_taxonomy_scope do
       (params[taxonomy_single.to_sym][:ignore_types] -= ["0"]) if params[taxonomy_single.to_sym][:ignore_types]
       @taxonomy.update_attributes(params[taxonomy_single.to_sym])
+      # (-) minus operator to substract elements of arrays.  remove the inherited ids from params[:location] so new rows are not saved in taxable_taxonomies if the parent already has a row
+      # note: if inherited ids are saved in taxable_taxonomies for child, there is no negative effect. The inner_select in #with_taxonomy_scope
+      params[taxonomy_single].merge!(@taxonomy.inherited_ids) {|k, v1, v2| v1.kind_of?(Array) && v2.kind_of?(Array) ? v1.map(&:to_s) - v2.map(&:to_s) : v1 }
+      @taxonomy.update_attributes(params[taxonomy_single])
     end
     if result
       process_success(:object => @taxonomy)
@@ -81,10 +91,15 @@ module Foreman::Controller::TaxonomiesController
   end
 
   def destroy
-    if @taxonomy.destroy
-      clear_current_taxonomy_from_session if session[taxonomy_id] == @taxonomy.id
-      process_success
-    else
+    begin
+      if @taxonomy.destroy
+        clear_current_taxonomy_from_session if session[taxonomy_id] == @taxonomy.id
+        process_success
+      else
+        process_error
+      end
+    rescue Ancestry::AncestryException
+      flash[:error] = _("Cannot delete group %{current} because it has nested groups.") % { :current => @taxonomy.label }
       process_error
     end
   end

@@ -45,24 +45,44 @@ class TaxHost
   end
 
   def used_and_selected_ids
-    @used_and_selected_ids ||= Hash[hash_keys.map do |col|
+    @used_and_selected_ids ||= HashWithIndifferentAccess.new(Hash[hash_keys.map do |col|
       if taxonomy.ignore?(hash_key_to_class(col))
         [col, used_ids[col] ] # used_ids only if ignore selected
       else
         [col, used_ids[col] & selected_ids[col]] # & operator to intersect COMMON elements of arrays
       end
-    end]
+    end])
+  end
+
+  def inherited_ids
+    return @inherited_ids if @inherited_ids
+    ids         = HashWithIndifferentAccess.new
+    ids.default = []
+    taxonomy.ancestor_ids.each do |taxonomy_id|
+      # | operator to union elements of arrays
+      ids.merge!(Taxonomy.find(taxonomy_id).selected_ids) {|k, v1, v2| v1.kind_of?(Array) && v2.kind_of?(Array) ? v1 | v2 : v1 }
+    end
+    @inherited_ids = ids
+  end
+
+  def selected_or_inherited_ids
+    # union operator | of value arrays for each key ("domain_ids", "subnet_ids, etc")
+    selected_ids.merge!(inherited_ids) {|k, v1, v2| v1.kind_of?(Array) && v2.kind_of?(Array) ? v1 | v2 : v1 }
+  end
+
+  def used_and_selected_or_inherited_ids
+    # union operator | of value arrays for each key ("domain_ids", "subnet_ids, etc")
+    used_and_selected_ids.merge!(inherited_ids) {|k, v1, v2| v1.kind_of?(Array) && v2.kind_of?(Array) ? v1 | v2 : v1 }
   end
 
   def need_to_be_selected_ids
-    @need_to_be_selected_ids ||= Hash[hash_keys.map do |col|
+    @need_to_be_selected_ids ||= HashWithIndifferentAccess.new(Hash[hash_keys.map do |col|
       if taxonomy.ignore?(hash_key_to_class(col))
         [col, [] ] # empty array since nothing needs to be selected
       else
-        [col, used_ids[col] - selected_ids[col]] # - operator find NON-common elements of arrays
+        [col, used_ids[col] - selected_or_inherited_ids[col]] # - operator find NON-common elements of arrays
       end
-    end]
-
+    end])
   end
 
   def missing_ids

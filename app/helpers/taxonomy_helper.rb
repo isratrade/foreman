@@ -76,6 +76,10 @@ module TaxonomyHelper
     is_location? ? hash_for_clone_location_path(:id => taxonomy) : hash_for_clone_organization_path(:id => taxonomy)
   end
 
+  def hash_for_nest_taxonomy_path(taxonomy)
+    is_location? ? hash_for_nest_location_path(taxonomy) : hash_for_nest_organization_path(taxonomy)
+  end
+
   def hash_for_taxonomy_path(taxonomy)
     is_location? ? hash_for_location_path(:id => taxonomy) : hash_for_organization_path(:id => taxonomy)
   end

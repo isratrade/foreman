@@ -161,4 +161,22 @@ class LocationsControllerTest < ActionController::TestCase
     assert_redirected_to root_url
   end
 
+  test "should nest a location" do
+    location = taxonomies(:location1)
+    get :nest, {:id => location.id}, set_session_user
+    assert_response :success
+    assert_template 'new'
+    assert_equal location.id, assigns(:taxonomy).parent_id
+  end
+
+  test "should not add inherited ids when updating location" do
+    parent = taxonomies(:location1)
+    location = Location.create :name => "rack1", :parent_id => parent.id
+    assert_difference('TaxableTaxonomy.count', 0) do
+      as_admin do
+        put :update, {:commit => "Update", :id => location.id, :location => {'name' => 'rack1'}.merge!(location.inherited_ids) }, set_session_user
+      end
+    end
+  end
+
 end
