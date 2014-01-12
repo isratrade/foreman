@@ -62,4 +62,39 @@ module Taxonomix
     Taxonomy.enabled?(taxonomy) && current_taxonomy && !self.send(association).include?(current_taxonomy)
   end
 
+  def get_obj_id
+    obj_id   = :compute_resource_id if self.kind_of?(ComputeResource)
+    obj_id   = :puppet_proxy_id if self.kind_of?(SmartProxy) && self.features.pluck(:name).include?("Puppet")
+    obj_id   = :puppet_ca_proxy_id if self.kind_of?(SmartProxy) && self.features.pluck(:name).include?("Puppet CA")
+    obj_id   = :owner_id if self.kind_of?(User)
+    obj_id ||= "#{self.class.to_s.tableize.singularize}_id".to_sym
+    obj_id
+  end
+
+  def used_location_ids
+    return [] if new_record?
+    obj_id = get_obj_id
+    ids = Host.where(obj_id => self.id).pluck(:location_id).uniq if Host.new.respond_to?(obj_id)
+    ids ||= []
+    ids
+  end
+
+  def used_organization_ids
+    return [] if new_record?
+    obj_id = get_obj_id
+    ids = Host.where(obj_id => self.id).pluck(:organization_id).uniq if Host.new.respond_to?(obj_id)
+    ids ||= []
+    ids
+  end
+
+  def used_or_selected_location_ids
+    ids = (location_ids + used_location_ids).uniq
+    ids
+  end
+
+  def used_or_selected_organization_ids
+    ids = (organization_ids + used_organization_ids).uniq
+    ids
+  end
+
 end

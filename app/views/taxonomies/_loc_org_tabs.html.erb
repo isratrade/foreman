@@ -1,0 +1,11 @@
+<% if show_location_tab? %>
+  <div class="tab-pane" id="locations">
+    <%= location_selects f, obj.used_or_selected_location_ids, {:disabled => obj.used_location_ids} %>
+  </div>
+<% end %>
+
+<% if show_organization_tab? %>
+  <div class="tab-pane" id="organizations">
+    <%= organization_selects f, obj.used_or_selected_organization_ids, {:disabled => obj.used_organization_ids} %>
+  </div>
+<% end %>

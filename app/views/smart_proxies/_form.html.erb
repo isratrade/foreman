@@ -19,18 +19,18 @@
         <%= text_f(f, :url, :size => "col-md-8" ) %>
   <% if show_taxonomy_tabs? %>
       </div>
+      <% if show_location_tab? %>
+        <div class="tab-pane" id="locations">
+          <%= location_selects f, @proxy.location_ids, {:disabled => @proxy.used_location_ids} %>
+        </div>
+      <% end %>
 
-    <% if show_location_tab? %>
-      <div class="tab-pane" id="locations">
-        <%= multiple_checkboxes f, :locations, @proxy, Location, { :prefix => "smart_proxy", :label => _("Locations") } %>
-      </div>
-    <% end %>
+      <% if show_organization_tab? %>
+        <div class="tab-pane" id="organizations">
+          <%= organization_selects f, @proxy.organization_ids, {:disabled => @proxy.used_organization_ids} %>
+        </div>
+      <% end %>
 
-    <% if show_organization_tab? %>
-      <div class="tab-pane" id="organizations">
-        <%= multiple_checkboxes f, :organizations, @proxy, Organization, { :prefix => "smart_proxy", :label => _("Organizations") } %>
-      </div>
-    <% end %>
     </div>
   <% end %>
 

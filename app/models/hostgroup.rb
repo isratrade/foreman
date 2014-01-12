@@ -140,6 +140,20 @@ class Hostgroup < ActiveRecord::Base
     ComputeProfile.find_by_id(inherited_compute_profile_id)
   end
 
+  # overwrite method is taxonomix, since hostgroup has ancestry
+  def used_location_ids
+    return [] if new_record? && parent_id.blank?
+    ids = Host.where(:hostgroup_id => self.path_ids).pluck(:location_id)
+    ids.uniq
+  end
+
+  # overwrite method is taxonomix, since hostgroup has ancestry
+  def used_organization_ids
+    return [] if new_record? && parent_id.blank?
+    ids = Host.where(:hostgroup_id => self.path_ids).pluck(:organization_id)
+    ids.uniq
+  end
+
   private
 
   def lookup_value_match
