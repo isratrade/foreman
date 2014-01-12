@@ -1,6 +1,8 @@
 class Taxonomy < ActiveRecord::Base
   audited :allow_mass_assignment => true
   has_associated_audits
+  include NestedAncestryCommon
+
   has_ancestry :orphan_strategy => :restrict
 
   serialize :ignore_types, Array
@@ -8,8 +10,6 @@ class Taxonomy < ActiveRecord::Base
 
   belongs_to :user
   before_destroy EnsureNotUsedBy.new(:hosts)
-  before_save :set_label, :on => [:create, :update, :destroy]
-  after_save :set_other_labels, :on => [:update, :destroy]
 
   has_many :taxable_taxonomies, :dependent => :destroy
   has_many :users, :through => :taxable_taxonomies, :source => :taxable, :source_type => 'User'
@@ -130,11 +130,6 @@ class Taxonomy < ActiveRecord::Base
     end
   end
 
-  def get_label
-    return name if ancestry.empty?
-    ancestors.map{|a| a.name + "/"}.join + name
-  end
-
   private
 
   def sanitize_ignored_types
@@ -148,20 +143,6 @@ class Taxonomy < ActiveRecord::Base
 
   def hash_key_to_class(key)
     key.to_s.gsub(/_ids?\Z/, '').classify
-  end
-
-  def set_label
-    self.label = get_label if (name_changed? || ancestry_changed? || label.blank?)
-  end
-
-  def set_other_labels
-    if name_changed? || ancestry_changed?
-      Taxonomy.where("ancestry IS NOT NULL").each do |taxonomy|
-        if taxonomy.path_ids.include?(self.id)
-          taxonomy.update_attributes(:label => taxonomy.get_label)
-        end
-      end
-    end
   end
 
 end
