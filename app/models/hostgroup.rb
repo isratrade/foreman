@@ -140,20 +140,6 @@ class Hostgroup < ActiveRecord::Base
     ComputeProfile.find_by_id(inherited_compute_profile_id)
   end
 
-  # overwrite method is taxonomix, since hostgroup has ancestry
-  def used_location_ids
-    return [] if new_record? && parent_id.blank?
-    ids = Host.where(:hostgroup_id => self.path_ids).pluck(:location_id)
-    ids.uniq
-  end
-
-  # overwrite method is taxonomix, since hostgroup has ancestry
-  def used_organization_ids
-    return [] if new_record? && parent_id.blank?
-    ids = Host.where(:hostgroup_id => self.path_ids).pluck(:organization_id)
-    ids.uniq
-  end
-
   private
 
   def lookup_value_match
@@ -173,6 +159,12 @@ class Hostgroup < ActiveRecord::Base
 
   def remove_duplicated_nested_class
     self.puppetclasses -= ancestors.map(&:puppetclasses).flatten
+  end
+
+  # overwrite method in taxonomix, since hostgroup has ancestry
+  def used_taxonomy_ids(type)
+    return [] if new_record? && parent_id.blank?
+    Host::Base.where(:hostgroup_id => self.path_ids).pluck(type).uniq
   end
 
 end

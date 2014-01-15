@@ -74,6 +74,13 @@ class SmartProxy < ActiveRecord::Base
     errors
   end
 
+  def taxonomy_foreign_conditions
+    conditions                      = {}
+    conditions[:puppet_proxy_id]    = id if self.features.pluck(:name).include?('Puppet')
+    conditions[:puppet_ca_proxy_id] = id if self.features.pluck(:name).include?('Puppet CA')
+    conditions
+  end
+
   private
 
   def sanitize_url

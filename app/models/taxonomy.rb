@@ -27,8 +27,7 @@ class Taxonomy < ActiveRecord::Base
   validate :check_for_orphans, :unless => Proc.new {|t| t.new_record?}
   before_validation :sanitize_ignored_types
 
-  delegate :import_missing_ids, :need_to_be_selected_ids, :used_ids, :selected_ids, :used_and_selected_ids, :mismatches, :missing_ids, :check_for_orphans,
-           :inherited_ids, :used_and_selected_or_inherited_ids, :selected_or_inherited_ids, :need_to_be_selected_ids_for_taxonomy,
+  delegate :import_missing_ids, :inherited_ids, :used_and_selected_or_inherited_ids, :selected_or_inherited_ids,
            :to => :tax_host
 
   def to_param
@@ -131,6 +130,9 @@ class Taxonomy < ActiveRecord::Base
   end
 
   private
+
+  delegate :need_to_be_selected_ids, :used_ids, :selected_ids, :used_and_selected_ids, :mismatches, :missing_ids, :check_for_orphans,
+           :to => :tax_host
 
   def sanitize_ignored_types
     self.ignore_types ||= []

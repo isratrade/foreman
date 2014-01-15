@@ -199,9 +199,7 @@ class LocationTest < ActiveSupport::TestCase
     parent = taxonomies(:location1)
     location = Location.create :name => "rack1", :parent_id => parent.id
     # check that inherited_ids of location matches selected_ids of parent
-    location.used_and_selected_or_inherited_ids.each do |k,v|
-      assert_equal v.uniq, parent.used_and_selected_ids[k].uniq
-    end
+    assert_equal location.used_and_selected_or_inherited_ids, parent.used_and_selected_ids
   end
 
   test "need_to_be_selected_ids for inherited location" do

@@ -19,4 +19,8 @@ module TasksHelper
            end
     icon_text(icon, status)
   end
+
+  def blabla
+    'bLALALS'
+  end
 end

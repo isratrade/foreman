@@ -5,9 +5,9 @@ module Foreman::Controller::TaxonomiesController
     before_filter :find_taxonomy, :only => %w{edit update destroy clone_taxonomy assign_hosts
                                             assign_selected_hosts assign_all_hosts step2 select}
     before_filter :count_nil_hosts, :only => %w{index create step2}
+    before_filter :avoid_duplicate_taxable, :only => :update
     skip_before_filter :authorize, :set_taxonomy, :only => %w{select clear}
   end
-
 
   def index
     begin
@@ -36,8 +36,8 @@ module Foreman::Controller::TaxonomiesController
   end
 
   def nest
-    @taxonomy = taxonomy_class.new
-    @taxonomy.parent_id = params[:id]
+    @taxonomy           = taxonomy_class.new
+    @taxonomy.parent_id = params[:id].to_i
     render 'taxonomies/new'
   end
 
@@ -77,10 +77,6 @@ module Foreman::Controller::TaxonomiesController
   def update
     result = Taxonomy.no_taxonomy_scope do
       (params[taxonomy_single.to_sym][:ignore_types] -= ["0"]) if params[taxonomy_single.to_sym][:ignore_types]
-      @taxonomy.update_attributes(params[taxonomy_single.to_sym])
-      # (-) minus operator to substract elements of arrays.  remove the inherited ids from params[:location] so new rows are not saved in taxable_taxonomies if the parent already has a row
-      # note: if inherited ids are saved in taxable_taxonomies for child, there is no negative effect. The inner_select in #with_taxonomy_scope
-      params[taxonomy_single].merge!(@taxonomy.inherited_ids) {|k, v1, v2| v1.kind_of?(Array) && v2.kind_of?(Array) ? v1.map(&:to_s) - v2.map(&:to_s) : v1 }
       @taxonomy.update_attributes(params[taxonomy_single])
     end
     if result
@@ -91,17 +87,15 @@ module Foreman::Controller::TaxonomiesController
   end
 
   def destroy
-    begin
-      if @taxonomy.destroy
-        clear_current_taxonomy_from_session if session[taxonomy_id] == @taxonomy.id
-        process_success
-      else
-        process_error
-      end
-    rescue Ancestry::AncestryException
-      flash[:error] = _("Cannot delete group %{current} because it has nested groups.") % { :current => @taxonomy.label }
+    if @taxonomy.destroy
+      clear_current_taxonomy_from_session if session[taxonomy_id] == @taxonomy.id
+      process_success
+    else
       process_error
     end
+  rescue Ancestry::AncestryException
+    flash[:error] = _('Cannot delete group %{current} because it has nested groups.') % { :current => @taxonomy.label }
+    process_error
   end
 
   def select
@@ -197,4 +191,15 @@ module Foreman::Controller::TaxonomiesController
     @count_nil_hosts = Host.where(taxonomy_id => nil).count
   end
 
+  def avoid_duplicate_taxable
+    # (-) minus operator to subtract elements of arrays. remove the inherited ids from params[:location] so new
+    # rows are not saved in taxable_taxonomies if the parent already has a row
+    # note: if inherited ids are saved in taxable_taxonomies for child, there is no negative effect.
+    # The inner_select in #with_taxonomy_scope
+    # params = {:location => {:domain_ids => [1,2,3], :subnet_ids => [] ..}
+    params[taxonomy_single].merge!(@taxonomy.inherited_ids) do |k, submitted_ids, inherited_ids|
+      return submitted_ids unless submitted_ids.kind_of?(Array) && inherited_ids.kind_of?(Array)
+      submitted_ids.map(&:to_i) - inherited_ids.map(&:to_i)
+    end
+  end
 end

@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionView::MissingTemplate, :with => :api_deprecation_error
 
   # standard layout to all controllers
-  helper 'layout'
+  helper :layout
 
   before_filter :require_ssl, :require_login
   before_filter :set_gettext_locale_db, :set_gettext_locale
@@ -211,13 +211,9 @@ class ApplicationController < ActionController::Base
   end
 
   def clean_taxonomy_ids
-    p = params[controller_path.singularize]
-    if p && p[:location_ids]
-      p[:location_ids] = p[:location_ids].delete_if(&:empty?).uniq
-    end
-    if p && p[:organization_ids]
-      p[:organization_ids] = p[:organization_ids].delete_if(&:empty?).uniq
-    end
+    return true unless (p = params[controller_path.singularize])
+    p[:location_ids]     = p[:location_ids].delete_if(&:empty?).uniq     if p[:location_ids]
+    p[:organization_ids] = p[:organization_ids].delete_if(&:empty?).uniq if p[:organization_ids]
   end
 
   private
