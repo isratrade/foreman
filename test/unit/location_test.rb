@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class LocationTest < ActiveSupport::TestCase
+
   test 'it should not save without an empty name' do
     location = Location.new
     assert !location.save
@@ -25,13 +26,6 @@ class LocationTest < ActiveSupport::TestCase
   test 'it should show the name for to_s' do
     location = Location.new :name => "location name"
     assert location.to_s == "location name"
-  end
-
-  test 'location is invalid without any taxable_taxonomies' do
-    # no taxable_taxonomies in fixtures
-    # no ignore_types in fixtures
-    location = taxonomies(:location1)
-    assert !location.valid?
   end
 
   test 'location is valid if ignore all types' do
@@ -72,23 +66,19 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal used_ids[:smart_proxy_ids].sort, smart_proxy_ids.sort
     assert_equal used_ids[:config_template_ids], config_template_ids
     # match to raw fixtures data
-    assert_equal used_ids[:environment_ids].sort, Array(environments(:production).id).sort
-    assert_equal used_ids[:hostgroup_ids].sort, Array.new
-    assert_equal used_ids[:subnet_ids].sort, Array(subnets(:one).id).sort
-    assert_equal used_ids[:domain_ids].sort, Array([domains(:yourdomain).id, domains(:mydomain).id]).sort
-    assert_equal used_ids[:medium_ids].sort, Array(media(:one).id).sort
-    assert_equal used_ids[:compute_resource_ids].sort, Array(compute_resources(:one).id).sort
+    assert_equal used_ids[:environment_ids].sort, [environments(:production).id]
+    assert_equal used_ids[:hostgroup_ids], []
+    assert_equal used_ids[:subnet_ids], [subnets(:one).id]
+    assert_equal used_ids[:domain_ids].sort, [domains(:yourdomain).id, domains(:mydomain).id].sort
+    assert_equal used_ids[:medium_ids], [media(:one).id]
+    assert_equal used_ids[:compute_resource_ids], [compute_resources(:one).id]
     assert_equal used_ids[:user_ids], [users(:restricted).id]
-    assert_equal used_ids[:smart_proxy_ids].sort, Array([smart_proxies(:one).id, smart_proxies(:two).id, smart_proxies(:three).id, smart_proxies(:puppetmaster).id]).sort
-    assert_equal used_ids[:config_template_ids].sort, Array(config_templates(:mystring2).id).sort
+    assert_equal used_ids[:smart_proxy_ids].sort, [smart_proxies(:one).id, smart_proxies(:two).id, smart_proxies(:three).id, smart_proxies(:puppetmaster).id].sort
+    assert_equal used_ids[:config_template_ids], [config_templates(:mystring2).id]
   end
 
   test 'it should return selected_ids array of selected values only (when types are not ignored)' do
     location = taxonomies(:location1)
-    #fixtures for taxable_taxonomies don't work, on has_many :through polymorphic
-    # so I created assocations here.
-    location.subnet_ids = Array(subnets(:one).id)
-    location.smart_proxy_ids = Array(smart_proxies(:puppetmaster).id)
     # run selected_ids method
     selected_ids = location.selected_ids
     # get results from taxable_taxonomies
@@ -108,19 +98,19 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal selected_ids[:domain_ids], domain_ids
     assert_equal selected_ids[:medium_ids], medium_ids
     assert_equal selected_ids[:user_ids], user_ids
-    assert_equal selected_ids[:smart_proxy_ids], smart_proxy_ids
+    assert_equal selected_ids[:smart_proxy_ids].sort, smart_proxy_ids.sort
     assert_equal selected_ids[:config_template_ids], config_template_ids
     assert_equal selected_ids[:compute_resource_ids], compute_resource_ids
     # match to manually generated taxable_taxonomies
-    assert_equal selected_ids[:environment_ids], Array(environments(:production).id)
-    assert_equal selected_ids[:hostgroup_ids], Array.new
-    assert_equal selected_ids[:subnet_ids].sort, Array(subnets(:one).id)
-    assert_equal selected_ids[:domain_ids], Array.new
-    assert_equal selected_ids[:medium_ids], Array.new
-    assert_equal selected_ids[:user_ids], Array.new
-    assert_equal selected_ids[:smart_proxy_ids].sort, Array(smart_proxies(:puppetmaster).id)
-    assert_equal selected_ids[:config_template_ids], Array.new
-    assert_equal selected_ids[:compute_resource_ids], Array.new
+    assert_equal selected_ids[:environment_ids], [environments(:production).id]
+    assert_equal selected_ids[:hostgroup_ids], []
+    assert_equal selected_ids[:subnet_ids], [subnets(:one).id]
+    assert_equal selected_ids[:domain_ids].sort, [domains(:mydomain).id, domains(:yourdomain).id].sort
+    assert_equal selected_ids[:medium_ids], [media(:one).id]
+    assert_equal selected_ids[:user_ids], [users(:restricted).id]
+    assert_equal selected_ids[:smart_proxy_ids].sort, [smart_proxies(:puppetmaster).id, smart_proxies(:one).id, smart_proxies(:two).id, smart_proxies(:three).id].sort
+    assert_equal selected_ids[:config_template_ids], [config_templates(:mystring2).id]
+    assert_equal selected_ids[:compute_resource_ids], [compute_resources(:one).id]
   end
 
   test 'it should return selected_ids array of ALL values (when types are ignored)' do
@@ -177,9 +167,7 @@ class LocationTest < ActiveSupport::TestCase
     parent = taxonomies(:location1)
     location = Location.create :name => "rack1", :parent_id => parent.id
     # check that inherited_ids of location matches selected_ids of parent
-    location.inherited_ids.each do |k,v|
-      assert_equal v.uniq, parent.selected_ids[k].uniq
-    end
+    assert_equal parent.selected_ids, location.inherited_ids
   end
 
   test "selected_or_inherited_ids for inherited location" do
@@ -192,7 +180,6 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal v.uniq, parent.selected_ids[k].uniq unless k == 'subnet_ids'
       assert_equal v.uniq, ([subnets(:two).id] + parent.selected_ids[k].uniq) if k == 'subnet_ids'
     end
-    # check that inherited_ids of location matches selected_ids of parent
   end
 
   test "used_and_selected_or_inherited_ids for inherited location" do

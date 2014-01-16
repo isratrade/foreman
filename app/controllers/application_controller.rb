@@ -17,7 +17,6 @@ class ApplicationController < ActionController::Base
   before_filter :set_taxonomy, :require_mail, :check_empty_taxonomy
   before_filter :welcome, :only => :index, :unless => :api_request?
   before_filter :authorize
-  before_filter :clean_taxonomy_ids, :only => [:create, :update]
 
   attr_reader :original_search_parameter
 
@@ -208,12 +207,6 @@ class ApplicationController < ActionController::Base
     return false unless Setting["authorize_login_delegation"]
     return false if api_request? and not Setting["authorize_login_delegation_api"]
     (@remote_user = request.env["REMOTE_USER"]).present?
-  end
-
-  def clean_taxonomy_ids
-    return true unless (p = params[controller_path.singularize])
-    p[:location_ids]     = p[:location_ids].delete_if(&:empty?).uniq     if p[:location_ids]
-    p[:organization_ids] = p[:organization_ids].delete_if(&:empty?).uniq if p[:organization_ids]
   end
 
   private

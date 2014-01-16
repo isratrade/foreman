@@ -1,7 +1,7 @@
 class Location < Taxonomy
   include Foreman::ThreadSession::LocationModel
 
-  has_and_belongs_to_many :organizations
+  has_and_belongs_to_many :organizations, :uniq => true
   has_many_hosts :dependent => :nullify
 
   scope :completer_scope, lambda { |opts| my_locations }

@@ -19,18 +19,19 @@ class TaxHost
   # returns a hash of HASH_KEYS used ids by hosts in a given taxonomy
   def used_ids
     return @used_ids if @used_ids
-    ids         = HashWithIndifferentAccess.new
-    ids.default = []
+    ids = HashWithIndifferentAccess.new([])
     hash_keys.each do |col|
-      ids[col] = self.send(col)
+      ids[col] = Array(self.send(col))
     end
     @used_ids = ids
   end
 
   def selected_ids
     return @selected_ids if @selected_ids
-    ids         = HashWithIndifferentAccess.new
-    ids.default = []
+    ids         = HashWithIndifferentAccess.new([])
+    hash_keys.each do |col|
+      ids[col] = []
+    end
     #types NOT ignored - get ids that are selected
     taxonomy.taxable_taxonomies.without(taxonomy.ignore_types).group_by { |d| d[:taxable_type] }.map do |k, v|
       ids["#{k.tableize.singularize}_ids"] = v.map { |i| i[:taxable_id] }
@@ -40,49 +41,48 @@ class TaxHost
       ids["#{taxonomy_type.tableize.singularize}_ids"] = taxonomy_type.constantize.pluck(:id)
     end
 
-    ids["#{opposite_taxonomy_type}_ids"] = taxonomy.send("#{opposite_taxonomy_type}_ids")
+    ids["#{opposite_taxonomy_type}_ids"] = Array(taxonomy.send("#{opposite_taxonomy_type}_ids"))
     @selected_ids                        = ids
   end
 
   def used_and_selected_ids
-    @used_and_selected_ids ||= HashWithIndifferentAccess[hash_keys.map do |col|
-      if taxonomy.ignore?(hash_key_to_class(col))
-        [col, used_ids[col] ] # used_ids only if ignore selected
-      else
-        [col, used_ids[col] & selected_ids[col]] # & operator to intersect COMMON elements of arrays
-      end
-    end]
+    @used_and_selected_ids ||= HashWithIndifferentAccess.new(Hash[hash_keys.map do |col|
+                                 if taxonomy.ignore?(hash_key_to_class(col))
+                                   [col, used_ids[col] ] # used_ids only if ignore selected
+                                 else
+                                   [col, used_ids[col] & selected_ids[col]] # & operator to intersect COMMON elements of arrays
+                                 end
+                               end])
   end
 
   def inherited_ids
     return @inherited_ids if @inherited_ids
-    ids = HashWithIndifferentAccess.new([])
-
-    Taxonomy.sort_by_ancestry(taxonomy.ancestors).each do |t|
-      # | operator to union elements of arrays
-      ids.deep_merge!(t.selected_ids)
+    ids         = HashWithIndifferentAccess.new([])
+    hash_keys.each do |col|
+      ids[col] = []
+    end
+    taxonomy.ancestors.each do |t|
+      ids = union_deep_hashes(ids, t.selected_ids)
     end
     @inherited_ids = ids
   end
 
   def selected_or_inherited_ids
-    # union operator | of value arrays for each key ("domain_ids", "subnet_ids, etc")
-    selected_ids.deep_merge!(inherited_ids)
+    @selected_or_inherited_ids ||= union_deep_hashes(selected_ids, inherited_ids)
   end
 
   def used_and_selected_or_inherited_ids
-    # union operator | of value arrays for each key ("domain_ids", "subnet_ids, etc")
-    used_and_selected_ids.deep_merge!(inherited_ids)
+    @used_and_selected_or_inherited_ids ||= union_deep_hashes(used_and_selected_ids, inherited_ids)
   end
 
   def need_to_be_selected_ids
-    @need_to_be_selected_ids ||= HashWithIndifferentAccess[hash_keys.map do |col|
-      if taxonomy.ignore?(hash_key_to_class(col))
-        [col, [] ] # empty array since nothing needs to be selected
-      else
-        [col, used_ids[col] - selected_or_inherited_ids[col]] # - operator find NON-common elements of arrays
-      end
-    end]
+    @need_to_be_selected_ids ||= HashWithIndifferentAccess.new(Hash[hash_keys.map do |col|
+                                   if taxonomy.ignore?(hash_key_to_class(col))
+                                     [col, [] ] # empty array since nothing needs to be selected
+                                   else
+                                     [col, used_ids[col] - selected_or_inherited_ids[col]] # - operator find NON-common elements of arrays
+                                   end
+                                 end])
   end
 
   def missing_ids
@@ -196,6 +196,10 @@ class TaxHost
 
   def clear!
     @need_to_be_selected_ids = @used_and_selected_ids = @used_ids = @selected_ids = @mismatches = @missing_ids = nil
+  end
+
+  def union_deep_hashes(h1, h2)
+    h1.merge!(h2) {|k, v1, v2| v1.kind_of?(Array) && v2.kind_of?(Array) ? (v1 | v2).uniq : v1 }
   end
 
 end
