@@ -23,7 +23,7 @@ module Taxonomix
     end
 
     def inner_select taxonomy
-      taxonomy_ids = Array.wrap(taxonomy).map(&:id).join(',')
+      taxonomy_ids = taxonomy.path_ids.join(',')
       "SELECT taxable_id from taxable_taxonomies WHERE taxable_type = '#{self.name}' AND taxonomy_id in (#{taxonomy_ids}) "
     end
 
@@ -60,6 +60,37 @@ module Taxonomix
                          end
     current_taxonomy = klass.current
     Taxonomy.enabled?(taxonomy) && current_taxonomy && !self.send(association).include?(current_taxonomy)
+  end
+
+  def used_location_ids
+    used_taxonomy_ids(:location_id)
+  end
+
+  def used_organization_ids
+    used_taxonomy_ids(:organization_id)
+  end
+
+  def used_or_selected_location_ids
+    (location_ids + used_location_ids).uniq
+  end
+
+  def used_or_selected_organization_ids
+    (organization_ids + used_organization_ids).uniq
+  end
+
+  protected
+
+  def taxonmy_foreign_key_conditions
+    if self.respond_to?(:taxonomy_foreign_conditions)
+      taxonomy_foreign_conditions
+    else
+      { "#{self.class.base_class.to_s.tableize.singularize}_id".to_sym => id }
+    end
+  end
+
+  def used_taxonomy_ids(type)
+    return [] if new_record?
+    Host::Base.where(taxonmy_foreign_key_conditions).pluck(type).uniq.compact
   end
 
 end

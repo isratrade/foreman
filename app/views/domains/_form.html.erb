@@ -1,4 +1,4 @@
-<%= form_for @domain, :url => (@domain.new_record? ? domains_path : domain_path(:id => @domain.id)) do |f| %>
+<%= form_for @domain do |f| %>
   <%= base_errors_for @domain %>
   <ul class="nav nav-tabs" data-tabs="tabs">
     <li class="active"><a href="#primary" data-toggle="tab"><%= _("Domain") %></a></li>
@@ -25,18 +25,7 @@
       <%= render "common_parameters/parameters", { :f => f, :type => :domain_parameters } %>
     </div>
 
-    <% if show_location_tab? %>
-      <div class="tab-pane" id="locations">
-        <%= multiple_checkboxes f, :locations, @domain, Location, :label => _("Locations") %>
-      </div>
-    <% end %>
-
-    <% if show_organization_tab? %>
-      <div class="tab-pane" id="organizations">
-        <%= multiple_checkboxes f, :organizations, @domain, Organization, {},
-          { :disabled => Array.wrap(Organization.current.try(:id)), :label => _("Organizations") } %>
-      </div>
-    <% end %>
+    <%= render 'taxonomies/loc_org_tabs', :f => f, :obj => @domain %>
 
   </div>
 

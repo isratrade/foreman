@@ -1,4 +1,6 @@
 module TaxonomyHelper
+  include AncestryHelper
+
   def show_location_tab?
     SETTINGS[:locations_enabled] && User.current.allowed_to?(:view_locations)
   end
@@ -76,6 +78,10 @@ module TaxonomyHelper
     is_location? ? hash_for_clone_location_path(:id => taxonomy) : hash_for_clone_organization_path(:id => taxonomy)
   end
 
+  def hash_for_nest_taxonomy_path(taxonomy)
+    is_location? ? hash_for_nest_location_path(taxonomy) : hash_for_nest_organization_path(taxonomy)
+  end
+
   def hash_for_taxonomy_path(taxonomy)
     is_location? ? hash_for_location_path(:id => taxonomy) : hash_for_organization_path(:id => taxonomy)
   end
@@ -115,7 +121,7 @@ module TaxonomyHelper
   def taxonomy_selects(f, selected_ids, taxonomy, label, options = {}, options_html = {})
     options[:disabled] = Array.wrap(options[:disabled]) + Array.wrap(taxonomy.current.try(:id))
     options[:label]    ||= _(label)
-    multiple_selects f, label.downcase, taxonomy, selected_ids, options, options_html
+    multiple_selects f, label.downcase, taxonomy, selected_ids, options, options_html, :label
   end
 
 end

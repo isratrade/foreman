@@ -7,8 +7,8 @@
       <li><%= link_to(_('Any Organization'), main_app.clear_organizations_path) %></li>
       <%= content_tag(:li, "", :class => "divider") %>
     <% end %>
-    <% Organization.my_organizations.each do |organization| %>
-      <li><%= link_to(organization.name, main_app.select_organization_path(organization)) %></li>
+    <% Organization.my_organizations.reorder(:label).each do |organization| %>
+      <li><%= link_to(organization.label, main_app.select_organization_path(organization)) %></li>
     <% end %>
   </ul>
 </li>

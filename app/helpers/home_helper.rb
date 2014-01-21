@@ -32,11 +32,11 @@ module HomeHelper
 
   def org_switcher_title
     title = if Organization.current && Location.current
-      Organization.current.to_label + "@" + Location.current.to_label
+      Organization.current.label + "@" + Location.current.label
     elsif Organization.current
-      Organization.current.to_label
+      Organization.current.label
     elsif Location.current
-      Location.current.to_label
+      Location.current.label
     else
       _("Any Context")
     end

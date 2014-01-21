@@ -1,6 +1,9 @@
 class Taxonomy < ActiveRecord::Base
   audited :allow_mass_assignment => true
   has_associated_audits
+  include NestedAncestryCommon
+
+  has_ancestry :orphan_strategy => :restrict
 
   serialize :ignore_types, Array
   validates :name, :presence => true, :uniqueness => {:scope => :type}
@@ -24,7 +27,8 @@ class Taxonomy < ActiveRecord::Base
   validate :check_for_orphans, :unless => Proc.new {|t| t.new_record?}
   before_validation :sanitize_ignored_types
 
-  delegate :import_missing_ids, :to => :tax_host
+  delegate :import_missing_ids, :inherited_ids, :used_and_selected_or_inherited_ids, :selected_or_inherited_ids,
+           :to => :tax_host
 
   def to_param
     "#{id.to_s.parameterize}"

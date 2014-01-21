@@ -5,9 +5,9 @@ module Foreman::Controller::TaxonomiesController
     before_filter :find_taxonomy, :only => %w{edit update destroy clone_taxonomy assign_hosts
                                             assign_selected_hosts assign_all_hosts step2 select}
     before_filter :count_nil_hosts, :only => %w{index create step2}
+    before_filter :avoid_duplicate_taxable, :only => :update
     skip_before_filter :authorize, :set_taxonomy, :only => %w{select clear}
   end
-
 
   def index
     begin
@@ -33,6 +33,12 @@ module Foreman::Controller::TaxonomiesController
       # we explicitly render here in order to evaluate the view without taxonomy scope
       render 'taxonomies/new'
     end
+  end
+
+  def nest
+    @taxonomy           = taxonomy_class.new
+    @taxonomy.parent_id = params[:id].to_i
+    render 'taxonomies/new'
   end
 
   # cannot name this method "clone" since Object has a clone method and the mixin doesn't overwrite it
@@ -71,7 +77,7 @@ module Foreman::Controller::TaxonomiesController
   def update
     result = Taxonomy.no_taxonomy_scope do
       (params[taxonomy_single.to_sym][:ignore_types] -= ["0"]) if params[taxonomy_single.to_sym][:ignore_types]
-      @taxonomy.update_attributes(params[taxonomy_single.to_sym])
+      @taxonomy.update_attributes(params[taxonomy_single])
     end
     if result
       process_success(:object => @taxonomy)
@@ -87,6 +93,9 @@ module Foreman::Controller::TaxonomiesController
     else
       process_error
     end
+  rescue Ancestry::AncestryException
+    flash[:error] = _('Cannot delete group %{current} because it has nested groups.') % { :current => @taxonomy.label }
+    process_error
   end
 
   def select
@@ -182,4 +191,16 @@ module Foreman::Controller::TaxonomiesController
     @count_nil_hosts = Host.where(taxonomy_id => nil).count
   end
 
+  def avoid_duplicate_taxable
+    # (-) minus operator to subtract elements of arrays. remove the inherited ids from params[:location] so new
+    # rows are not saved in taxable_taxonomies if the parent already has a row
+    # note: if inherited ids are saved in taxable_taxonomies for child, there is no negative effect.
+    # The inner_select in #with_taxonomy_scope
+    # params = {:location => {:domain_ids => [1,2,3], :subnet_ids => [] ..}
+    params[taxonomy_single].merge!(@taxonomy.inherited_ids) do |k, submitted_ids, inherited_ids|
+      return submitted_ids unless submitted_ids.kind_of?(Array) && inherited_ids.kind_of?(Array)
+      #submited_ids are an array of strings, so convert them to array of integers and remove [0] elements caused by ''.to_ = 0
+      submitted_ids.map(&:to_i) - inherited_ids - [0]
+    end
+  end
 end

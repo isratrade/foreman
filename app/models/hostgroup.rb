@@ -145,7 +145,6 @@ class Hostgroup < ActiveRecord::Base
   def lookup_value_match
     "hostgroup=#{to_label}"
   end
-
   def nested_root_pw
     Hostgroup.sort_by_ancestry(ancestors).reverse.each do |a|
       return a.root_pass unless a.root_pass.blank?
@@ -159,6 +158,12 @@ class Hostgroup < ActiveRecord::Base
 
   def remove_duplicated_nested_class
     self.puppetclasses -= ancestors.map(&:puppetclasses).flatten
+  end
+
+  # overwrite method in taxonomix, since hostgroup has ancestry
+  def used_taxonomy_ids(type)
+    return [] if new_record? && parent_id.blank?
+    Host::Base.where(:hostgroup_id => self.path_ids).pluck(type).compact.uniq
   end
 
 end

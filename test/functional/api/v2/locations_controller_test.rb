@@ -70,7 +70,7 @@ class Api::V2::LocationsControllerTest < ActionController::TestCase
     # ignore all but Domain
     @location.ignore_types = ["Hostgroup", "Environment", "User", "Medium", "Subnet", "SmartProxy", "ConfigTemplate", "ComputeResource"]
     @location.save(:validate => false)
-    assert_difference('@location.domains.count', 4) do
+    assert_difference('@location.domains.count', 2) do
       put :update, { :id => @location.to_param, :location => { :domain_ids => Domain.pluck(:id) } }
     end
     assert_response :success
