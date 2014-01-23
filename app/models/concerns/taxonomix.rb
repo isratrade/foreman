@@ -15,22 +15,46 @@ module Taxonomix
   end
 
   module ClassMethods
-    def with_taxonomy_scope
+
+    # default inner_method includes children (subtree_ids)
+    def with_taxonomy_scope(loc = Location.current, org = Organization.current, inner_method = :subtree_ids)
       scope =  block_given? ? yield : where('1=1')
-      scope = scope.where("#{self.table_name}.id in (#{inner_select(Location.current)}) #{user_conditions}") if SETTINGS[:locations_enabled] && Location.current && !Location.ignore?(self.to_s)
-      scope = scope.where("#{self.table_name}.id in (#{inner_select(Organization.current)}) #{user_conditions}") if SETTINGS[:organizations_enabled] and Organization.current && !Organization.ignore?(self.to_s)
+      if SETTINGS[:locations_enabled] && loc
+        inner_ids_loc = if Location.ignore?(self.to_s)
+                          self.pluck(:id)
+                        else
+                          inner_select(loc, inner_method)
+                        end
+      end
+      if SETTINGS[:organizations_enabled] && org
+        inner_ids_org = if Organization.ignore?(self.to_s)
+                          self.pluck(:id)
+                        else
+                          inner_select(org, inner_method)
+                        end
+      end
+      inner_ids   = inner_ids_loc & inner_ids_org if (inner_ids_loc && inner_ids_org)
+      inner_ids ||= inner_ids_loc if inner_ids_loc
+      inner_ids ||= inner_ids_org if inner_ids_org
+      # In the case of users we want the taxonomy scope to get both the users of the taxonomy and admins.
+      inner_ids << admin_ids if inner_ids && self == User
+      scope = scope.where(:id => inner_ids) if inner_ids
       scope.readonly(false)
     end
 
-    def inner_select taxonomy
-      taxonomy_ids = taxonomy.path_ids.join(',')
-      "SELECT taxable_id from taxable_taxonomies WHERE taxable_type = '#{self.name}' AND taxonomy_id in (#{taxonomy_ids}) "
+    # default inner_method includes parents (path_ids)
+    def with_taxonomy_scope_override(loc = nil, org = nil, inner_method = :path_ids)
+      with_taxonomy_scope(loc, org, inner_method)
     end
 
-    # I the case of users we want the taxonomy scope to get both the users of the taxonomy and admins.
-    # This is done here and not in the user class because scopes cannot be chained with OR condition.
-    def user_conditions
-      sanitize_sql_for_conditions([" OR users.admin = ?", true]) if self == User
+    def inner_select(taxonomy, inner_method)
+      # always include ancestor_ids in inner select
+      taxonomy_ids = (taxonomy.send(inner_method) + taxonomy.ancestor_ids).uniq
+      TaxableTaxonomy.where(:taxable_type => self.name, :taxonomy_id => taxonomy_ids).pluck(:taxable_id).compact.uniq
+    end
+
+    def admin_ids
+      User.unscoped.where(:admin => true).pluck(:id) if self == User
     end
   end
 

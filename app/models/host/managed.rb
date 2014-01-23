@@ -55,8 +55,8 @@ class Host::Managed < Host::Base
       org = Organization.current
       loc = Location.current
       conditions = {}
-      conditions[:organization_id] = org.path_ids if org
-      conditions[:location_id]     = loc.path_ids if loc
+      conditions[:organization_id] = org.subtree_ids if org
+      conditions[:location_id]     = loc.subtree_ids if loc
       where(conditions)
     }
 

@@ -572,11 +572,11 @@ class HostsController < ApplicationController
 
     if SETTINGS[:organizations_enabled]
       @organization ||= Organization.current
-      @organization ||= Organization.my_organizations.first
+      @organization ||= Organization.my_organizations.reorder(:label).first
     end
     if SETTINGS[:locations_enabled]
       @location ||= Location.current
-      @location ||= Location.my_locations.first
+      @location ||= Location.my_locations.reorder(:label).first
     end
   end
 
