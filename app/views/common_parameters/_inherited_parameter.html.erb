@@ -1,0 +1,17 @@
+<div class="fields">
+  <table class="row">
+  <tr class="form-group">
+    <td class="col-md-2">
+      <%= f.text_field(:name, :value => param.name, :class => "form-control", :disabled => true) %>
+    </td>
+    <td class="col-md-7">
+      <%= f.text_area(:value, :value => param.name, :class => "form-control", :rows => line_count(f, :value), :disabled => true) %>
+    </td>
+    <td class="col-md-1">
+    <span class="help-block">
+      <%= "Inherited" %>
+    </span>
+    </td>
+  </tr>
+  </table>
+</div>

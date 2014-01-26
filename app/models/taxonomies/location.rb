@@ -25,4 +25,12 @@ class Location < Taxonomy
     new
   end
 
+  def inherited_parameters
+    LocationParameter.where(:reference_id => ancestor_ids)
+  end
+
+  def selected_or_inherited_parameters
+    LocationParameter.where(:reference_id => path_ids)
+  end
+
 end

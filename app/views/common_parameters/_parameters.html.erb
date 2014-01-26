@@ -1,4 +1,9 @@
 <div id="parameters">
+  <% if ["locations", "organizations"].include?(controller_name) %>
+    <% f.object.inherited_parameters.each do |param| %>
+      <%= render("common_parameters/inherited_parameter", :f => f, :param => param) %>
+    <% end %>
+  <% end %>
   <%= f.fields_for type do |builder| %>
     <%= render "common_parameters/parameter", :f => builder %>
   <% end %>

@@ -340,7 +340,7 @@ class Host::Managed < Host::Base
     end
     if SETTINGS[:locations_enabled] && location
       # read location parameters
-      location.parameters.each {|p| hp.update Hash[p.name => include_source ? {:value => p.value, :source => N_('location').to_sym} : p.value] }
+      location.selected_or_inherited_parameters.each {|p| hp.update Hash[p.name => include_source ? {:value => p.value, :source => N_('location').to_sym} : p.value] }
     end
     # read domain parameters
     domain.domain_parameters.each {|p| hp.update Hash[p.name => include_source ? {:value => p.value, :source => N_('domain').to_sym} : p.value] } unless domain.nil?
