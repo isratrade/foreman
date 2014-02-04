@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  puppetclass_id: 1
+  puppet_group_id: 1
+
+two:
+  puppetclass_id: 1
+  puppet_group_id: 1
