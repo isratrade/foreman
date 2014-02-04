@@ -6,6 +6,9 @@ class Host::Managed < Host::Base
 
   has_many :host_classes, :dependent => :destroy, :foreign_key => :host_id
   has_many :puppetclasses, :through => :host_classes
+  has_many :host_puppet_groups, :foreign_key => :host_id
+  has_many :puppet_groups, :through => :host_puppet_groups
+  has_many :group_puppetclasses, :through => :puppet_groups, :source => :puppetclasses
   belongs_to :hostgroup
   has_many :reports, :dependent => :destroy, :foreign_key => :host_id
   has_many :host_parameters, :dependent => :destroy, :foreign_key => :reference_id
