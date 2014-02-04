@@ -5,6 +5,8 @@ class Subnet < ActiveRecord::Base
   audited :allow_mass_assignment => true
 
   before_destroy EnsureNotUsedBy.new(:hosts, :interfaces )
+  before_save :update_sort_network_id
+
   has_many_hosts
   has_many :hostgroups
   belongs_to :dhcp, :class_name => "SmartProxy"
@@ -129,9 +131,6 @@ class Subnet < ActiveRecord::Base
   end
 
   attr_accessor
-  def snetwork
-    IPAddr.new(network)
-  end
 
 #   def self.sort_networks
 #     a = []
@@ -150,9 +149,17 @@ class Subnet < ActiveRecord::Base
 # #    Subnet.unscoped.where(:id => ids)
 #   end
 
+  def snetwork
+    IPAddr.new(network)
+  end
+
+  def update_sort_network_id
+    self.sort_network_id = snetwork.to_i
+  end
+
   def self.sort_networks
     Subnet.all.sort do |a,b|
-      a.snetwork <=> b.snetwork
+      a.snetwork.to_i <=> b.snetwork.to_i
     end
   end
 
