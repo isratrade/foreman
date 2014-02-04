@@ -2,7 +2,11 @@ class SubnetsController < ApplicationController
   include Foreman::Controller::AutoCompleteSearch
 
   def index
+   if params[:search].blank? && params[:order].blank?
+     @subnets = Subnet.includes(:domains, :dhcp).sort_networks.paginate :page => params[:page]
+   else
     @subnets = Subnet.search_for(params[:search], :order => params[:order]).includes(:domains, :dhcp).paginate :page => params[:page]
+   end
   end
 
   def new

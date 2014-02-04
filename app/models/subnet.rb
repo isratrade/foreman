@@ -128,6 +128,34 @@ class Subnet < ActiveRecord::Base
     end.compact
   end
 
+  attr_accessor
+  def snetwork
+    IPAddr.new(network)
+  end
+
+#   def self.sort_networks
+#     a = []
+#     Subnet.scoped.each do |subnet|
+#       n = IPAddr.new(subnet.network)
+#       a << n
+#     end
+#     ids = []
+#     a.sort!.each do |ippr|
+#       sid = Subnet.find_by_network(ippr.to_s).id
+
+#       ids << sid
+#       #ids << "#{sid} - #{ippr.to_s}"
+#     end
+#     ids
+# #    Subnet.unscoped.where(:id => ids)
+#   end
+
+  def self.sort_networks
+    Subnet.all.sort do |a,b|
+      a.snetwork <=> b.snetwork
+    end
+  end
+
   private
 
   def validate_ranges
