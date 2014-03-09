@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  host: one (Host::Base)
+  config_group: one
+
+two:
+  host: one (Host::Base)
+  config_group: two
+
+three:
+  host: common (Hostgroup)
+  config_group: one

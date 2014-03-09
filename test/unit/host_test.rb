@@ -483,7 +483,7 @@ class HostTest < ActiveSupport::TestCase
     h = hosts(:one)
 
     pc = puppetclasses(:three)
-    h.puppetclasses << pc
+    h.puppetclasses_without_groups << pc
     assert !h.environment.puppetclasses.map(&:id).include?(pc.id)
     assert !h.valid?
     assert_equal ["#{pc} does not belong to the #{h.environment} environment"], h.errors[:puppetclasses]
@@ -492,7 +492,7 @@ class HostTest < ActiveSupport::TestCase
   test "when changing host environment, its puppet classes should be verified" do
     h = hosts(:two)
     pc = puppetclasses(:one)
-    h.puppetclasses << pc
+    h.puppetclasses_without_groups << pc
     assert h.save
     h.environment = environments(:testing)
     assert !h.save
@@ -782,7 +782,7 @@ class HostTest < ActiveSupport::TestCase
     assert_equal ['my5name.mydomain.net'], rundeck.keys
     assert_kind_of Hash, rundeck[h.name]
     assert_equal 'my5name.mydomain.net', rundeck[h.name]['hostname']
-    assert_equal ['class=base'], rundeck[h.name]['tags']
+    assert_equal ["class=auth", "class=base", "class=chkmk", "class=nagios", "class=pam"], rundeck[h.name]['tags']
   end
 
   test "#rundeck returns extra facts as tags" do

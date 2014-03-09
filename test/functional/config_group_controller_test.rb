@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class HostPuppetGroupTest < ActiveSupport::TestCase
+class ConfigGroupControllerTest < ActionController::TestCase
   # test "the truth" do
   #   assert true
   # end

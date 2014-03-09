@@ -6,9 +6,22 @@ class Host::Managed < Host::Base
 
   has_many :host_classes, :dependent => :destroy, :foreign_key => :host_id
   has_many :puppetclasses, :through => :host_classes
-  has_many :host_puppet_groups, :foreign_key => :host_id
-  has_many :puppet_groups, :through => :host_puppet_groups
-  has_many :group_puppetclasses, :through => :puppet_groups, :source => :puppetclasses
+
+  # Note, this causes the setter host.puppetclasses << not to work.  Instead, use host.puppetclasses_without_groups <<
+  def puppetclasses_with_groups
+    ids = (host_classes.pluck(:puppetclass_id) + config_group_classes.pluck(:puppetclass_id)).uniq
+    Puppetclass.where(:id => ids)
+  end
+  def puppetclass_ids_with_groups
+    puppetclass_ids_without_groups
+  end
+  def puppetclass_ids_with_groups=(value)
+    puppetclass_ids_without_groups = value
+  end
+  alias_method_chain :puppetclasses, :groups
+  alias_method_chain :puppetclass_ids, :groups
+
+
   belongs_to :hostgroup
   has_many :reports, :dependent => :destroy, :foreign_key => :host_id
   has_many :host_parameters, :dependent => :destroy, :foreign_key => :reference_id
@@ -796,7 +809,7 @@ class Host::Managed < Host::Base
       end
     end if SETTINGS[:unattended] and managed? and os and pxe_build?
 
-    puppetclasses.select("puppetclasses.id,puppetclasses.name").uniq.each do |e|
+    puppetclasses.select("puppetclasses.id, puppetclasses.name").uniq.each do |e|
       unless environment.puppetclasses.map(&:id).include?(e.id)
         errors.add(:puppetclasses, _("%{e} does not belong to the %{environment} environment") % { :e => e, :environment => environment })
         status = false

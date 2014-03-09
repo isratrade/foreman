@@ -6,7 +6,21 @@ function multiSelectOnLoad(){
   $('select[multiple]').each(function(i,item){
     $(item).multiSelect({
       selectableHeader: $("<div class='ms-header'>" + __('All items') + " <input placeholder='" + __('Filter') + "' class='ms-filter' type='text'><a href='#' title='" + __('Select All') + "' class='ms-select-all pull-right glyphicon glyphicon-plus icon-white'></a></div>"),
-      selectionHeader: $("<div class='ms-header'>" + __('Selected items') + "<a href='#' title='" + __('Deselect All') + "' class='ms-deselect-all pull-right glyphicon glyphicon-minus icon-white'></a></div>")
+      selectionHeader: $("<div class='ms-header'>" + __('Selected items') + "<a href='#' title='" + __('Deselect All') + "' class='ms-deselect-all pull-right glyphicon glyphicon-minus icon-white'></a></div>"),
+      afterSelect: function(values){
+        var pupetclasses =  $(item).children("option[value='"+ values +"']").attr('data-puppetclass_ids')
+        var pupetclasses_ids = $.parseJSON(pupetclasses);
+        $.each(pupetclasses_ids, function(index,pupetclasses_id){
+          add_puppet_class($("a[data-class-id='" + pupetclasses_id + "']"));
+        })
+    },
+      afterDeselect: function(values){
+        var pupetclasses =  $(item).children("option[value='"+ values +"']").attr('data-puppetclass_ids')
+        var pupetclasses_ids = $.parseJSON(pupetclasses);
+        $.each(pupetclasses_ids, function(index,pupetclasses_id){
+          remove_puppet_class($("a[data-class-id='" + pupetclasses_id + "']"));
+        })
+      }
     })
   });
   multiSelectToolTips();

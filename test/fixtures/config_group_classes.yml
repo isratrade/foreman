@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  puppetclass: five
+  config_group: one
+
+two:
+  puppetclass: six
+  config_group: one
+
+three:
+  puppetclass: seven
+  config_group: two
+
+four:
+  puppetclass: eight
+  config_group: two

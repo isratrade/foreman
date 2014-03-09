@@ -6,12 +6,12 @@
   <div class="col-md-4 classes">
     <h3><%= _('Included Classes') %></h3>
     <%# hidden field to ensure that classes gets removed if none are defined %>
-    <%= hidden_field_tag obj.class.model_name.downcase + "[puppetclass_ids][]" %>
+    <%= hidden_field_tag obj.class.model_name.tableize.singularize + "[puppetclass_ids][]" %>
     <ul id="selected_classes">
       <% if authorized_for(:controller => :host_editing, :action => :edit_classes) %>
         <%= render :partial => "puppetclasses/selectedClasses",
           :collection => obj.puppetclasses ,:as => :klass,
-          :locals => { :type => obj.class.model_name.downcase, :host => obj } %>
+          :locals => { :type => obj.class.model_name.tableize.singularize, :host => obj } %>
       <% else %>
         <% obj.puppetclasses.each do |klass| %>
           <li data-original-title="<%= _('Not authorized to edit classes') %>" rel="twipsy" ><%= h klass.name %></li>
@@ -26,6 +26,19 @@
   </div>
 
   <div class="col-md-8">
+    <% unless controller_name == 'config_groups' %>
+    <h4><%= _('Available Config Groups') %>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;
+        <%= _('Included Config Groups') %>
+    </h4>
+    <div class='clearfix'>
+      <div class='form-group'>
+        <%= f.select :config_group_ids, options_for_select(ConfigGroup.scoped.map{ |cg| [cg.name, cg.id, { 'data-puppetclass_ids' => cg.config_group_classes.pluck(:puppetclass_id).to_json }] },f.object.config_group_ids), {}, { :multiple => true, :label => _("Config groups") , :class => "form-control"} %>
+      </div>
+    </div>
+    <% end %>
+
     <h3><%= _('Available Classes') %></h3>
     <div class='clearfix'>
       <div class='form-group col-md-6'>
@@ -34,10 +47,10 @@
     </div>
     <div class="row">
       <%= render "puppetclasses/classes",
-        :puppetclasses => (obj.environment.blank? ? Puppetclass.all : obj.environment.puppetclasses),
+        :puppetclasses => (obj.environment.blank? ? Puppetclass.scoped : obj.environment.puppetclasses),
         :selected_puppet_classes => obj.all_puppetclasses,
         :obj => obj,
-        :type => obj.class.model_name.downcase
+        :type => obj.class.model_name.tableize.singularize
       %>
     </div>
   </div>

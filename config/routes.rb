@@ -146,6 +146,8 @@ Foreman::Application.routes.draw do
     end
   end
 
+  resources :config_groups, :except => [:show]
+
   resources :puppetclasses, :except => [:show] do
     collection do
       get 'import_environments'

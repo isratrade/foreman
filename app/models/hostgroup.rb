@@ -8,6 +8,21 @@ class Hostgroup < ActiveRecord::Base
   before_destroy EnsureNotUsedBy.new(:hosts)
   has_many :hostgroup_classes, :dependent => :destroy
   has_many :puppetclasses, :through => :hostgroup_classes
+
+  # Note, this causes the setter host.puppetclasses << not to work.  Instead, use host.puppetclasses_without_groups <<
+  def puppetclasses_with_groups
+    ids = (hostgroup_classes.pluck(:puppetclass_id) + config_group_classes.pluck(:puppetclass_id)).uniq
+    Puppetclass.where(:id => ids)
+  end
+  def puppetclass_ids_with_groups
+    puppetclass_ids_without_groups
+  end
+  def puppetclass_ids_with_groups=(value)
+    puppetclass_ids_without_groups = value
+  end
+  alias_method_chain :puppetclasses, :groups
+  alias_method_chain :puppetclass_ids, :groups
+
   has_many :user_hostgroups, :dependent => :destroy
   has_many :users, :through => :user_hostgroups
   validates :name, :format => { :with => /\A(\S+\s?)+\Z/, :message => N_("can't be blank or contain trailing white spaces.")}
@@ -79,7 +94,11 @@ class Hostgroup < ActiveRecord::Base
   end
 
   def classes
-    Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+   # changes since this returned Array and couldn't recorder or .pluck on it
+   #(Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids}) + group_puppetclasses).uniq
+   ids = Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids}).pluck(:id) +
+         config_group_classes.pluck(:puppetclass_id)
+   Puppetclass.where(:id => ids.uniq)
   end
 
   def puppetclass_ids
