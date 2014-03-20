@@ -45,7 +45,7 @@
   <div class="col-md-8">
     <h3>
       <%= _('Available Classes') %>
-      <a ng-click="toggleExpandAll()" class='btn btn-default btn-sm'>{{ is_collapse_all ? 'Expand' : 'Collapse' }} </a>
+      <a ng-click="toggleExpandAll()" class='btn btn-default btn-sm'>{{ is_collapse_all ? 'Expand All' : 'Collapse All' }} </a>
       <span class="label label-success">{{ availablePuppetClasses.length }}</span>
     </h3>
 
@@ -55,21 +55,22 @@
       </div>
     </div>
 
+<!-- '!is_collapse || !is_collapse_all || (search.name.length > 0)' -->
     <div class="row">
       <div class="col-md-6 classes">
         <ul class="puppetclass_group">
           <div data-ng-repeat-start="(module_name,available_puppetclasses) in availablePuppetClassesByModule">
-            <a data-ng-click='is_collapse = !is_collapse' ng-hide='search.name.length > 0'>
+            <a data-ng-click='toggleExpand(module_name)' ng-hide='search.name.length > 0'>
                <%= image_tag("bullet_toggle_plus.png") %>
                {{ module_name }}
             </a>
           </div>
-              <li data-ng-repeat="puppetclass in available_puppetclasses | filter:search | orderBy:'name'" data-ng-show='!is_collapse || !is_collapse_all || (search.name.length > 0)'>
+              <li data-ng-repeat="puppetclass in available_puppetclasses | filter:search | orderBy:'name'" data-ng-show='!collapedModules[module_name].is_collapse || (search.name.length > 0)'>
                 <ul>
                 <% unless authorized_for(:controller => :host_editing, :action => :edit_classes) %>
                   <li data-original-title="<%= _('Not authorized to edit classes') %>" rel="twipsy">{{ puppetclass.name }}</li>
                 <% else %>
-                  <li class="puppetclass">
+                  <li class="puppetclass" data-ng-show='!collapedModules[module_name].is_collapse || (search.name.length > 0)'>
                     <span>
                       <a data-ng-click="addPuppetclass(puppetclass)" data-original-title="Click to add puppetclass.name" rel="twipsy"
                          data-type="hostgroup">

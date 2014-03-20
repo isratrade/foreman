@@ -109,8 +109,12 @@ app.controller('hostgroupController', ['$scope', '$location', '$resource', 'host
                                   $scope.apiPuppetClassesInherited.$promise,
                                   $scope.apiPuppetClassesAvailable.$promise
                                  ]);
+    $scope.collapedModules = {};
     pupetclassLists.then(function() {
       $scope.availablePuppetClassesByModule = _.groupBy($scope.availablePuppetClasses, 'module_name');
+      angular.forEach($scope.availablePuppetClassesByModule, function (v,k) {
+        $scope.collapedModules[k] = {is_collapse: true}
+      });
     });
   }
 
@@ -128,19 +132,17 @@ app.controller('hostgroupController', ['$scope', '$location', '$resource', 'host
     $scope.availablePuppetClassesByModule = _.groupBy($scope.availablePuppetClasses, 'module_name');
   };
 
-  $scope.is_collapse_all = true
-  $scope.is_collapse     = true
-
-  $scope.toggleExpandAll = function (puppetclass) {
+  $scope.is_collapse_all = true;
+  $scope.toggleExpandAll = function () {
     $scope.is_collapse_all = !$scope.is_collapse_all
-    //TODO it doesn't change each child scope created by ng-repeat
-    $scope.is_collapse = !$scope.is_collapse
+    angular.forEach($scope.availablePuppetClassesByModule, function (v,k) {
+      $scope.collapedModules[k].is_collapse = $scope.is_collapse_all
+    });
   };
 
-  // THIS CHANGES ALL so I moved function include ng-click
-  // $scope.toggleExpand = function (puppetclass) {
-  //   $scope.is_collapse = !$scope.is_collapse
-  // };
+  $scope.toggleExpand = function (module_name) {
+    $scope.collapedModules[module_name].is_collapse = !$scope.collapedModules[module_name].is_collapse;
+  };
 
 
 
