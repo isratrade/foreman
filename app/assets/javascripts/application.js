@@ -16,6 +16,7 @@
 //= require angular
 //= require angular-resource
 //= require underscore
+//= require app
 
 $(document).on('ContentLoad', function(){onContentLoad()});
 
