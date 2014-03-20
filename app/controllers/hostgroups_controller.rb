@@ -55,7 +55,6 @@ class HostgroupsController < ApplicationController
   end
 
   def edit
-    load_vars_for_ajax
   end
 
   def update

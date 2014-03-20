@@ -101,6 +101,22 @@ class Hostgroup < ActiveRecord::Base
    Puppetclass.where(:id => ids.uniq)
   end
 
+  def inherited_puppetclasses
+   # same as method #classes but path_ids changed to ancestor_ids
+   ids = Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => ancestor_ids}).pluck(:id) +
+         config_group_classes.pluck(:puppetclass_id)
+   Puppetclass.where(:id => ids.uniq)
+  end
+
+  def added_puppetclasses
+    self.puppetclasses
+  end
+
+  def available_puppetclasses(env_id = environment_id)
+    Puppetclass.includes(:environment_classes).where('environment_classes.environment_id' => env_id).
+                where("puppetclasses.id NOT IN (#{classes.map(&:id).join(',')})")
+  end
+
   def puppetclass_ids
     classes.reorder('').pluck('puppetclasses.id')
   end

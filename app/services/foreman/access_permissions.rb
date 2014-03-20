@@ -472,7 +472,7 @@ Foreman::AccessControl.map do |map|
   map.security_block :puppetclasses do |map|
     map.permission :view_puppetclasses,    {:puppetclasses => [:index, :show, :auto_complete_search],
                                           :"api/v1/puppetclasses" => [:index, :show],
-                                          :"api/v2/puppetclasses" => [:index, :show],
+                                          :"api/v2/puppetclasses" => [:index, :show, :available, :added, :inherited],
                                           :"api/v1/lookup_keys" => [:index, :show],
                                           :"api/v2/smart_variables" => [:index, :show],
                                           :"api/v2/smart_class_parameters" => [:index, :show],

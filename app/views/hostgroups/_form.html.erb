@@ -1,5 +1,14 @@
-<%= javascript 'host_edit' %>
-<%= form_for @hostgroup, :html => {:data => {:id => @hostgroup.try(:id)}} do |f| %>
+<%= form_for @hostgroup, :html => {:data => {:id => @hostgroup.try(:id), :'hostgroup-form' => @hostgroup.id || 0 }} do |f| %>
+
+<div ng-init="hostgroupId='<%= @hostgroup.id %>';">
+</div>
+
+<div data-ng-controller='hostgroupController'>
+<!--   {{ hostgroupId }} -->
+<!--   <pre>
+    {{ addedPuppetClasses }}
+ </pre> -->
+
   <%= base_errors_for @hostgroup %>
 
   <ul class="nav nav-tabs" data-tabs="tabs">
@@ -25,14 +34,31 @@
                       :onchange => 'hostgroup_changed(this);', :'data-url'=> process_hostgroup_hostgroups_path,
                       :disabled => !@hostgroup.new_record?,
                       :help_inline => :indicator } %>
-      <%= text_f f, :name %>
+      <%= text_f f, :name, :'data-ng-model' => 'hostgroup.name' %>
       <%= select_f f, :environment_id, Environment.all, :id, :to_label, {:include_blank => blank_or_inherit_f(f, :environment)},
-        {:label => _("Environment"), :onchange => 'update_puppetclasses(this);', :"data-url" => environment_selected_hostgroups_path} %>
+        {:label => _("Environment"),
+         :'data-ng-model' => 'hostgroup.environment',
+         :'data-ng-options' => 'env.name for env in environments',
+         :'data-ng-change' => 'environmentChanged()'
+          } %>
+      <%= f.hidden_field :environment_id, :value => "{{ hostgroup.environment.id }}" %>
+<!--
+c.value as c.label for c in countries
+env.id as env.name for env in environments
+key as value for (key,value) in environments
+ -->
       <%= select_f(f, :compute_profile_id, ComputeProfile.visibles, :id, :name,
                        { :include_blank => blank_or_inherit_f(f, :compute_profile) },
-                       { :label => _("Compute profile") }
+                       { :label => _("Compute profile"),
+                         :'data-ng-model' => 'hostgroup.compute_profile',
+                         :'data-ng-options' => 'cp.name for cp in compute_profiles'
+                       }
                   ) if ComputeProfile.visibles.any? %>
+      <%= f.hidden_field :compute_profile_id, :value => "{{ hostgroup.compute_profile.id }}" %>
+
       <%= puppet_master_fields f %>
+      <%= f.hidden_field :puppet_ca_proxy_id, :value => "{{ hostgroup.puppet_ca_proxy.id }}" %>
+      <%= f.hidden_field :puppet_proxy_id, :value => "{{ hostgroup.puppet_proxy.id }}" %>
     </div>
 
     <div class="tab-pane" id="puppet_klasses">
@@ -49,7 +75,7 @@
 
     <div class="tab-pane" id="os">
       <%= render "common/os_selection/initial", :item=> @hostgroup %>
-      <%= password_f f, :root_pass %>
+      <%= password_f f, :root_pass, :'data-ng-model' => 'hostgroup.root_pass' %>
     </div>
 
     <div class="tab-pane" id="params">
@@ -65,6 +91,6 @@
 
     <%= render 'taxonomies/loc_org_tabs', :f => f, :obj => @hostgroup %>
   </div>
-
   <%= submit_or_cancel f %>
+</div>
 <% end %>
