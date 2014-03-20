@@ -13,6 +13,9 @@
 //= require jquery.extentions
 //= require jquery.multi-select
 //= require settings
+//= require angular
+//= require angular-resource
+//= require underscore
 
 $(document).on('ContentLoad', function(){onContentLoad()});
 
