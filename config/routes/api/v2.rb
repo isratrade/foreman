@@ -62,6 +62,13 @@ Foreman::Application.routes.draw do
         end
         resources :puppetclasses, :except => [:new, :edit]
         resources :hostgroup_classes, :path => :puppetclass_ids, :only => [:index, :create, :destroy]
+        resources :environments, :only => [] do
+          resources :puppetclasses, :only => [] do
+            get :available, :on => :collection
+            get :added, :on => :collection
+            get :inherited, :on => :collection
+          end
+        end
       end
 
       resources :media, :except => [:new, :edit] do
@@ -149,6 +156,7 @@ Foreman::Application.routes.draw do
       end
 
       resources :template_kinds, :only => [:index]
+      resources :compute_profiles, :only => [:index]
 
       resources :template_combinations, :only => [:show, :destroy]
 

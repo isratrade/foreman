@@ -3,3 +3,7 @@ object @domain
 extends "api/v2/domains/base"
 
 attributes :fullname, :dns_id, :created_at, :updated_at
+
+child :subnets do
+  extends "api/v2/subnets/base"
+end

@@ -6,7 +6,8 @@ module Api
       include Api::TaxonomyScope
 
       before_filter :find_resource, :only => %w{show update destroy}
-      before_filter :find_optional_nested_object, :only => [:index, :show]
+      before_filter :find_optional_nested_object, :only => [:index, :show, :available, :added, :inherited]
+      layout 'api/v2/layouts/index_layout', :only => [:index, :available, :added, :inherited]
 
       api :GET, "/puppetclasses/", "List all puppetclasses."
       api :GET, "/hosts/:host_id/puppetclasses", "List all puppetclasses for host"
@@ -37,8 +38,55 @@ module Api
                        nested_obj.puppetclasses.count
                    end
         @subtotal = values.count
-        @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+        if params[:style] == 'list'
+          @puppetclasses = values
+          render :list
+        else
+          @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+          render :index
+        end
       end
+
+      def available
+        values ||= nested_obj.available_puppetclasses(params[:environment_id]).search_for(*search_options)
+        @total   = nested_obj.available_puppetclasses(params[:environment_id]).count
+        @subtotal = values.count
+        @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+        if params[:style] == 'list'
+          @puppetclasses = values
+          render :list
+        else
+          @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+          render :index
+        end
+      end
+
+      def added
+        values ||= nested_obj.added_puppetclasses.search_for(*search_options)
+        @total   = nested_obj.added_puppetclasses.count
+        @subtotal = values.count
+        if params[:style] == 'list'
+          @puppetclasses = values
+          render :list
+        else
+          @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+          render :index
+        end
+      end
+
+      def inherited
+        values ||= nested_obj.inherited_puppetclasses.search_for(*search_options)
+        @total   = nested_obj.inherited_puppetclasses.count
+        @subtotal = values.count
+        if params[:style] == 'list'
+          @puppetclasses = values
+          render :list
+        else
+          @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+          render :index
+        end
+      end
+
 
       api :GET, "/puppetclasses/:id", "Show a puppetclass"
       api :GET, "/hosts/:host_id/puppetclasses/:id", "Show a puppetclass for host"
