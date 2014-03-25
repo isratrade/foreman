@@ -7,7 +7,11 @@
 <!--   {{ hostgroupId }} -->
 <!--   <pre>
     {{ addedPuppetClasses }}
+ </pre>
+ --><!--   <pre>
+    {{ includedConfigGroups }}
  </pre> -->
+
 
   <%= base_errors_for @hostgroup %>
 
@@ -59,6 +63,11 @@ key as value for (key,value) in environments
       <%= puppet_master_fields f %>
       <%= f.hidden_field :puppet_ca_proxy_id, :value => "{{ hostgroup.puppet_ca_proxy.id }}" %>
       <%= f.hidden_field :puppet_proxy_id, :value => "{{ hostgroup.puppet_proxy.id }}" %>
+
+   <pre>
+    {{ hostgroup }}
+   </pre>
+
     </div>
 
     <div class="tab-pane" id="puppet_klasses">

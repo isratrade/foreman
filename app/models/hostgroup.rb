@@ -11,7 +11,7 @@ class Hostgroup < ActiveRecord::Base
 
   # Note, this causes the setter host.puppetclasses << not to work.  Instead, use host.puppetclasses_without_groups <<
   def puppetclasses_with_groups
-    ids = (hostgroup_classes.pluck(:puppetclass_id) + config_group_classes.pluck(:puppetclass_id)).uniq
+    ids = hostgroup_classes.pluck(:puppetclass_id)
     Puppetclass.where(:id => ids)
   end
   def puppetclass_ids_with_groups
@@ -103,13 +103,18 @@ class Hostgroup < ActiveRecord::Base
 
   def inherited_puppetclasses
    # same as method #classes but path_ids changed to ancestor_ids
-   ids = Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => ancestor_ids}).pluck(:id) +
-         config_group_classes.pluck(:puppetclass_id)
+   ids = Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => ancestor_ids}).pluck(:id)
+   Puppetclass.where(:id => ids.uniq)
+  end
+
+  def grouped_puppetclasses
+   # same as method #classes but path_ids changed to ancestor_ids
+   ids = config_group_classes.pluck(:puppetclass_id)
    Puppetclass.where(:id => ids.uniq)
   end
 
   def added_puppetclasses
-    self.puppetclasses
+    self.puppetclasses_without_groups
   end
 
   def available_puppetclasses(env_id = environment_id)

@@ -67,6 +67,7 @@ Foreman::Application.routes.draw do
             get :available, :on => :collection
             get :added, :on => :collection
             get :inherited, :on => :collection
+            get :config_grouped, :on => :collection
           end
         end
       end
@@ -157,6 +158,7 @@ Foreman::Application.routes.draw do
 
       resources :template_kinds, :only => [:index]
       resources :compute_profiles, :only => [:index]
+      resources :config_groups, :only => [:index]
 
       resources :template_combinations, :only => [:show, :destroy]
 

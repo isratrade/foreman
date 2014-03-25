@@ -6,8 +6,8 @@ module Api
       include Api::TaxonomyScope
 
       before_filter :find_resource, :only => %w{show update destroy}
-      before_filter :find_optional_nested_object, :only => [:index, :show, :available, :added, :inherited]
-      layout 'api/v2/layouts/index_layout', :only => [:index, :available, :added, :inherited]
+      before_filter :find_optional_nested_object, :only => [:index, :show, :available, :added, :inherited, :config_grouped]
+      layout 'api/v2/layouts/index_layout', :only => [:index, :available, :added, :inherited, :config_grouped]
 
       api :GET, "/puppetclasses/", "List all puppetclasses."
       api :GET, "/hosts/:host_id/puppetclasses", "List all puppetclasses for host"
@@ -77,6 +77,19 @@ module Api
       def inherited
         values ||= nested_obj.inherited_puppetclasses.search_for(*search_options)
         @total   = nested_obj.inherited_puppetclasses.count
+        @subtotal = values.count
+        if params[:style] == 'list'
+          @puppetclasses = values
+          render :list
+        else
+          @puppetclasses = Puppetclass.classes2hash_v2(values.paginate(paginate_options))
+          render :index
+        end
+      end
+
+      def config_grouped
+        values ||= nested_obj.grouped_puppetclasses.search_for(*search_options)
+        @total   = nested_obj.grouped_puppetclasses.count
         @subtotal = values.count
         if params[:style] == 'list'
           @puppetclasses = values

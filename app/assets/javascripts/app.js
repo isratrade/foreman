@@ -8,7 +8,8 @@ app.factory('puppetclassesFactory', ['$resource', function($resource) {
   return {
       Added:     $resource("/api/v2/hostgroups/:Id/environments/:envId/puppetclasses/added",     {Id: "@Id", envId: "@envId"}),
       Inherited: $resource("/api/v2/hostgroups/:Id/environments/:envId/puppetclasses/inherited", {Id: "@Id", envId: "@envId"}),
-      Available: $resource("/api/v2/hostgroups/:Id/environments/:envId/puppetclasses/available", {Id: "@Id", envId: "@envId"})
+      Available: $resource("/api/v2/hostgroups/:Id/environments/:envId/puppetclasses/available", {Id: "@Id", envId: "@envId"}),
+      Grouped: $resource("/api/v2/hostgroups/:Id/environments/:envId/puppetclasses/config_grouped", {Id: "@Id", envId: "@envId"})
   };
 }]);
 
@@ -61,13 +62,18 @@ app.controller('hostgroupController', ['$scope', '$location', '$resource', 'host
        $scope.compute_profiles = response.results;
   });
 
+  $scope.apiConfigGroups = $resource('/api/v2/config_groups',{per_page: 10000}).get();
+  $scope.apiConfigGroups.$promise.then(function (response) {
+       $scope.config_groups = response.results;
+  });
+
   $scope.hostgroup = {};
   $scope.hostgroup = hostgroupFactory.get({'Id': $scope.hostgroupId});
 
   var pickLists = $q.all([$scope.apiEnvironments.$promise, $scope.apiSubnets.$promise, $scope.apiDomains.$promise,
                           $scope.apiSmartProxies.$promise,   $scope.apiArchitectures.$promise, $scope.apiOperatingsystems.$promise,
                           $scope.apiMedia.$promise, $scope.apiPtables.$promise, $scope.apiComputeProfiles.$promise,
-                          $scope.hostgroup.$promise
+                          $scope.hostgroup.$promise, $scope.apiConfigGroups.$promise
                          ]);
 
   pickLists.then(function() {
@@ -105,9 +111,15 @@ app.controller('hostgroupController', ['$scope', '$location', '$resource', 'host
        $scope.availablePuppetClasses = response.results;
     });
 
+    $scope.apiPuppetClassesGrouped = puppetclassesFactory.Grouped.get({Id: $scope.hostgroupId, envId: $scope.hostgroup.environment.id, per_page: 10000, style: 'list'});
+    $scope.apiPuppetClassesGrouped.$promise.then(function (response) {
+       $scope.groupedPuppetClasses = response.results;
+    });
+
     var pupetclassLists = $q.all([$scope.apiPuppetClassesAdded.$promise,
                                   $scope.apiPuppetClassesInherited.$promise,
-                                  $scope.apiPuppetClassesAvailable.$promise
+                                  $scope.apiPuppetClassesAvailable.$promise,
+                                  $scope.apiPuppetClassesGrouped.$promise,
                                  ]);
     $scope.collapedModules = {};
     pupetclassLists.then(function() {
@@ -116,6 +128,18 @@ app.controller('hostgroupController', ['$scope', '$location', '$resource', 'host
         $scope.collapedModules[k] = {is_collapse: true}
       });
     });
+
+    $scope.includedConfigGroups = {};
+    $scope.apiConfigGroupsAdded = $scope.hostgroup.config_groups;
+    // initial all to false
+    angular.forEach($scope.config_groups, function (k) {
+      $scope.includedConfigGroups[k.name] = false;
+    });
+    // change GroupsAdded to true
+    angular.forEach($scope.apiConfigGroupsAdded, function (k) {
+      $scope.includedConfigGroups[k.name] = true;
+    });
+
   }
 
   $scope.addPuppetclass = function (puppetclass) {
@@ -145,7 +169,51 @@ app.controller('hostgroupController', ['$scope', '$location', '$resource', 'host
   };
 
 
+  $scope.addConfigGroup = function (config_group) {
+    $scope.apiConfigGroupsAdded.push(config_group);
+    $scope.includedConfigGroups[config_group.name] = true;
+    zerooutPuppetclassesAddedFromGroup(config_group);
+    addPuppetclassesFromGroup(config_group);
+  };
 
+  $scope.removeConfigGroup = function (config_group) {
+    $scope.apiConfigGroupsAdded.splice(config_group.name,1);
+    $scope.includedConfigGroups[config_group.name] = false;
+    removePuppetclassesFromGroup(config_group);
+  };
+
+  function zerooutPuppetclassesAddedFromGroup(config_group) {
+    angular.forEach(config_group.puppetclasses, function (pc) {
+      //if (_.contains($scope.addedPuppetClasses, pc)) {
+        $scope.removePuppetclass(pc);
+      //}
+    });
+  }
+
+  function addPuppetclassesFromGroup(config_group) {
+    angular.forEach(config_group.puppetclasses, function (pc) {
+      $scope.groupedPuppetClasses.push(pc);
+      //if (_.contains($scope.availablePuppetClasses, pc)) {
+        $scope.availablePuppetClasses.splice(pc,1);
+        $scope.availablePuppetClassesByModule = _.groupBy($scope.availablePuppetClasses, 'module_name');
+      //}
+    });
+  }
+
+  function removePuppetclassesFromGroup(config_group) {
+    angular.forEach(config_group.puppetclasses, function (pc) {
+      $scope.groupedPuppetClasses.splice(config_group, 1);
+      //if (_.contains($scope.availablePuppetClasses, pc)) {
+        $scope.availablePuppetClasses.push(pc);
+        $scope.availablePuppetClassesByModule = _.groupBy($scope.availablePuppetClasses, 'module_name');
+      //}
+    });
+  }
+
+
+  // $scope.includedConfigGroupo
+  // $scope.addConfigGroup = function (config_group) {
+  //   config_group.
   // app.directive('hostgroupForm', function($http) {
   //   return {
   //     restrict: 'A',

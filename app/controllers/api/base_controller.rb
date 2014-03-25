@@ -269,7 +269,7 @@ module Api
         'edit'
       when 'destroy'
         'destroy'
-      when 'index', 'show', 'status', 'available', 'added', 'inherited'
+      when 'index', 'show', 'status', 'available', 'added', 'inherited', 'config_grouped'
         'view'
       else
         raise ::Foreman::Exception.new(N_("unknown permission for %s"), "#{params[:controller]}##{params[:action]}")

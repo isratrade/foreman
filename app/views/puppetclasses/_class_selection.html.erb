@@ -3,51 +3,56 @@
     <%= alert :class => "alert-block alert-danger base in fade",
               :text => obj.errors[:puppetclasses].map { |e| "<li>#{e}</li>" }.to_s.html_safe %>
   <% end %>
-  <div class="col-md-4 classes">
-    <h3>
-      <%= _('Included Classes') %>
-      <span class="label label-primary">{{ addedPuppetClasses.length + inheritedPuppetClasses.length }}</span>
-    </h3>
-    <%= hidden_field_tag obj.class.model_name.tableize.singularize + "[puppetclass_ids][]" %>
 
-    <ul id="selected_classes">
-      <% if authorized_for(:controller => :host_editing, :action => :edit_classes) %>
-          <li data-original-title="<%= _('Not authorized to edit classes') %>" rel="twipsy"
-              data-ng-repeat="puppetclass in addedPuppetClasses | orderBy:'name'"
-              class="selected_puppetclass even">
-                <span>
-                   <a data-original-title="Click to undo adding this class" rel="twipsy" ng-click="removePuppetclass(puppetclass)">
-                  {{ puppetclass.name }}
-                  </a>
-                </span>
-                <a class="glyphicon glyphicon-minus-sign" data-original-title="Click to undo adding this class"  rel="twipsy"
-                   ng-click="removePuppetclass(puppetclass)">
-                </a>
-                <%= hidden_field_tag "#{obj.class.model_name.tableize.singularize}[puppetclass_ids][]",
-                        "{{ puppetclass.id }}" %>
-          </li>
-      <% else %>
-        <% obj.puppetclasses.each do |klass| %>
-          <li data-original-title="<%= _('Not authorized to edit classes') %>" rel="twipsy" >
-            <%= h klass.name %></li>
-        <% end %>
-      <% end %>
-    </ul>
+  <div class="col-md-5">
 
-    <ul>
-        <li data-original-title="<%= _('included already from parent') %>" rel="twipsy" style='color:black;'
-            data-ng-repeat="puppetclass in inheritedPuppetClasses | orderBy:'name' ">
-                  {{ puppetclass.name }}
-        </li>
-    </ul>
-  </div>
-
-  <div class="col-md-8">
     <h3>
       <%= _('Available Classes') %>
+    </h3>
+    <h4>
+      <%= _('Config Groups') %>
+      <span class="label label-success">{{ config_groups.length - apiConfigGroupsAdded.length }}</span>
+    </h4>
+    <%= hidden_field_tag obj.class.model_name.tableize.singularize + "[config_group_ids][]" %>
+    <div class='clearfix'>
+      <div class='form-group col-md-6'>
+        <input placeholder="<%= _('Filter groups') %>" class="form-control" data-ng-model='search_group.name' type='text'>
+      </div>
+    </div>
+
+    <div data-ng-repeat="config_group in config_groups | filter:search_group">
+      <div class="row" style='padding-bottom:5px'>
+        <div class="col-md-4" style='border-bottom: 1px solid #eee'>
+           <a ng-click="expand_group = !expand_group">
+            {{ config_group.name }}
+           </a>
+           <div data-ng-repeat='puppetclass in config_group.puppetclasses' data-ng-show='expand_group'>
+             {{ puppetclass.name }}
+           </div>
+        </div>
+        <div class="col-md-2">
+          <a data-ng-click='addConfigGroup(config_group)'
+             class='btn btn-primary btn-sm glyphicon glyphicon-plus-sign'
+             data-ng-hide='includedConfigGroups[config_group.name]'>
+             Include
+          </a>
+          <a data-ng-click='removeConfigGroup(config_group)'
+             class='btn btn-default btn-sm glyphicon glyphicon-minus-sign'
+             data-ng-show='includedConfigGroups[config_group.name]'>
+             Exclude
+          </a>
+          <%= hidden_field_tag "#{obj.class.model_name.tableize.singularize}[config_group_ids][]",
+                  "{{ includedConfigGroups[config_group.name] ? config_group.id : null}}" %>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+    <h4>
+      <%= _('Individual Classes') %>
       <a ng-click="toggleExpandAll()" class='btn btn-default btn-sm'>{{ is_collapse_all ? 'Expand All' : 'Collapse All' }} </a>
       <span class="label label-success">{{ availablePuppetClasses.length }}</span>
-    </h3>
+    </h4>
 
     <div class='clearfix'>
       <div class='form-group col-md-6'>
@@ -90,6 +95,66 @@
     </div>
 
   </div>
+
+  <div class="col-md-4 classes">
+    <h3>
+      <%= _('Included Classes') %>
+      <span class="label label-primary">{{ addedPuppetClasses.length + groupedPuppetClasses.length + inheritedPuppetClasses.length }}</span>
+    </h3>
+    <%= hidden_field_tag obj.class.model_name.tableize.singularize + "[puppetclass_ids][]" %>
+
+    <h4>
+      <%= _('Individuallly Added') %>
+      <span class="label label-info">{{ addedPuppetClasses.length }}</span>
+    </h4>
+    <ul id="selected_classes">
+      <% if authorized_for(:controller => :host_editing, :action => :edit_classes) %>
+          <li data-original-title="<%= _('Not authorized to edit classes') %>" rel="twipsy"
+              data-ng-repeat="puppetclass in addedPuppetClasses | orderBy:'name'"
+              class="selected_puppetclass even">
+                <span>
+                   <a data-original-title="Click to undo adding this class" rel="twipsy" ng-click="removePuppetclass(puppetclass)">
+                  {{ puppetclass.name }}
+                  </a>
+                </span>
+                <a class="glyphicon glyphicon-minus-sign" data-original-title="Click to undo adding this class"  rel="twipsy"
+                   ng-click="removePuppetclass(puppetclass)">
+                </a>
+                <%= hidden_field_tag "#{obj.class.model_name.tableize.singularize}[puppetclass_ids][]",
+                        "{{ puppetclass.id }}" %>
+          </li>
+      <% else %>
+        <% obj.puppetclasses.each do |klass| %>
+          <li data-original-title="<%= _('Not authorized to edit classes') %>" rel="twipsy" >
+            <%= h klass.name %></li>
+        <% end %>
+      <% end %>
+    </ul>
+
+    <hr />
+    <h4>
+      <%= _('Included in Config Group') %>
+      <span class="label label-info">{{ groupedPuppetClasses.length }}</span>
+    </h4>    <ul>
+        <li data-original-title="<%= _('included already from parent') %>" rel="twipsy" style='color:black;'
+            data-ng-repeat="puppetclass in groupedPuppetClasses | orderBy:'name' ">
+                  {{ puppetclass.name }}
+        </li>
+    </ul>
+
+    <hr />
+    <h4>
+      <%= _('Inherited from Parent') %>
+      <span class="label label-info">{{ inheritedPuppetClasses.length }}</span>
+    </h4>
+    <ul>
+        <li data-original-title="<%= _('included already from parent') %>" rel="twipsy" style='color:black;'
+            data-ng-repeat="puppetclass in inheritedPuppetClasses | orderBy:'name' ">
+                  {{ puppetclass.name }}
+        </li>
+    </ul>
+  </div>
+
 </div>
 
 
