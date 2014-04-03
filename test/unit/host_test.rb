@@ -844,7 +844,7 @@ class HostTest < ActiveSupport::TestCase
     assert_equal ['my5name.mydomain.net'], rundeck.keys
     assert_kind_of Hash, rundeck[h.name]
     assert_equal 'my5name.mydomain.net', rundeck[h.name]['hostname']
-    assert_equal ['class=base'], rundeck[h.name]['tags']
+    assert_equal ["class=auth", "class=base", "class=chkmk", "class=nagios", "class=pam"], rundeck[h.name]['tags']
   end
 
   test "#rundeck returns extra facts as tags" do

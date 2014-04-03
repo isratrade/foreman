@@ -1,0 +1,5 @@
+<%= content_tag_for :li, klass, :selected, :class => cycle('even', 'odd') do %>
+  <%= link_to klass.name, "#", :'data-original-title' => _('belongs to config group'), :onclick => "", :rel => "twipsy",
+                               :'data-id' => klass.id, :'data-class-id' => klass.id, :'data-group-class-id' => klass.id,
+                               :'data-host-id' => obj.id %>
+<% end %>

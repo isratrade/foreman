@@ -6,9 +6,12 @@ class Host::Managed < Host::Base
 
   has_many :host_classes, :dependent => :destroy, :foreign_key => :host_id
   has_many :puppetclasses, :through => :host_classes
-  has_many :host_puppet_groups, :foreign_key => :host_id
-  has_many :puppet_groups, :through => :host_puppet_groups
-  has_many :group_puppetclasses, :through => :puppet_groups, :source => :puppetclasses
+
+  def puppetclasses_with_groups
+    ids = (host_classes.pluck(:puppetclass_id) + config_group_classes.pluck(:puppetclass_id)).uniq
+    Puppetclass.where(:id => ids)
+  end
+
   belongs_to :hostgroup
   has_many :reports, :dependent => :destroy, :foreign_key => :host_id
   has_many :host_parameters, :dependent => :destroy, :foreign_key => :reference_id
@@ -300,7 +303,53 @@ class Host::Managed < Host::Base
   end
 
   def all_puppetclasses
-    hostgroup.nil? ? puppetclasses : (hostgroup.classes + puppetclasses).uniq
+    classes
+  end
+
+  def classes
+    hostgroup.nil? ? puppetclasses_with_groups : (parent_classes + classes_in_groups + puppetclasses + puppetclasses_with_groups).uniq
+  end
+
+  def puppetclass_ids
+    classes.reorder('').pluck('puppetclasses.id')
+  end
+
+  def individual_puppetclasses
+    puppetclasses - classes_in_groups
+  end
+
+  def classes_in_groups
+    # TODO - REFACTOR - BAD
+    ids = []
+    self.config_groups.each do |config_group|
+      ids += config_group.config_group_classes.pluck(:puppetclass_id)
+    end
+    Puppetclass.where(:id => ids.uniq) - parent_classes
+  end
+
+  def parent_classes
+    return [] unless hostgroup
+    hostgroup.classes
+  end
+
+  def parent_class_ids
+    return [] unless hostgroup
+    hostgroup.classes.select('puppetclasses.id')
+  end
+
+  def parent_config_groups
+    return [] unless hostgroup
+    hostgroup.config_groups
+  end
+
+  def all_config_groups
+    return [] if is_root?
+    hostgroup.config_groups + config_groups
+  end
+
+  def available_puppetclasses
+    return Puppetclass.scoped if environment_id.blank?
+    environment.puppetclasses - parent_classes
   end
 
   # provide information about each node, mainly used for puppet external nodes

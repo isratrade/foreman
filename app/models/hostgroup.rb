@@ -8,6 +8,12 @@ class Hostgroup < ActiveRecord::Base
   before_destroy EnsureNotUsedBy.new(:hosts)
   has_many :hostgroup_classes, :dependent => :destroy
   has_many :puppetclasses, :through => :hostgroup_classes
+
+  def puppetclasses_with_groups
+    ids = (hostgroup_classes.pluck(:puppetclass_id) + config_group_classes.pluck(:puppetclass_id)).uniq
+    Puppetclass.where(:id => ids)
+  end
+
   has_many :user_hostgroups, :dependent => :destroy
   has_many :users, :through => :user_hostgroups
   validates :name, :format => { :with => /\A(\S+\s?)+\Z/, :message => N_("can't be blank or contain trailing white spaces.")}
@@ -78,12 +84,57 @@ class Hostgroup < ActiveRecord::Base
     ptable.layout.gsub("\r","")
   end
 
+  def individual_puppetclasses
+    puppetclasses - classes_in_groups
+  end
+
   def classes
-    Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+    # TODO - REFACTOR - BAD
+    ids = []
+    self.path.each do |hostgroup|
+      ids += Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => hostgroup.path_ids}).pluck(:id)
+      ids += hostgroup.config_group_classes.pluck(:puppetclass_id)
+    end
+    Puppetclass.where(:id => ids.uniq)
+  end
+
+  def classes_in_groups
+    # TODO - REFACTOR - BAD
+    ids = []
+    config_groups.each do |config_group|
+      ids += config_group.config_group_classes.pluck(:puppetclass_id)
+    end
+    return (Puppetclass.where(:id => ids.uniq) - parent_classes) unless environment
+    environment.puppetclasses.where(:id => ids.uniq) - parent_classes
   end
 
   def puppetclass_ids
     classes.reorder('').pluck('puppetclasses.id')
+  end
+
+  def parent_classes
+    return [] if is_root?
+    parent.classes
+  end
+
+  def parent_class_ids
+    return [] if is_root?
+    parent.classes.select('puppetclasses.id')
+  end
+
+  def parent_config_groups
+    return [] if is_root?
+    parent.config_groups
+  end
+
+  def all_config_groups
+    return [] if is_root?
+    config_groups + parent.config_groups
+  end
+
+  def available_puppetclasses
+    return Puppetclass.scoped if environment_id.blank?
+    environment.puppetclasses - parent_classes
   end
 
   def inherited_lookup_value key

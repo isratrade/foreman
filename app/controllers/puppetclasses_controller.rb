@@ -69,12 +69,12 @@ class PuppetclassesController < ApplicationController
           @obj.type = "Host::Managed"
         end
         # puppetclass_ids is removed since it causes an insert on host_classes before form is submitted
-        @obj.attributes = params['host'].except!(:puppetclass_ids)
+        @obj.attributes = params['host'].except!(:puppetclass_ids, :config_group_ids)
       elsif params['hostgroup']
         # hostgroup.id is assigned to params['host_id'] by host_edit.js#load_puppet_class_parameters
         @obj = Hostgroup.find(params['host_id'])
         # puppetclass_ids is removed since it causes an insert on hostgroup_classes before form is submitted
-        @obj.attributes = params['hostgroup'].except!(:puppetclass_ids)
+        @obj.attributes = params['hostgroup'].except!(:puppetclass_ids, :config_group_ids)
       end
     end
     @obj

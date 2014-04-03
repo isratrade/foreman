@@ -22,6 +22,11 @@ module HostCommon
 
     before_save :check_puppet_ca_proxy_is_required?, :crypt_root_pass
 
+    has_many :host_config_groups, :as => :host
+    has_many :config_groups, :through => :host_config_groups
+    has_many :config_group_classes, :through => :config_groups
+    has_many :group_puppetclasses, :through => :config_groups, :source => :puppetclasses
+
     has_many :lookup_values, :finder_sql => Proc.new { LookupValue.where('lookup_values.match' => lookup_value_match).to_sql }, :dependent => :destroy
     # See "def lookup_values_attributes=" under, for the implementation of accepts_nested_attributes_for :lookup_values
     accepts_nested_attributes_for :lookup_values

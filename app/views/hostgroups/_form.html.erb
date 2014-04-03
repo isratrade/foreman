@@ -37,7 +37,7 @@
 
     <div class="tab-pane" id="puppet_klasses">
       <% if @environment or @hostgroup.environment %>
-        <%= render 'puppetclasses/class_selection', :obj => @hostgroup %>
+        <%= render 'puppetclasses/class_selection', :obj => @hostgroup, :type => 'hostgroup' %>
       <% else %>
         <%= alert :class => 'alert-warning', :text =>  _('Please select an environment first') %>
       <% end %>

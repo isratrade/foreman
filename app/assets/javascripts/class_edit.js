@@ -1,3 +1,5 @@
+//= require underscore
+
 function filter_puppet_classes(item){
   var term = $(item).val().trim();
   $('.puppetclass_group li.puppetclass.hide').addClass('hide-me');
@@ -36,6 +38,29 @@ function add_puppet_class(item){
   $(document.body).trigger('AddedClass', link);
 }
 
+function add_group_puppet_class(item){
+  var id = $(item).attr('data-class-id');
+  var type = $(item).attr('data-type');
+  $(item).tooltip('hide');
+  var content = $(item).closest('li').clone();
+  content.attr('id', 'selected_puppetclass_'+ id);
+  content.children('span').tooltip();
+  content.val('');
+
+  var link = content.children('a');
+  var links = content.find('a');
+  links.attr('onclick', '');
+  links.attr('data-original-title', __('belongs to config group'));
+  links.tooltip();
+  link.removeClass('glyphicon-plus-sign');
+
+  $('#selected_classes').append(content);
+
+  $("#selected_puppetclass_"+ id).show('highlight', 5000);
+  $("#puppetclass_"+ id).addClass('selected-marker').hide();
+  $(document.body).trigger('AddedClass', link);
+}
+
 function remove_puppet_class(item){
   var id = $(item).attr('data-class-id');
   $('#puppetclass_' + id).removeClass('selected-marker').show();
@@ -50,3 +75,57 @@ function remove_puppet_class(item){
   return false;
 }
 
+function addConfigGroup(item){
+  var id = $(item).attr('data-group-id');
+  var type = $(item).attr('data-type');
+  var content = $(item).closest('li').clone();
+  content.attr('id', 'selected_config_group_'+ id);
+  content.append("<input id='config_group_ids' name=" + type + "[config_group_ids][] type='hidden' value=" +id+ ">");
+  $("#selected_config_group_"+ id).show('highlight', 5000);
+  $("#config_group_"+ id).addClass('selected-marker').hide();
+  var link = content.children('a');
+  var links = content.find('a');
+  link.attr('onclick', 'removeConfigGroup(this)');
+  link.attr('data-original-title', __('Click to remove config group'));
+  links.tooltip();
+  link.removeClass('glyphicon-plus-sign').addClass('glyphicon-minus-sign');
+  link.text(__(' Remove'));
+
+  $('#selected_config_groups').append(content);
+  $("#selected_config_group_"+ id).show('highlight', 5000);
+  $("#config_group_"+ id).addClass('selected-marker').hide();
+
+  var puppetclass_ids = $.parseJSON($(item).attr('data-puppetclass_ids'));
+  var inherited_ids = $.parseJSON($('#inherited_ids').attr('data-inherited-puppetclass-ids'));
+  console.log('trying to add ' + puppetclass_ids);
+  $.each(puppetclass_ids, function(index,puppetclass_id) {
+    var pc = $("li#puppetclass_" + puppetclass_id);
+    var pc_link = $("a[data-class-id='" + puppetclass_id + "']");
+    if ( (pc_link.size() > 0) && (pc.size() > 0) && (!(_.contains(inherited_ids, puppetclass_id)))  ) {
+      if (!($("#selected_puppetclass_"+ puppetclass_id).size() > 0)) {
+        console.log('adding ' + puppetclass_id);
+        add_group_puppet_class(pc_link);
+      }
+    }
+  })
+}
+
+function removeConfigGroup(item){
+  var id = $(item).attr('data-group-id');
+  $('#config_group_' + id).removeClass('selected-marker').show();
+  $('#selected_config_group_' + id).children('a').tooltip('hide');
+  $('#selected_config_group_' + id).remove();
+
+  var puppetclasses =  $(item).attr('data-puppetclass_ids')
+  var puppetclass_ids = $.parseJSON(puppetclasses);
+  console.log('trying to remove ' + puppetclass_ids);
+  $.each(puppetclass_ids, function(index,puppetclass_id){
+    var pc = $('#selected_puppetclass_' + puppetclass_id)
+    var pc_link = $("a[data-class-id='" + puppetclass_id + "']");
+    if ( (pc_link.size() > 0) && (pc.size() > 0) && (!(_.contains(inherited_ids, puppetclass_id)))  ) {
+      console.log('removing ' + puppetclass_id);
+      remove_puppet_class(pc_link);
+    }
+  })
+  return false;
+}

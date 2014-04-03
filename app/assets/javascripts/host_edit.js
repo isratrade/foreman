@@ -149,7 +149,6 @@ function load_puppet_class_parameters(item) {
   var url = $(item).attr('data-url');
   var data = $("form").serialize().replace('method=put', 'method=post');
   data = data + '&host_id=' + host_id
-
   if (url == undefined) return; // no parameters
   var placeholder = $('<tr id="puppetclass_'+id+'_params_loading">'+
       '<td colspan="5">' + spinner_placeholder(__('Loading parameters...')) + '</td></tr>');

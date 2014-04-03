@@ -1,0 +1,52 @@
+<div class="row">
+  <div class="col-md-4 classes">
+    <h3>
+      <%= _('Included Config Groups') %><br />
+    </h3>
+    <ul id="selected_config_groups">
+    <%= hidden_field_tag "#{type}[config_group_ids][]" %>
+    <% obj.config_groups.each do |config_group| %>
+      <%= render 'config_groups/selected_config_group', :obj => obj, :config_group => config_group %>
+    <% end %>
+    </ul>
+    <ul id="inherited_config_groups">
+    <% obj.parent_config_groups.each do |config_group| %>
+      <%= render 'config_groups/selected_config_group', :obj => obj, :config_group => config_group %>
+    <% end %>
+    </ul>
+
+  </div>
+
+  <div class="col-md-8">
+    <h3>
+      <%= _('Available Config Groups') %>
+    </h3>
+
+    <div class="row">
+      <div class="col-md-6 classes">
+        <ul class="config_group_group">
+          <% (ConfigGroup.scoped - obj.parent_config_groups).each do |config_group| %>
+            <% style = obj.config_groups.include?(config_group) ? "hide" : "" %>
+            <%= content_tag_for :li, config_group, :class => style, :id => "config_group_#{config_group.id}" do %>
+              <span>
+              <%= link_to(image_tag("bullet_toggle_plus.png") + " " + config_group.name, '#', :'data-puppetclass_ids' => config_group.puppetclass_ids.to_json, :'data-group-id' => config_group.id, :'data-id' => config_group.id, :'data-type' => type, :onclick => "$('#cgroup_#{config_group.id}').fadeToggle('slow')", :rel=>'twipsy', :class => 'config_group_name')  %>
+              </span>
+              <%= link_to ' Add', '#', :'data-puppetclass_ids' => config_group.puppetclass_ids.to_json, :'data-group-id' => config_group.id, :'data-id' => config_group.id, :'data-type' => type, :onclick => 'addConfigGroup(this)', :rel=>'twipsy', :class => 'btn btn-default btn-sm glyphicon glyphicon-plus-sign'  %>
+              <ul class='hide' id='<%= "cgroup_" + config_group.id.to_s %>'>
+                <% config_group.puppetclasses.each do |cg_puppetclass|%>
+                  <% strike = (obj.environment && obj.environment.puppetclasses.map(&:id).include?(cg_puppetclass.id) ? '' : 'strikethrough') %>
+                  <% tip = strike == 'strikethrough' ? _('not in environment') : '' %>
+                  <li>
+                    <%= content_tag(:span, :class => strike, :'data-original-title' => tip, :rel => "twipsy") do %>
+                      <%= cg_puppetclass.name + ' (' + cg_puppetclass.id.to_s + ')'%>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<%= content_tag_for :li, config_group, :selected, :class => cycle('even', 'odd') do %>
+  <span>
+   <%= link_to(image_tag("bullet_toggle_plus.png") + " " + config_group.name, '#', :'data-puppetclass_ids' => config_group.puppetclass_ids.to_json, :'data-group-id' => config_group.id, :'data-id' => config_group.id, :'data-type' => type, :onclick => "$('#cgroup_#{config_group.id}').fadeToggle('slow')", :rel=>'twipsy', :class => 'config_group_name', :'data-original-title' => (_('included already from parent') if obj.parent_config_groups.include?(config_group)) )  %>
+  </span>
+  <%= link_to(' Remove', '#', :'data-puppetclass_ids' => config_group.puppetclass_ids.to_json, :'data-group-id' => config_group.id, :'data-id' => config_group.id, :'data-type' => type, :onclick => 'removeConfigGroup(this)', :rel=>'twipsy', :class => 'btn btn-default btn-sm glyphicon glyphicon-minus-sign') unless obj.parent_config_groups.include?(config_group) %>
+  <ul class='hide' id='<%= "cgroup_" + config_group.id.to_s %>'>
+    <% config_group.puppetclasses.each do |cg_puppetclass|%>
+          <% strike = (obj.environment && obj.environment.puppetclasses.map(&:id).include?(cg_puppetclass.id) ? '' : 'strikethrough') %>
+          <% tip = strike == 'strikethrough' ? _('not in environment') : '' %>
+          <li>
+            <%= content_tag(:span, :class => strike, :'data-original-title' => tip, :rel => "twipsy") do %>
+              <%= cg_puppetclass.name + ' (' + cg_puppetclass.id.to_s + ')'%>
+            <% end %>
+          </li>
+    <% end %>
+  </ul>
+<% end %>
