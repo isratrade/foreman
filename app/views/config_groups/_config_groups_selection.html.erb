@@ -1,0 +1,38 @@
+<div class="row">
+
+  <div class="col-md-4 classes">
+    <h3>
+      <%= _('Included Config Groups') %><br />
+    </h3>
+    <ul id="selected_config_groups">
+      <%= hidden_field_tag "#{type}[config_group_ids][]" %>
+      <% (obj.config_groups - obj.parent_config_groups).each do |config_group| %>
+        <%= hidden_field_tag("#{type}[config_group_ids][]", config_group.id) %>
+        <%= render 'config_groups/config_group', :obj => obj, :config_group => config_group, :added => true, :css_class => '' %>
+      <% end %>
+    </ul>
+    <ul id="inherited_config_groups">
+      <% obj.parent_config_groups.each do |config_group| %>
+        <%= render 'config_groups/config_group', :obj => obj, :config_group => config_group, :added => true, :css_class => '' %>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="col-md-8">
+    <h3>
+      <%= _('Available Config Groups') %>
+    </h3>
+
+    <div class="row">
+      <div class="col-md-6 classes">
+        <ul class="config_group_group">
+          <% (ConfigGroup.scoped - obj.parent_config_groups).each do |config_group| %>
+            <% css_class = obj.config_groups.include?(config_group) ? "hide" : "" %>
+            <%= render 'config_groups/config_group', :obj => obj, :config_group => config_group, :added => false, :css_class => css_class %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>

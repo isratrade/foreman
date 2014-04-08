@@ -4,6 +4,7 @@ class Hostgroup < ActiveRecord::Base
   include Taxonomix
   include HostCommon
   include NestedAncestryCommon
+  include ScopedSearchExtensions
 
   before_destroy EnsureNotUsedBy.new(:hosts)
   has_many :hostgroup_classes, :dependent => :destroy
@@ -40,12 +41,24 @@ class Hostgroup < ActiveRecord::Base
   scoped_search :on => :id, :complete_value => :true
   # for legacy purposes, keep search on :label
   scoped_search :on => :title, :complete_value => true, :rename => :label
+  scoped_search :in => :config_groups, :on => :name, :complete_value => true, :rename => :config_group, :only_explicit => true, :operators => ['= ', '~ '], :ext_method => :search_by_config_group
+
+  def self.search_by_config_group(key, operator, value)
+    conditions  = sanitize_sql_for_conditions(["config_groups.name #{operator} ?", value_to_sql(operator, value)])
+    hostgroup_ids = Hostgroup.unscoped.with_taxonomy_scope.joins(:config_groups).where(conditions).map(&:subtree_ids).flatten.uniq
+
+    opts = 'hostgroups.id < 0'
+    opts = "hostgroups.id IN(#{hostgroup_ids.join(',')})" unless hostgroup_ids.blank?
+    return {:conditions => opts}
+  end
+
   if SETTINGS[:unattended]
     scoped_search :in => :architecture, :on => :name, :complete_value => :true, :rename => :architecture
     scoped_search :in => :operatingsystem, :on => :name, :complete_value => true, :rename => :os
     scoped_search :in => :medium,            :on => :name, :complete_value => :true, :rename => "medium"
     scoped_search :in => :config_templates, :on => :name, :complete_value => :true, :rename => "template"
   end
+
 
   # returns reports for hosts in the User's filter set
   scope :my_groups, lambda {
@@ -66,10 +79,6 @@ class Hostgroup < ActiveRecord::Base
 
   #TODO: add a method that returns the valid os for a hostgroup
 
-  def all_puppetclasses
-    classes
-  end
-
   def hostgroup
     self
   end
@@ -78,16 +87,49 @@ class Hostgroup < ActiveRecord::Base
     ptable.layout.gsub("\r","")
   end
 
-  def classes
-    if environment && Setting['remove_classes_not_in_environment']
-      environment.puppetclasses.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+  def classes(env = environment)
+    conditions = {:id => (ConfigGroupClass.where(:config_group_id => path.each.map(&:config_group_ids).flatten.uniq).pluck(:puppetclass_id) +
+                          HostgroupClass.where(:hostgroup_id => path_ids).pluck(:puppetclass_id)) }
+    if env && Setting['remove_classes_not_in_environment']
+      env.puppetclasses.where(conditions)
     else
-      Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+      Puppetclass.where(conditions)
+    end
+  end
+  alias_method :all_puppetclasses, :classes
+
+  def classes_in_groups
+    conditions = {:id => ConfigGroupClass.where(:config_group_id => path.each.map(&:config_group_ids).flatten.uniq).pluck(:puppetclass_id) }
+
+    if environment && Setting['remove_classes_not_in_environment']
+      environment.puppetclasses.where(conditions) - parent_classes
+    else
+      Puppetclass.where(conditions) - parent_classes
     end
   end
 
   def puppetclass_ids
     classes.reorder('').pluck('puppetclasses.id')
+  end
+
+  # the environment used by #clases nees to be self.environment and not self.parent.environment
+  def parent_classes
+    return [] unless parent
+    parent.classes(environment)
+  end
+
+  def parent_config_groups
+    return [] unless parent
+    parent.config_groups
+  end
+
+  def individual_puppetclasses
+    puppetclasses - classes_in_groups
+  end
+
+  def available_puppetclasses
+    return Puppetclass.scoped if environment_id.blank?
+    environment.puppetclasses - parent_classes
   end
 
   def inherited_lookup_value key

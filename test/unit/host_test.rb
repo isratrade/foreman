@@ -382,6 +382,7 @@ class HostTest < ActiveSupport::TestCase
   end
 
   test "should import from external nodes output" do
+    Setting['remove_classes_not_in_environment'] = false
     # create a dummy node
     Parameter.destroy_all
     host = Host.create :name => "myfullhost", :mac => "aabbacddeeff", :ip => "2.3.4.12",
@@ -844,7 +845,7 @@ class HostTest < ActiveSupport::TestCase
     assert_equal ['my5name.mydomain.net'], rundeck.keys
     assert_kind_of Hash, rundeck[h.name]
     assert_equal 'my5name.mydomain.net', rundeck[h.name]['hostname']
-    assert_equal ['class=base'], rundeck[h.name]['tags']
+    assert_equal ["class=auth", "class=base", "class=chkmk", "class=nagios", "class=pam"], rundeck[h.name]['tags']
   end
 
   test "#rundeck returns extra facts as tags" do

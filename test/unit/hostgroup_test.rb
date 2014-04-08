@@ -3,6 +3,7 @@ require 'test_helper'
 class HostgroupTest < ActiveSupport::TestCase
   setup do
     User.current = User.find_by_login "admin"
+    Setting['remove_classes_not_in_environment'] = true
   end
   test "name can't be blank" do
     host_group = Hostgroup.new :name => "  "
@@ -188,6 +189,26 @@ class HostgroupTest < ActiveSupport::TestCase
     # only environment_id is overriden in inherited fixture
     refute_equal parent.environment, child.environment
     assert_equal environments(:production), child.environment
+  end
+
+  test "classes_in_groups should return the puppetclasses of a config group only if it is in hostgroup environment" do
+    # config_groups(:one) and (:three) belongs to hostgroup(:common)
+    hostgroup = hostgroups(:common)
+    group_classes = hostgroup.classes_in_groups
+    # four classes in config groups
+    assert_equal 4, (config_groups(:one).puppetclasses + config_groups(:three).puppetclasses).uniq.count
+    # but only 3 are in production environment. git is in testing environment
+    assert_equal 3, group_classes.count
+    assert_equal ['chkmk', 'nagios', 'vim'].sort, group_classes.map(&:name).sort
+  end
+
+  test "should return all classes for environment only" do
+    # config_groups(:one) and (:three) belongs to hostgroup(:common)
+    hostgroup = hostgroups(:common)
+    all_classes = hostgroup.classes
+    # three classes from group and one class directly - base
+    assert_equal 4, all_classes.count
+    assert_equal ['base', 'chkmk', 'nagios', 'vim'].sort, all_classes.map(&:name).sort
   end
 
 end

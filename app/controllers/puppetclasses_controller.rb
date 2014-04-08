@@ -62,19 +62,19 @@ class PuppetclassesController < ApplicationController
       @obj = Host::Managed.new(params['host']) if params['host']
       @obj ||= Hostgroup.new(params['hostgroup']) if params['hostgroup']
     else
+      # puppetclass_ids and config_group_ids need to be removed so they don't cause automatic inserts
+      ignored_parameters = [:puppetclass_ids, :config_group_ids]
       if params['host']
         @obj = Host::Base.find(params['host_id'])
         unless @obj.kind_of?(Host::Managed)
           @obj      = @obj.becomes(Host::Managed)
           @obj.type = "Host::Managed"
         end
-        # puppetclass_ids is removed since it causes an insert on host_classes before form is submitted
-        @obj.attributes = params['host'].except!(:puppetclass_ids)
+        @obj.attributes = params['host'].except!(*ignored_parameters)
       elsif params['hostgroup']
         # hostgroup.id is assigned to params['host_id'] by host_edit.js#load_puppet_class_parameters
         @obj = Hostgroup.find(params['host_id'])
-        # puppetclass_ids is removed since it causes an insert on hostgroup_classes before form is submitted
-        @obj.attributes = params['hostgroup'].except!(:puppetclass_ids)
+        @obj.attributes = params['hostgroup'].except!(*ignored_parameters)
       end
     end
     @obj

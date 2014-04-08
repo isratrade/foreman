@@ -291,14 +291,58 @@ class Host::Managed < Host::Base
     not enabled?
   end
 
+  def classes(env = environment)
+    hostgroup_class_ids = hostgroup ? (ConfigGroupClass.where(:config_group_id => hostgroup.path.each.map(&:config_group_ids).flatten.uniq).pluck(:puppetclass_id) +
+                                        HostgroupClass.where(:hostgroup_id => hostgroup.path_ids).pluck(:puppetclass_id))
+                                     : []
+    host_class_ids = (ConfigGroupClass.where(:config_group_id => config_group_ids).pluck(:puppetclass_id) + host_classes.pluck(:puppetclass_id))
+    conditions = {:id => hostgroup_class_ids + host_class_ids }
+    if env && Setting['remove_classes_not_in_environment']
+      env.puppetclasses.where(conditions)
+    else
+      Puppetclass.where(conditions)
+    end
+  end
+  alias_method :all_puppetclasses, :classes
+
+  def classes_in_groups
+    conditions = {:id => ConfigGroupClass.where(:config_group_id => config_group_ids).pluck(:puppetclass_id) }
+    if environment && Setting['remove_classes_not_in_environment']
+      environment.puppetclasses.where(conditions)
+    else
+      Puppetclass.where(conditions)
+    end
+  end
+
+  def puppetclass_ids
+    classes.reorder('').pluck('puppetclasses.id')
+  end
+
+  # the environment used by #clases nees to be self.environment and not self.parent.environment
+  def parent_classes
+    return [] unless hostgroup
+    hostgroup.classes(environment)
+  end
+
+  def parent_config_groups
+    return [] unless hostgroup
+    hostgroup.config_groups
+  end
+
+  def individual_puppetclasses
+    puppetclasses - classes_in_groups
+  end
+
+  def available_puppetclasses
+    return Puppetclass.scoped if environment_id.blank?
+    environment.puppetclasses - parent_classes
+  end
+
   # returns the list of puppetclasses a host is in.
   def puppetclasses_names
     all_puppetclasses.collect {|c| c.name}
   end
 
-  def all_puppetclasses
-    hostgroup.nil? ? puppetclasses : (hostgroup.classes + puppetclasses).uniq
-  end
 
   # provide information about each node, mainly used for puppet external nodes
   # TODO: remove hard coded default parameters into some selectable values in the database.
