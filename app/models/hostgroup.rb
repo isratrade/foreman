@@ -79,7 +79,11 @@ class Hostgroup < ActiveRecord::Base
   end
 
   def classes
-    Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+    if environment && Setting['remove_classes_not_in_environment']
+      environment.puppetclasses.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+    else
+      Puppetclass.joins(:hostgroups).where(:hostgroups => {:id => path_ids})
+    end
   end
 
   def puppetclass_ids

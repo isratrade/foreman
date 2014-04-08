@@ -92,6 +92,7 @@ class LookupKeyTest < ActiveSupport::TestCase
   end
 
   def test_parameters_multiple_paths
+     Setting['remove_classes_not_in_environment'] = false
      host = hosts(:one)
      host.hostgroup = hostgroups(:common)
      host.environment = environments(:testing)

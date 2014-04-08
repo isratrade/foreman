@@ -153,7 +153,7 @@ attribute30:
 attribute31:
   name: remove_classes_not_in_environment
   category: Setting::Puppet
-  default: "false"
+  default: "true"
   description: "When Host and Hostgroup have different environments should all classes be included (regardless if they exists or not in the other environment)"
 attribute32:
   name: trusted_puppetmaster_hosts
