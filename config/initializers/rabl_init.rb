@@ -13,28 +13,28 @@ module Rabl
       respond_to?(:response) ? response.headers["Foreman_api_version"] : '1'
     end
 
-    def default_options
-      return {:root => false, :object_root => false} if api_version.to_i > 1
-      {}
-    end
+    # def default_options
+    #   return {:root => false, :object_root => false} if api_version.to_i > 1
+    #   {}
+    # end
 
-    def collection_with_defaults(data, options = default_options)
-      collection_without_defaults(data, options)
-    end
-    alias_method_chain :collection, :defaults
+    # def collection_with_defaults(data, options = default_options)
+    #   collection_without_defaults(data, options)
+    # end
+    # alias_method_chain :collection, :defaults
 
-    # extending this helper defined in module Rabl::Helpers allows users to
-    # overwrite the object root name in show rabl views.  Two options:
-    # 1) no root - default
-    # 2) custom  - pass ?params[:root_name]=custom_name in URL
-    def data_name(data_token)
-      # custom object root
-      return params['root_name'] if respond_to?(:params) && params['root_name'].present? && !['false', false].include?(params['root_name'])
-      # no object root for v2
-      return nil if !respond_to?(:params) || api_version.to_i > 1 || ['false', false].include?(params['root_name'])
-      # otherwise return super since v1 has object root (config.include_child_root = true)
-      super
-    end
+    # # extending this helper defined in module Rabl::Helpers allows users to
+    # # overwrite the object root name in show rabl views.  Two options:
+    # # 1) no root - default
+    # # 2) custom  - pass ?params[:root_name]=custom_name in URL
+    # def data_name(data_token)
+    #   # custom object root
+    #   return params['root_name'] if respond_to?(:params) && params['root_name'].present? && !['false', false].include?(params['root_name'])
+    #   # no object root for v2
+    #   return nil if !respond_to?(:params) || api_version.to_i > 1 || ['false', false].include?(params['root_name'])
+    #   # otherwise return super since v1 has object root (config.include_child_root = true)
+    #   super
+    # end
 
   end
 end
