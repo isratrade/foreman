@@ -3,7 +3,7 @@ group :test do
   gem 'simplecov'
   gem 'spork-minitest'
   gem 'single_test'
-  gem 'minitest', '~> 5.1'
+  gem 'minitest', '~> 4.2'
 #  gem 'minitest-spec-rails'
   gem 'ci_reporter', '>= 1.6.3', "< 2.0.0", :require => false
   gem 'capybara', '~> 2.0.0'

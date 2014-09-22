@@ -5,10 +5,10 @@ require File.expand_path('../lib/regexp_extensions', FOREMAN_GEMFILE)
 
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.18'
+gem 'rails', '4.0.10'
 gem 'json'
 gem 'rest-client', '> 1.6.2', '< 1.7', :require => 'rest_client'
-gem "audited-activerecord"
+#gem "audited-activerecord"
 gem "will_paginate", "~> 3.0.2"
 gem "ancestry", "~> 2.0.0"
 gem 'scoped_search', '>= 2.7.0', '< 3.0.0'
@@ -21,6 +21,7 @@ gem 'oauth'
 gem 'deep_cloneable', '~> 2.0'
 gem 'foreigner', '~> 1.4.2'
 gem 'validates_lengths_from_database',  '~> 0.2.0'
+gem 'rails-observers'
 
 if RUBY_VERSION =~ /^1\.8/
   # Older version of safemode for Ruby 1.8, as the latest causes regexp overflows (#2100)
