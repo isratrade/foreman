@@ -235,7 +235,7 @@ Foreman::Application.routes.draw do
 
     resources :auth_source_ldaps, :except => [:show]
 
-    resources :external_usergroups, :except => [:index, :new, :create, :show, :edit, :update, :destroy] do
+    resources :external_usergroups, :only => [] do
       member do
         put 'refresh'
       end
