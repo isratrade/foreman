@@ -4,7 +4,7 @@ gem 'execjs'
 gem "jquery-rails"
 gem 'jquery-ui-rails'
 gem "therubyracer", :require => 'v8'
-gem 'bootstrap-sass'
+#gem 'bootstrap-sass'
 #gem "spice-html5-rails"
 gem "flot-rails"
 gem "quiet_assets"
