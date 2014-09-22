@@ -1,7 +1,7 @@
 require "fast_gettext"
 require "gettext_i18n_rails"
 require "gettext_i18n_rails/tasks"
-require "gettext_i18n_rails_js/tasks"
+#require "gettext_i18n_rails_js/tasks"
 require File.expand_path("../../../lib/foreman/gettext/support.rb", __FILE__)
 
 namespace :gettext do
