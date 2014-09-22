@@ -54,7 +54,7 @@ class PuppetFactParser < FactParser
   def environment
     # by default, puppet doesn't store an env name in the database
     name = facts[:environment] || Setting[:default_puppet_environment]
-    Environment.find_or_create_by_name name
+    Environment.find_or_create_by(name: name)
   end
 
   def architecture
@@ -67,7 +67,7 @@ class PuppetFactParser < FactParser
            end
     # ensure that we convert debian legacy to standard
     name = "x86_64" if name == "amd64"
-    Architecture.find_or_create_by_name name unless name.blank?
+    Architecture.find_or_create_by(name: name) unless name.blank?
   end
 
   def model
@@ -79,7 +79,7 @@ class PuppetFactParser < FactParser
 
   def domain
     name = facts[:domain]
-    Domain.find_or_create_by_name name unless name.blank?
+    Domain.find_or_create_by(name: name) unless name.blank?
   end
 
   def primary_interface
