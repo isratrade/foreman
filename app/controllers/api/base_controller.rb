@@ -6,6 +6,15 @@ module Api
     include Foreman::ThreadSession::Cleaner
     include FindCommon
 
+  after_filter :cors_set_access_control_headers
+
+  def cors_set_access_control_headers
+    headers['Access-Control-Allow-Origin']      = '*'
+    headers['Access-Control-Allow-Methods']     = 'POST, GET, OPTIONS'
+    headers['Access-Control-Max-Age']           = '1728000'
+    headers['Access-Control-Allow-Credentials'] = 'true'
+  end
+
     #protect_from_forgery
     skip_before_filter :verify_authenticity_token #, :unless => :protect_api_from_forgery?
 
