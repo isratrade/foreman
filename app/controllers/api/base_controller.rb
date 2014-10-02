@@ -6,8 +6,8 @@ module Api
     include Foreman::ThreadSession::Cleaner
     include FindCommon
 
-    protect_from_forgery
-    skip_before_filter :verify_authenticity_token, :unless => :protect_api_from_forgery?
+    #protect_from_forgery
+    skip_before_filter :verify_authenticity_token #, :unless => :protect_api_from_forgery?
 
     before_filter :set_default_response_format, :authorize, :add_version_header, :set_gettext_locale
     before_filter :session_expiry, :update_activity_time
