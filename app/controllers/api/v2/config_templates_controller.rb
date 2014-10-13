@@ -13,9 +13,9 @@ module Api
       before_filter :process_operatingsystems, :only => [:create, :update]
 
       api :GET, "/config_templates/", N_("List provisioning templates")
-      api :GET, "/operatingsystem/:operatingsystem_id/config_templates", N_("List templates per operating system")
-      api :GET, "/locations/:location_id/config_templates/", N_("List templates per location")
-      api :GET, "/organizations/:organization_id/config_templates/", N_("List templates per organization")
+      api :GET, "/operatingsystem/:operatingsystem_id/config_templates", N_("List provisioning templates per operating system")
+      api :GET, "/locations/:location_id/config_templates/", N_("List provisioning templates per location")
+      api :GET, "/organizations/:organization_id/config_templates/", N_("List provisioning templates per organization")
       param :operatingsystem_id, String, :desc => N_("ID of operating system")
       param_group :taxonomy_scope, ::Api::V2::BaseController
       param_group :search_and_pagination, ::Api::V2::BaseController
