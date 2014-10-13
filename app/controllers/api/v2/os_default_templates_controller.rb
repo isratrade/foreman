@@ -9,7 +9,7 @@ module Api
       before_filter :find_resource, :only => %w{show update destroy}
 
       api :GET, '/operatingsystems/:operatingsystem_id/os_default_templates', N_('List default templates combinations for an operating system')
-      api :GET, '/config_templates/:config_template_id/os_default_templates', N_('List os default templates for provisioning template')
+      api :GET, '/config_templates/:config_template_id/os_default_templates', N_('List operating systems where this template is set as a default')
       param :operatingsystem_id, String, :desc => N_("ID of operating system")
       param :config_template_id, String, :desc => N_('ID of provisioning template')
       param_group :pagination, ::Api::V2::BaseController

@@ -10,8 +10,8 @@ module Api
 
       api :GET, '/subnets', N_("List of subnets")
       api :GET, "/domains/:domain_id/subnets", N_("List of subnets for a domain")
-      api :GET, "/locations/:location_id/subnets", N_("List of domains per location")
-      api :GET, "/organizations/:organization_id/subnets", N_("List of domains per organization")
+      api :GET, "/locations/:location_id/subnets", N_("List of subnets per location")
+      api :GET, "/organizations/:organization_id/subnets", N_("List of subnets per organization")
       param :domain_id, String, :desc => N_("ID of domain")
       param_group :taxonomy_scope, ::Api::V2::BaseController
       param_group :search_and_pagination, ::Api::V2::BaseController
