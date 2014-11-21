@@ -61,6 +61,7 @@ class UsersController < ApplicationController
   # Called from the login form.
   # Stores the user id in the session and redirects required URL or default homepage
   def login
+    puts "XXX login"
     User.current = nil
     if request.post?
       backup_session_content { reset_session }
@@ -111,6 +112,38 @@ class UsersController < ApplicationController
 
   def extlogout
     render :extlogout, :layout => 'login'
+  end
+
+  def change_password
+    puts "XXX Change password called"
+    if request.put?
+        uri = session[:original_uri]
+        puts "XXX We're trying to go to #{uri}"
+        puts "XXX it's a PUT"
+        puts params[:new_password]
+        puts params[:confirm_password]
+        if User.current.nil?
+          puts "User is null"
+        elsif
+          puts User.current.login
+        end
+
+        if params[:new_password] == params[:confirm_password]
+          puts "Changing password"
+          puts User.current.password
+          puts User.current.password_hash
+          User.current.password= params[:new_password]
+          puts User.current.password
+          puts User.current.password_hash
+        elsif
+          puts "Passwords are not the same"
+        end
+        User.current.save!
+        notice _("Password changed.")
+        redirect_to (uri || hosts_path)
+    else
+        puts "XXX it's a GET"
+    end
   end
 
   private
