@@ -61,6 +61,8 @@ module Foreman
       end
     end
 
+    config.assets.initialize_on_precompile = false
+
     # Setup additional routes by loading all routes file from routes directory
     config.paths["config/routes"] += Dir[Rails.root.join("config/routes/**/*.rb")]
 
