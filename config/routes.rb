@@ -350,7 +350,7 @@ Foreman::Application.routes.draw do
 
   end
 
-  root :to => 'dashboard#index'
+  root :to => 'fusor_ui/deployments#new'
   match 'dashboard', :to => 'dashboard#index', :as => "dashboard"
   match 'dashboard/auto_complete_search', :to => 'hosts#auto_complete_search', :as => "auto_complete_search_dashboards"
   match 'statistics', :to => 'statistics#index', :as => "statistics"
