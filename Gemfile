@@ -29,7 +29,6 @@ gem 'turbolinks', '~> 2.5'
 #gem 'secure_headers', '~> 1.3.3'
 
 gem 'rack-cors', :require => 'rack/cors'
-#gem 'fusor', :git => 'https://github.com/fusor/fusor.git'
 gem 'fusor_ui', :path => '../fusor_ui'
 #gem 'foreman_api_v3', :path => '../foreman_api_v3'
 
