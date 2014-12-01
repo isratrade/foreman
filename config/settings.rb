@@ -9,6 +9,8 @@ SETTINGS[:login]    ||= SETTINGS[:ldap]
 SETTINGS[:puppetconfdir] ||= '/etc/puppet'
 SETTINGS[:puppetvardir]  ||= '/var/lib/puppet'
 
+ANSWERS = YAML.load_file("#{root}/config/foreman-installer-answers.yaml")
+
 # Load plugin config, if any
 Dir["#{root}/config/settings.plugins.d/*.yaml"].each do |f|
   SETTINGS.merge! YAML.load_file f

@@ -6,6 +6,8 @@ Foreman::Application.routes.draw do
     # new v2 routes that point to v2
     scope "(:apiv)", :module => :v2, :defaults => {:apiv => 'v2'}, :apiv => /v1|v2/, :constraints => ApiConstraints.new(:version => 2) do
 
+      get 'answers' => 'bookmarks#answers'
+
       resources :architectures, :except => [:new, :edit] do
         constraints(:id => /[^\/]+/) do
           resources :hosts, :except => [:new, :edit]

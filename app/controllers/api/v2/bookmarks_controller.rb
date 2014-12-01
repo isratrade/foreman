@@ -6,6 +6,10 @@ module Api
       api :GET, "/bookmarks/", N_("List all bookmarks")
       param_group :pagination, ::Api::V2::BaseController
 
+      def answers
+        render :json => ANSWERS
+      end
+
       def index
         @bookmarks = resource_scope.paginate(paginate_options)
       end
