@@ -20,12 +20,31 @@ class ApplicationController < ActionController::Base
   before_filter :session_expiry, :update_activity_time, :unless => proc {|c| !SETTINGS[:login] || c.remote_user_provided? || c.api_request? }
   before_filter :set_taxonomy, :require_mail, :check_empty_taxonomy
   before_filter :authorize
+  before_filter :password_change, :only => :index, :unless => :api_request?
   before_filter :welcome, :only => :index, :unless => :api_request?
   layout :display_layout?
 
   attr_reader :original_search_parameter
 
   cache_sweeper :topbar_sweeper
+
+  def password_change
+    puts "XXX application_controller password change"
+    puts !User.current.nil?
+    User.find_each do |user|
+      puts "XXX id [#{user.id}], login [#{user.login}]"
+    end
+    if !User.current.nil? and User.current.login == "admin"
+      puts "XXX We have the admin user"
+      puts "XXX application_controller we need to change password"
+      redirect_to change_password_user_path( :id => User.current.id)
+    else
+      puts "XXX application_controller no need to change"
+    end
+  rescue
+    puts "XXX not found, but why?"
+    not_found
+  end
 
   def welcome
     @searchbar = true
