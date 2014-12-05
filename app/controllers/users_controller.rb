@@ -133,6 +133,7 @@ class UsersController < ApplicationController
           puts User.current.password
           puts User.current.password_hash
           User.current.password= params[:new_password]
+          User.current.force_password_reset= false
           puts User.current.password
           puts User.current.password_hash
         elsif

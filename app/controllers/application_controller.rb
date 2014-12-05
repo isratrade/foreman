@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
     User.find_each do |user|
       puts "XXX id [#{user.id}], login [#{user.login}]"
     end
-    if !User.current.nil? and User.current.login == "admin"
+    if !User.current.nil? and User.current.force_password_reset?
       puts "XXX We have the admin user"
       puts "XXX application_controller we need to change password"
       redirect_to change_password_user_path( :id => User.current.id)
