@@ -29,12 +29,32 @@ gem 'turbolinks', '~> 2.5'
 #gem 'secure_headers', '~> 1.3.3'
 
 gem 'rack-cors', :require => 'rack/cors'
-gem 'rhci_plugin', :git => 'https://github.com/isratrade/rhci_plugin.git'
-#gem 'rhci_plugin', :path => '../rhci_plugin'
+#gem 'fusor', :git => 'https://github.com/fusor/fusor.git'
+gem 'fusor_ui', :path => '../fusor_ui'
 #gem 'foreman_api_v3', :path => '../foreman_api_v3'
 
 #gem 'katello', :git => 'https://github.com/Katello/katello.git', :branch => 'KATELLO-2.0'
 #gem 'katello', :path => '../katello'
+<<<<<<< upstream/develop
+=======
+
+
+if RUBY_VERSION =~ /^1\.8/
+  # Older version of safemode for Ruby 1.8, as the latest causes regexp overflows (#2100)
+  gem 'safemode', '~> 1.0.2'
+  gem 'ruby_parser', '>= 2.3.1', '< 3.0'
+
+  # Used in fog, rbovirt etc.  1.6.0 breaks Ruby 1.8 compatibility.
+  gem 'nokogiri', '~> 1.5.0'
+
+  # 10.2.0 breaks Ruby 1.8 compatibility
+  gem 'rake', '< 10.2.0'
+else
+  # Newer version of safemode contains fixes for Ruby 1.9
+  gem 'safemode', '~> 1.2.1'
+  gem 'ruby_parser', '~> 3.0.0'
+end
+>>>>>>> HEAD~3
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
   self.instance_eval(Bundler.read_file(bundle))
