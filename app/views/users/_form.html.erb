@@ -35,6 +35,8 @@
         <%= password_f f, :password, :label => _('Password') %>
         <%= password_f f, :password_confirmation, :label => _('Verify') %>
       </div>
+      <%= checkbox_f f, :force_password_reset %>
+
     </div>
 
     <div class='tab-pane' id='mail_preferences'>
