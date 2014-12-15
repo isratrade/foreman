@@ -30,6 +30,8 @@ gem 'turbolinks', '~> 2.5'
 
 gem 'rack-cors', :require => 'rack/cors'
 gem 'fusor_ui', :path => '../fusor_ui'
+gem 'staypuft'
+
 #gem 'foreman_api_v3', :path => '../foreman_api_v3'
 
 #gem 'katello', :git => 'https://github.com/Katello/katello.git', :branch => 'KATELLO-2.0'
