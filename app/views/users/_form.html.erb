@@ -35,7 +35,7 @@
         <%= password_f f, :password, :label => _('Password') %>
         <%= password_f f, :password_confirmation, :label => _('Verify') %>
       </div>
-      <%= checkbox_f f, :force_password_reset %>
+      <%= checkbox_f f, :force_password_reset if User.current.can_change_admin_flag? %>
 
     </div>
 

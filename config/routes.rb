@@ -229,7 +229,7 @@ Foreman::Application.routes.draw do
 
       member do
         get 'change_password'
-        put 'set_password'
+        put 'update_password'
       end
     end
     resources :roles, :except => [:show] do

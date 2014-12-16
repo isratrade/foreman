@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   skip_before_filter :require_mail, :only => [:edit, :update, :logout]
   skip_before_filter :require_login, :authorize, :session_expiry, :update_activity_time, :set_taxonomy, :set_gettext_locale_db, :only => [:login, :logout, :extlogout]
   skip_before_filter :authorize, :only => [:extlogin]
-  skip_before_filter :password_change, :only => [:change_password, :set_password]
+  skip_before_filter :password_change, :only => [:change_password, :update_password, :edit]
   after_filter       :update_activity_time, :only => :login
   skip_before_filter :update_admin_flag, :only => :update
 
@@ -115,34 +115,18 @@ class UsersController < ApplicationController
   end
 
   def change_password
+    editing_self?
+    @user = find_resource(:edit_users)
   end
 
-  def set_password
-    uri = session[:original_uri]
-    puts "XXX We're trying to go to #{uri}"
-    puts "XXX it's a PUT"
-    puts params[:new_password]
-    puts params[:confirm_password]
-    if User.current.nil?
-      puts "User is null"
-    elsif
-      puts User.current.login
+  def update_password
+    editing_self?
+    @user = find_resource(:edit_users)
+    if @user.update_attributes(params[:user].merge(:force_password_reset => false))
+      process_success(:success_redirect => hosts_path, :success_msg => _('Password successfully updated.'))
+    else
+      render :change_password, :notice => _('Passwords are not the same. Please re-enter.')
     end
-
-    if params[:new_password] == params[:confirm_password]
-      puts "Changing password"
-      puts User.current.password
-      puts User.current.password_hash
-      User.current.password= params[:new_password]
-      User.current.force_password_reset= false
-      puts User.current.password
-      puts User.current.password_hash
-    elsif
-      puts "Passwords are not the same"
-    end
-    User.current.save!
-    notice _("Password changed.")
-    redirect_to (uri || hosts_path)
   end
 
   private
