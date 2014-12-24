@@ -9,7 +9,7 @@ Doorkeeper.configure do
     # fail "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
     # Put your resource owner authentication logic here.
     # Example implementation:
-      User.find_by_id(session[:user]) || redirect_to(login_users_url, :notice => 'redirecting from doorkeeper')
+      User.find_by_id(1)  || redirect_to(login_users_url, :notice => 'redirecting from doorkeeper')
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
