@@ -1,6 +1,8 @@
 require 'api_constraints'
 
 Foreman::Application.routes.draw do
+  use_doorkeeper
+
   resources :mail_notifications, :only => [] do
     collection do
       get 'auto_complete_search'
@@ -350,7 +352,8 @@ Foreman::Application.routes.draw do
 
   end
 
-  root :to => 'fusor_ui/deployments#new'
+#  root :to => 'fusor_ui/deployments#new'
+  root :to => 'dashboard#index'
   match 'dashboard', :to => 'dashboard#index', :as => "dashboard"
   match 'dashboard/auto_complete_search', :to => 'hosts#auto_complete_search', :as => "auto_complete_search_dashboards"
   match 'statistics', :to => 'statistics#index', :as => "statistics"

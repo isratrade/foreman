@@ -29,10 +29,11 @@ gem 'turbolinks', '~> 2.5'
 #gem 'secure_headers', '~> 1.3.3'
 
 gem 'rack-cors', :require => 'rack/cors'
-gem 'fusor_ui', :path => '../fusor_ui'
+#gem 'fusor_ui', :path => '../fusor_ui'
 #gem 'staypuft'
 
 gem 'foreman_api_v3', :path => '../foreman_api_v3'
+gem 'doorkeeper'
 
 #gem 'katello', :git => 'https://github.com/Katello/katello.git', :branch => 'KATELLO-2.0'
 #gem 'katello', :path => '../katello'
