@@ -9,6 +9,8 @@ Doorkeeper.configure do
     # fail "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
     # Put your resource owner authentication logic here.
     # Example implementation:
+      Rails.logger.info('DOORKEEPER PARAMS')
+      Rails.logger.info(params.inspect)
       User.find_by_id(1)  || redirect_to(login_users_url, :notice => 'redirecting from doorkeeper')
   end
 

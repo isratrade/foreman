@@ -3,8 +3,8 @@ class UsersController < ApplicationController
   include Foreman::Controller::UsersMixin
 
   skip_before_filter :require_mail, :only => [:edit, :update, :logout]
-  skip_before_filter :require_login, :authorize, :session_expiry, :update_activity_time, :set_taxonomy, :set_gettext_locale_db, :only => [:login, :logout, :extlogout]
-  skip_before_filter :authorize, :only => :extlogin
+  skip_before_filter :require_login, :authorize, :session_expiry, :update_activity_time, :set_taxonomy, :set_gettext_locale_db, :only => [:login, :logout, :extlogout, :oauth_login, :oauth_signin]
+  skip_before_filter :authorize, :only => [:extlogin, :oauth_login, :oauth_signin]
   after_filter       :update_activity_time, :only => :login
   skip_before_filter :update_admin_flag, :only => :update
 
@@ -85,6 +85,14 @@ class UsersController < ApplicationController
         render :layout => 'login'
       end
     end
+  end
+
+  def oauth_login
+    render :oauth_login, :layout => 'login'
+  end
+
+  def oauth_signin
+    render :text => params.inspect, :layout => 'login'
   end
 
   def extlogin

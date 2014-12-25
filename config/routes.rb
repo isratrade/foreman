@@ -222,6 +222,8 @@ Foreman::Application.routes.draw do
       collection do
         get 'login'
         post 'login'
+        get 'oauth_login'
+        post 'oauth_signin'
         post 'logout'
         get 'extlogin'
         get 'extlogout'
