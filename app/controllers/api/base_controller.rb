@@ -7,7 +7,7 @@ module Api
 #    skip_before_action :verify_authenticity_token, if: :json_request?
     skip_before_filter :verify_authenticity_token, :unless => :protect_api_from_forgery?
 
-    before_filter :doorkeeper_authorize! # Require access token for all actions
+#    before_filter :doorkeeper_authorize! # Require access token for all actions
     before_filter :set_default_response_format, :authorize, :add_version_header, :set_gettext_locale
     before_filter :session_expiry, :update_activity_time
     around_filter :set_timezone
