@@ -3,7 +3,7 @@ module Api
   class BaseController < ActionController::Base
     include ApplicationShared
 
-    protect_from_forgery
+#    protect_from_forgery
 #    skip_before_action :verify_authenticity_token, if: :json_request?
     skip_before_filter :verify_authenticity_token, :unless => :protect_api_from_forgery?
 

@@ -11,6 +11,7 @@ Doorkeeper.configure do
     # Example implementation:
       Rails.logger.info('DOORKEEPER PARAMS')
       Rails.logger.info(params.inspect)
+      #User.try_to_login(params[:login], params[:password]) || redirect_to(oauth_login_users_url)
       User.find_by_id(1)  || redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
   end
 

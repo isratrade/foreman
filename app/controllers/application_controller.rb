@@ -2,11 +2,11 @@ class ApplicationController < ActionController::Base
   include ApplicationShared
 
   #ensure_security_headers
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+#  protect_from_forgery # See ActionController::RequestForgeryProtection for details
   rescue_from ScopedSearch::QueryNotSupported, :with => :invalid_search_query
   rescue_from Exception, :with => :generic_exception if Rails.env.production?
   rescue_from ActiveRecord::RecordNotFound, :with => :not_found
-  rescue_from ActionView::MissingTemplate, :with => :api_deprecation_error
+  #rescue_from ActionView::MissingTemplate, :with => :api_deprecation_error
 
   # standard layout to all controllers
   helper 'layout'
