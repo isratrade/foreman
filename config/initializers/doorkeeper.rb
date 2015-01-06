@@ -9,16 +9,18 @@ Doorkeeper.configure do
     # fail "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
     # Put your resource owner authentication logic here.
     # Example implementation:
-      Rails.logger.info('DOORKEEPER PARAMS')
+      Rails.logger.info('DOORKEEPER resource_owner_authenticator')
       Rails.logger.info(params.inspect)
       #User.try_to_login(params[:login], params[:password]) || redirect_to(oauth_login_users_url)
-      User.find_by_id(1)  #|| redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
+      User.try_to_login(params[:username], params[:password]) || redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
+      #User.find_by_id(1)  #|| redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
   end
 
   resource_owner_from_credentials do |routes|
     Rails.logger.info('DOORKEEPER resource_owner_from_credentials')
     Rails.logger.info(params.inspect)
-    User.find_by_id(1)
+    #username/password coming for ember-simple-auth login-controller-mixin
+    User.try_to_login(params[:username], params[:password])
     #User.authenticate!('admin', 'secret')
   end
 

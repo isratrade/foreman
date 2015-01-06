@@ -205,7 +205,7 @@ class User < ActiveRecord::Base
       user = try_to_auto_create_user(login, password)
     end
     if user
-      user.post_successful_login
+      user.post_successful_login #UNLESS API REQUEST?
     else
       logger.info "invalid user"
       User.current = nil
