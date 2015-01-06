@@ -15,6 +15,13 @@ Doorkeeper.configure do
       User.find_by_id(1)  #|| redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
   end
 
+  resource_owner_from_credentials do |routes|
+    Rails.logger.info('DOORKEEPER resource_owner_from_credentials')
+    Rails.logger.info(params.inspect)
+    User.find_by_id(1)
+    #User.authenticate!('admin', 'secret')
+  end
+
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   # admin_authenticator do
   #   # Put your admin authentication logic here.
