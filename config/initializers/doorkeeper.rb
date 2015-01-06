@@ -9,19 +9,11 @@ Doorkeeper.configure do
     # fail "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
     # Put your resource owner authentication logic here.
     # Example implementation:
-      Rails.logger.info('DOORKEEPER resource_owner_authenticator')
-      Rails.logger.info(params.inspect)
-      #User.try_to_login(params[:login], params[:password]) || redirect_to(oauth_login_users_url)
-      User.try_to_login(params[:username], params[:password]) || redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
-      #User.find_by_id(1)  #|| redirect_to(oauth_login_users_url, :notice => 'redirecting from doorkeeper')
+    # User.find_by_id(session[:user_id]) || redirect_to(new_user_session_url)
   end
 
   resource_owner_from_credentials do |routes|
-    Rails.logger.info('DOORKEEPER resource_owner_from_credentials')
-    Rails.logger.info(params.inspect)
-    #username/password coming for ember-simple-auth login-controller-mixin
     User.try_to_login(params[:username], params[:password])
-    #User.authenticate!('admin', 'secret')
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
