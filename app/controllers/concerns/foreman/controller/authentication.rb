@@ -7,8 +7,8 @@ module Foreman::Controller::Authentication
 
   def authenticate
     return true if (User.current && Rails.env.test? && api_request?) ||
-                   (api_request? && (User.current = User.unscoped.find_by_id(doorkeeper_token.resource_owner_id))) ||
-                   (session[:user] && (User.current = User.unscoped.find(session[:user])))
+                   (session[:user] && (User.current = User.unscoped.find(session[:user]))) ||
+                   ((User.current = User.find_by_id(doorkeeper_token.try(:resource_owner_id))) && api_request?)
 
     if SETTINGS[:login]
       # authentication is enabled

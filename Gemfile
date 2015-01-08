@@ -38,6 +38,7 @@ gem 'oauth2'
 
 #gem 'katello', :git => 'https://github.com/Katello/katello.git', :branch => 'KATELLO-2.0'
 #gem 'katello', :path => '../katello'
+gem 'doorkeeper'
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
   self.instance_eval(Bundler.read_file(bundle))
