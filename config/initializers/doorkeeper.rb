@@ -12,6 +12,7 @@ Doorkeeper.configure do
     # User.find_by_id(session[:user_id]) || redirect_to(new_user_session_url)
   end
 
+  # authenticate based on username / password credentials
   resource_owner_from_credentials do |routes|
     User.try_to_login(params[:username], params[:password])
   end
