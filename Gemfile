@@ -29,7 +29,8 @@ gem 'turbolinks', '~> 2.5'
 #gem 'secure_headers', '~> 1.3.3'
 
 gem 'rack-cors', :require => 'rack/cors'
-gem 'fusor_ui', :path => '../fusor_ui'
+#gem 'fusor_ui', :path => '../fusor_ui'
+gem 'fusor', :path => '../fusor'
 #gem 'staypuft'
 
 gem 'foreman_api_v3', :path => '../foreman_api_v3'
