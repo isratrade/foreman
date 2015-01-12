@@ -34,6 +34,7 @@ gem 'rack-cors', :require => 'rack/cors'
 
 gem 'foreman_api_v3', :path => '../foreman_api_v3'
 gem 'doorkeeper'
+gem 'oauth2'
 
 #gem 'katello', :git => 'https://github.com/Katello/katello.git', :branch => 'KATELLO-2.0'
 #gem 'katello', :path => '../katello'
