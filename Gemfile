@@ -30,7 +30,7 @@ gem 'turbolinks', '~> 2.5'
 
 gem 'rack-cors', :require => 'rack/cors'
 #gem 'fusor_ui', :path => '../fusor_ui'
-gem 'fusor', :path => '../fusor'
+gem 'fusor_ui', :path => '../fusor/ui'
 #gem 'staypuft'
 
 gem 'foreman_api_v3', :path => '../foreman_api_v3'
