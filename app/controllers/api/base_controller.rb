@@ -114,7 +114,7 @@ module Api
     end
 
     def authorize
-      Rails.logger.info("authorize DOORKEEPER - doorkeeper_token.resource_owner_id IS #{doorkeeper_token.resource_owner_id}");
+      Rails.logger.info("authorize DOORKEEPER - doorkeeper_token.resource_owner_id IS #{doorkeeper_token.resource_owner_id}") if doorkeeper_token
       unless authenticate
         render_error('unauthorized', :status => :unauthorized, :locals => { :user_login => @available_sso.try(:user) })
         return false
