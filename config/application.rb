@@ -53,6 +53,14 @@ end
 
 module Foreman
   class Application < Rails::Application
+
+    config.middleware.use Rack::Cors do
+      allow do
+        origins '*'
+        resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options]
+      end
+    end
+
     # Setup additional routes by loading all routes file from routes directory
     config.paths["config/routes"] += Dir[Rails.root.join("config/routes/**/*.rb")]
 

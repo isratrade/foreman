@@ -26,6 +26,15 @@ gem 'fast_gettext', '0.9.0'
 gem 'gettext_i18n_rails', '~> 1.0'
 gem 'i18n', '~> 0.6.4'
 gem 'turbolinks', '~> 2.5'
+#gem 'secure_headers', '~> 1.3.3'
+
+gem 'rack-cors', :require => 'rack/cors'
+gem 'rhci_plugin', :git => 'https://github.com/isratrade/rhci_plugin.git'
+#gem 'rhci_plugin', :path => '../rhci_plugin'
+#gem 'foreman_api_v3', :path => '../foreman_api_v3'
+
+#gem 'katello', :git => 'https://github.com/Katello/katello.git', :branch => 'KATELLO-2.0'
+#gem 'katello', :path => '../katello'
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
   self.instance_eval(Bundler.read_file(bundle))
