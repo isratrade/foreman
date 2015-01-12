@@ -89,4 +89,33 @@ class Api::V2::DomainsControllerTest < ActionController::TestCase
     end
   end
 
+  context "token based authentication" do
+
+    setup do
+      @request.env['HTTP_AUTHORIZATION'] = nil
+      @access_token = get_access_token  #get_access_token is method in test_helper.rb
+    end
+
+    teardown do
+      user = users(:apiadmin)
+      login = user.login
+      password = 'secret'
+      @request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(login, password)
+      @access_token = nil
+    end
+
+    test "get index based on access_token in URL" do
+      get :index, { :access_token => @access_token }
+      assert_response :success
+      refute_nil assigns(:domains)
+    end
+
+    test "get index based on access_token in HEADER" do
+      @request.env['HTTP_AUTHORIZATION'] = "Bearer #{@access_token}"
+      get :index, { :access_token => @access_token }
+      assert_response :success
+      refute_nil assigns(:domains)
+    end
+  end
+
 end
