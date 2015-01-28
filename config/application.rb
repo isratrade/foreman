@@ -54,12 +54,12 @@ end
 module Foreman
   class Application < Rails::Application
 
-    # config.middleware.use Rack::Cors do
-    #   allow do
-    #     origins '*'
-    #     resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options]
-    #   end
-    # end
+    config.middleware.use Rack::Cors do
+      allow do
+        origins '*'
+        resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options]
+      end
+    end
 
     config.assets.initialize_on_precompile = false
 
