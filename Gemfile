@@ -29,7 +29,7 @@ gem 'turbolinks', '~> 2.5'
 
 gem 'rack-cors', :require => 'rack/cors'
 gem 'fusor_ui', :path => '../fusor/ui'
-gem 'foreman_discovery', :git => "https://github.com/theforeman/foreman_discovery.git"
+gem 'foreman_discovery', :git => "https://github.com/theforeman/foreman_discovery.git", :branch => 'develop'
 
 gem 'foreman_api_v3', :path => '../foreman_api_v3'
 gem 'doorkeeper'
