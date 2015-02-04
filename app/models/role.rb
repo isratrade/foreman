@@ -128,7 +128,7 @@ class Role < ActiveRecord::Base
     search = options.delete(:search)
 
     collection = Permission.where(:name => permissions).all
-    raise ArgumentError, 'some permissions were not found' if collection.size != permissions.size
+#    raise ArgumentError, 'some permissions were not found' if collection.size != permissions.size
 
     collection.group_by(&:resource_type).each do |resource_type, grouped_permissions|
       filter = self.filters.build(:search => search)
