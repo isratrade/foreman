@@ -28,10 +28,10 @@ gem 'i18n', '~> 0.6.4'
 gem 'turbolinks', '~> 2.5'
 
 gem 'rack-cors', :require => 'rack/cors'
-gem 'fusor_ui', :path => '../fusor/ui'
-gem 'foreman_discovery', :git => "https://github.com/theforeman/foreman_discovery.git", :branch => 'develop'
+gem 'fusor_ui', :git => 'git@github.com:isratrade/fusor_ui.git', :branch => 'develop'
+gem 'foreman_discovery', :git => "git@github.com:theforeman/foreman_discovery.git", :branch => 'develop'
 
-gem 'foreman_api_v3', :path => '../foreman_api_v3'
+#gem 'foreman_api_v3', :path => '../foreman_api_v3'
 gem 'doorkeeper'
 gem 'oauth2'
 
