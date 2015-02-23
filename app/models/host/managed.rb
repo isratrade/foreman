@@ -1,3 +1,4 @@
+require 'safemode'
 class Host::Managed < Host::Base
   include ReportCommon
   include Hostext::Search
