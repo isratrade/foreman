@@ -25,6 +25,8 @@ module Host
                                            :allow_blank => true,
                                            :message     => (_("Owner type needs to be one of the following: %s") % OWNER_TYPES.join(', ')) }
 
+    has_many :deployment_hosts, :class_name => "::Fusor::DeploymentHost", :foreign_key => :host_id
+
     attr_writer :updated_virtuals
     def updated_virtuals
       @updated_virtuals ||= []
