@@ -40,8 +40,8 @@ else
   gem 'ruby_parser', '~> 3.0.0'
 end
 
-gem 'katello', :path => '../katello'
-gem 'fusor', :path => '../fusor/server'
+#gem 'katello', :path => '../katello'
+gem 'fusor_server', :path => '../fusor/server'
 gem 'foretello_api_v21', :path => '../foretello_api_v21'
 
 gem 'fusor_ui', :path => '../fusor/ui' #git: 'https://github.com/fusor/fusor.git', ref: '18c1adb29f46469886283d42d2fcc97cfab6221f'
