@@ -19,7 +19,7 @@
 #global dashalphatag -%{alphatag}
 
 Name:   foreman
-Version: 1.7.2.51
+Version: 1.7.2.52
 Release: 1%{?dotalphatag}%{?dist}
 Summary:Systems Management web application
 
@@ -673,6 +673,10 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Mon Feb 01 2016 Mike McCune <mmccune@redhat.com> 1.7.2.52-1
+- 1297040 - fixing syntax error from bad cherry-pick in prior commit
+  (mmccune@redhat.com)
+
 * Mon Feb 01 2016 Mike McCune <mmccune@redhat.com> 1.7.2.51-1
 - Fixes #12611 - CVE-2015-7518 prevent XSS on host edit form
   (tbrisker@gmail.com)
