@@ -19,7 +19,7 @@
 #global dashalphatag -%{alphatag}
 
 Name:   foreman
-Version: 1.7.2.52
+Version: 1.7.2.53
 Release: 1%{?dotalphatag}%{?dist}
 Summary:Systems Management web application
 
@@ -673,6 +673,9 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Tue Feb 02 2016 Mike McCune <mmccune@redhat.com> 1.7.2.53-1
+- Version 6.1.7 (mmccune@redhat.com)
+
 * Mon Feb 01 2016 Mike McCune <mmccune@redhat.com> 1.7.2.52-1
 - 1297040 - fixing syntax error from bad cherry-pick in prior commit
   (mmccune@redhat.com)
