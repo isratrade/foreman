@@ -19,7 +19,7 @@
 #global dashalphatag -%{alphatag}
 
 Name:   foreman
-Version: 1.7.2.50
+Version: 1.7.2.51
 Release: 1%{?dotalphatag}%{?dist}
 Summary:Systems Management web application
 
@@ -673,6 +673,11 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Mon Feb 01 2016 Mike McCune <mmccune@redhat.com> 1.7.2.51-1
+- Fixes #12611 - CVE-2015-7518 prevent XSS on host edit form
+  (tbrisker@gmail.com)
+- fixes BZ1282539 - show identifier in base output (stbenjam@redhat.com)
+
 * Fri Dec 18 2015 Chris Peters <chrispeters.psu@gmail.com> 1.7.2.50-1
 - Fixes #12554 - Change OS name column heading to match contents
   (alexshtayer@yahoo.com)
