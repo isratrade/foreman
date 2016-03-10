@@ -19,7 +19,7 @@
 #global dashalphatag -%{alphatag}
 
 Name:   foreman
-Version: 1.7.2.54
+Version: 1.7.2.55
 Release: 1%{?dotalphatag}%{?dist}
 Summary:Systems Management web application
 
@@ -673,6 +673,9 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %changelog
+* Thu Mar 10 2016 Mike McCune <mmccune@redhat.com> 1.7.2.55-1
+- 6.1.8 version bump (mmccune@redhat.com)
+
 * Wed Mar 09 2016 Mike McCune <mmccune@redhat.com> 1.7.2.54-1
 - fixes #9108 - parent parameters are now overrideable (tcaspy@gmail.com)
 
