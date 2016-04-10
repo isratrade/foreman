@@ -6,10 +6,9 @@ source 'https://rubygems.org'
 gem 'rails', '4.1.14.2'
 gem 'rake', '< 11'
 
-gem 'foretello_api_v21', :path => '../foretello_api_v21'
-#gem 'foreman_api_v3', :path => '../foreman_api_v3'
-#gem 'katello_api_v3', :path => '../katello_api_v3'
-
+gem 'foreman_api_v3', :path => '../foreman_api_v3'
+gem 'katello_api_v3', :path => '../katello_api_v3'
+gem 'fusor_server', :path => '../fusor/server'
 
 gem 'rest-client', '~> 1.6.0', :require => 'rest_client'
 gem 'audited-activerecord', '~> 4.0'
