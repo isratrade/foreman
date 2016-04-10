@@ -4,7 +4,7 @@ FOREMAN_GEMFILE = __FILE__ unless defined? FOREMAN_GEMFILE
 source 'https://rubygems.org'
 
 gem 'rails', '4.1.14.2'
-gem 'rake', '< 11'
+gem 'rake'
 
 gem 'foreman_api_v3', :path => '../foreman_api_v3'
 gem 'katello_api_v3', :path => '../katello_api_v3'
