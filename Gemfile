@@ -24,6 +24,7 @@ gem 'secure_headers', '~> 1.3'
 gem 'safemode', '~> 1.2'
 gem 'ruby_parser', '3.1.1'
 gem 'foreman_api_v3', :git => 'git@github.com:isratrade/foreman_api_v3.git'
+gem 'rack-cors', :require => 'rack/cors'
 
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
