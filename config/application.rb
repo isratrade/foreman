@@ -83,6 +83,8 @@ module Foreman
     config.autoload_paths += %W(#{config.root}/app/models/taxonomies)
     config.autoload_paths += %W(#{config.root}/app/models/mail_notifications)
 
+    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
+
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
@@ -121,7 +123,7 @@ module Foreman
     config.cache_store = :file_store, Rails.root.join("tmp", "cache")
 
     # enables JSONP support in the Rack middleware
-    config.middleware.use Rack::JSONP if SETTINGS[:support_jsonp]
+    #config.middleware.use Rack::JSONP if SETTINGS[:support_jsonp]
 
     # Enable Rack OpenID middleware
     begin
@@ -161,6 +163,7 @@ module Foreman
 
     config.logger = Foreman::Logging.logger('app')
     config.active_record.logger = Foreman::Logging.logger('sql')
+    config.serve_static_assets = true
 
     if config.serve_static_assets
       ::Rails::Engine.subclasses.map(&:instance).each do |engine|

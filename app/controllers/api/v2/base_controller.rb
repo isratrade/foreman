@@ -30,9 +30,9 @@ module Api
       end
 
       before_filter :setup_has_many_params, :only => [:create, :update]
-      before_filter :check_content_type
+      #before_filter :check_content_type #TODO change to application/vnd.api+json
       # ensure include_root_in_json = false for V2 only
-      around_filter :disable_json_root
+      #around_filter :disable_json_root
 
       layout 'api/v2/layouts/index_layout', :only => :index
 

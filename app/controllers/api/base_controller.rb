@@ -3,7 +3,8 @@ module Api
   class BaseController < ActionController::Base
     include ApplicationShared
 
-    protect_from_forgery
+    #protect_from_forgery
+#    protect_from_forgery with: :null_session
     force_ssl :if => :require_ssl?
     skip_before_filter :verify_authenticity_token, :unless => :protect_api_from_forgery?
 

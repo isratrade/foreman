@@ -1,22 +1,23 @@
 $(function() {
   var clone = $('.persist-header').clone();
+  console.log('Gail is here');
   $('.persist-header').after(clone);
   $('.persist-header:first').hide();
   $('.persist-header:last').css({
     'position': 'static', 'top': '0'
   });
-
   mark_active_menu();
 
   $('.dropdown-toggle').dropdown();
   if(!is_mobile()){
     $(window).on('scroll', function() {onScroll(this)});
   }
-})
+});
 
 //open main menu on hover
 $(document).on('mouseenter', '.collapse .dropdown.menu_tab_dropdown', function(){
   if(!$(this).hasClass('open')){
+    console.log('mouse over');
     $(this).find('.dropdown-toggle:first').click();
   }
 });
@@ -87,3 +88,4 @@ function onScroll(item){
     $('#content').css({'padding-top': '0'})
   }
 }
+

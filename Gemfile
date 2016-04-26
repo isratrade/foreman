@@ -4,12 +4,14 @@ FOREMAN_GEMFILE = __FILE__ unless defined? FOREMAN_GEMFILE
 source 'https://rubygems.org'
 
 gem 'rails', '4.1.14.2'
-gem 'rake', '< 11'
+gem 'rake'
 
 gem 'foretello_api_v21', :path => '../foretello_api_v21'
-#gem 'foreman_api_v3', :path => '../foreman_api_v3'
-#gem 'katello_api_v3', :path => '../katello_api_v3'
-
+gem 'fusor_server', :path => '../fusor/server'
+gem 'fusor_ui', :path => '../fusor/ui'
+gem 'foreman_discovery', :path => '../foreman_discovery'
+gem 'foreman-tasks'
+gem "active_model_serializers", '~> 0.9'
 
 gem 'rest-client', '~> 1.6.0', :require => 'rest_client'
 gem 'audited-activerecord', '~> 4.0'
@@ -29,7 +31,6 @@ gem 'safemode', '~> 1.2'
 gem 'fast_gettext', '~> 0.8'
 gem 'gettext_i18n_rails', '~> 1.0'
 gem 'rails-i18n', '~> 4.0.0'
-gem 'turbolinks', '~> 2.5'
 gem 'logging', '>= 1.8.0', '< 3.0.0'
 gem 'fog-core', '1.36.0'
 gem 'net-scp'

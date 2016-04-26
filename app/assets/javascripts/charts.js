@@ -398,7 +398,7 @@ $(function() {
 $(window).on('resize', refreshCharts);
 
 function refreshCharts(){
-  $(".statistics-bar:visible").flot_bar();
-  $(".statistics-pie:visible").flot_pie();
-  $(".statistics-chart:visible").flot_chart();
+  // $(".statistics-bar:visible").flot_bar();
+  // $(".statistics-pie:visible").flot_pie();
+  // $(".statistics-chart:visible").flot_chart();
 }

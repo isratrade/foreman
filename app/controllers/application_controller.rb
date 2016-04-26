@@ -2,8 +2,9 @@ class ApplicationController < ActionController::Base
   include ApplicationShared
 
   force_ssl :if => :require_ssl?
-  ensure_security_headers
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+#  ensure_security_headers
+#  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+ # protect_from_forgery with: :null_session
   rescue_from ScopedSearch::QueryNotSupported, :with => :invalid_search_query
   rescue_from Exception, :with => :generic_exception if Rails.env.production?
   rescue_from ActiveRecord::RecordNotFound, :with => :not_found
