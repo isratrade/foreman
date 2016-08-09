@@ -35,6 +35,8 @@ gem 'roadie-rails', '~> 1.1'
 gem 'x-editable-rails', '~> 1.5.5'
 gem 'deacon', '~> 1.0'
 gem 'webpack-rails', '~> 0.9.8'
+gem 'foreman_jsonapi', :path => '../foreman_jsonapi' #:git => 'git@github.com:isratrade/foreman_jsonapi.git'
+gem 'rack-cors', :require => 'rack/cors'
 
 Dir["#{File.dirname(FOREMAN_GEMFILE)}/bundler.d/*.rb"].each do |bundle|
   self.instance_eval(Bundler.read_file(bundle))
